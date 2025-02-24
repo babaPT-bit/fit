@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fitness Workout Planner</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+body, h1,h2,h3,h4,h5,h6 {font-family: "Montserrat", sans-serif}
+.w3-row-padding img {margin-bottom: 12px}
+.w3-sidebar {width: 120px;background: #222;}
+#main {margin-left: 120px}
+@media only screen and (max-width: 600px) {#main {margin-left: 0}}
+.tab-content {display: none;}
+.tab-content.active {display: block;}
+
+/* Home Section with Swiping Background */
+.home-section {
+  position: relative;
+  height: 100vh; /* Full viewport height */
+  overflow: hidden;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.home-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('arnold.jpg') no-repeat center center;
+  background-size: cover;
+  opacity: 0.3; /* Low opacity for background image */
+  z-index: -1;
+  animation: swipeBackground 60s infinite; /* Swipe animation */
+}
+
+@keyframes swipeBackground {
+  0% { background-image: url('arnold.jpg'); }
+  16.66% { background-image: url('cbum.jpg'); }
+  33.33% { background-image: url('rock.jpg'); }
+  50% { background-image: url('chris.jpg'); }
+  66.66% { background-image: url('sam.jpg'); }
+  83.33% { background-image: url('arn.jpg'); }
+  100% { background-image: url('cbum2.jpg'); }
+}
+
+/* Project Title Styling */
+.project-title {
+  position: relative;
+  z-index: 1;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Text shadow for better visibility */
+}
+
+/* Table Styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  padding: 12px;
+  border: 1px solid #444;
+  text-align: left;
+}
+
+th {
+  background-color: #000; /* Black header */
+  color: #fff; /* White text */
+}
+
+tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.1); /* Light gray for even rows */
+}
+
+tr:hover {
+  background-color: rgba(255, 255, 255, 0.2); /* Slightly darker gray on hover */
+}
+
+a {
+  color: #fff; /* White text for links */
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline; /* Underline on hover */
+}
+</style>
+</head>
+<body class="w3-black">
+
+<!-- Icon Bar (Sidebar - hidden on small screens) -->
+<nav class="w3-sidebar w3-bar-block w3-small w3-hide-small w3-center">
+  <img src="dumbell.jpg" style="width:100%">
+  <a href="#" class="w3-bar-item w3-button w3-padding-large w3-black">
+    <i class="fa fa-home w3-xxlarge"></i>
+    <p>HOME</p>
+  </a>
+  <a href="#workouts" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+    <i class="fas fa-dumbbell w3-xxlarge"></i>
+    <p>WORKOUTS</p>
+  </a>
+  <a href="#contact" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+    <i class="fa fa-envelope w3-xxlarge"></i>
+    <p>CONTACT</p>
+  </a>
+</nav>
+
+<!-- Navbar on small screens -->
+<div class="w3-top w3-hide-large w3-hide-medium" id="myNavbar">
+  <div class="w3-bar w3-black w3-opacity w3-hover-opacity-off w3-center w3-small">
+    <a href="#" class="w3-bar-item w3-button" style="width:25% !important">HOME</a>
+    <a href="#workouts" class="w3-bar-item w3-button" style="width:25% !important">WORKOUTS</a>
+    <a href="#contact" class="w3-bar-item w3-button" style="width:25% !important">CONTACT</a>
+  </div>
+</div>
+
+<!-- Page Content -->
+<div class="w3-padding-large" id="main">
+  <!-- Header/Home with Swiping Background -->
+  <header class="home-section" id="home">
+    <div class="project-title">
+      <h1 class="w3-jumbo"><span class="w3-hide-small">Fitness</span> Workout Planner</h1>
+      <p>Plan your workouts like a pro.</p>
+    </div>
+  </header>
+
+  <!-- Workouts Section -->
+  <div class="w3-padding-64 w3-content" id="workouts">
+    <h2 class="w3-text-light-grey">Workout Plans</h2>
+    <hr style="width:200px" class="w3-opacity">
+
+    <!-- Tabs for PUSH, PULL, LEG DAY -->
+    <div class="w3-bar w3-black">
+      <button class="w3-bar-item w3-button" onclick="openTab('PushDay')">PUSH DAY</button>
+      <button class="w3-bar-item w3-button" onclick="openTab('PullDay')">PULL DAY</button>
+      <button class="w3-bar-item w3-button" onclick="openTab('LegDay')">LEG DAY</button>
+    </div>
+
+    <!-- PUSH DAY Tab Content -->
+    <div id="PushDay" class="tab-content active">
+      <h3 class="w3-padding-16 w3-text-light-grey">PUSH DAY</h3>
+      <div class="w3-row-padding">
+        <div class="w3-half">
+          <div class="w3-container w3-padding-16 w3-light-grey">
+            <h4>PUSH DAY 1</h4>
+            <img src="PUSH2.jpg" style="width:100%">
+            <p>Focus on chest, shoulders, and triceps.</p>
+            <button class="w3-button w3-black w3-block" onclick="showWorkout('push1')">View Workout</button>
+          </div>
+        </div>
+        <div class="w3-half">
+          <div class="w3-container w3-padding-16 w3-light-grey">
+            <h4>PUSH DAY 2</h4>
+            <img src="PUSH1.jpg" style="width:100%">
+            <p>Focus on shoulders, triceps, and chest.</p>
+            <button class="w3-button w3-black w3-block" onclick="showWorkout('push2')">View Workout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PULL DAY Tab Content -->
+    <div id="PullDay" class="tab-content">
+      <h3 class="w3-padding-16 w3-text-light-grey">PULL DAY</h3>
+      <div class="w3-row-padding">
+        <div class="w3-half">
+          <div class="w3-container w3-padding-16 w3-light-grey">
+            <h4>PULL DAY 1</h4>
+            <img src="pull1.jpg" style="width:100%">
+            <p>Focus on back and biceps.</p>
+            <button class="w3-button w3-black w3-block" onclick="showWorkout('pull1')">View Workout</button>
+          </div>
+        </div>
+        <div class="w3-half">
+          <div class="w3-container w3-padding-16 w3-light-grey">
+            <h4>PULL DAY 2</h4>
+            <img src="pull2.jpg" style="width:100%">
+            <p>Focus on back and biceps.</p>
+            <button class="w3-button w3-black w3-block" onclick="showWorkout('pull2')">View Workout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEG DAY Tab Content -->
+    <div id="LegDay" class="tab-content">
+      <h3 class="w3-padding-16 w3-text-light-grey">LEG DAY</h3>
+      <div class="w3-row-padding">
+        <div class="w3-half">
+          <div class="w3-container w3-padding-16 w3-light-grey">
+            <h4>LEG DAY 1</h4>
+            <img src="leg1.jpg" style="width:100%">
+            <p>Focus on quads, hamstrings, and glutes.</p>
+            <button class="w3-button w3-black w3-block" onclick="showWorkout('leg1')">View Workout</button>
+          </div>
+        </div>
+        <div class="w3-half">
+          <div class="w3-container w3-padding-16 w3-light-grey">
+            <h4>LEG DAY 2</h4>
+            <img src="leg2.jpg" style="width:100%">
+            <p>Focus on quads, hamstrings, and glutes.</p>
+            <button class="w3-button w3-black w3-block" onclick="showWorkout('leg2')">View Workout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Workout Details Section -->
+  <div id="workoutDetails" class="w3-padding-64 w3-content" style="display:none;">
+    <h2 class="w3-text-light-grey">Workout Plan</h2>
+    <hr style="width:200px" class="w3-opacity">
+    <div id="workoutPlan"></div>
+    <button class="w3-button w3-light-grey w3-padding-large" onclick="hideWorkout()">Close</button>
+  </div>
+
+  <!-- Contact Section -->
+  <div class="w3-padding-64 w3-content w3-text-grey" id="contact">
+    <h2 class="w3-text-light-grey">Contact Me</h2>
+    <hr style="width:200px" class="w3-opacity">
+
+    <div class="w3-section">
+      <p><i class="fa fa-map-marker fa-fw w3-text-white w3-xxlarge w3-margin-right"></i> Hyderabad, India</p>
+      <p><i class="fa fa-phone fa-fw w3-text-white w3-xxlarge w3-margin-right"></i> Phone: +91 9151755210</p>
+      <p><i class="fa fa-envelope fa-fw w3-text-white w3-xxlarge w3-margin-right"> </i> Email: tripathipranshu17@gmail.com</p>
+    </div><br>
+    <p>Let's get in touch. Send me a message:</p>
+
+    <form action="/action_page.php" target="_blank">
+      <p><input class="w3-input w3-padding-16" type="text" placeholder="Name" required name="Name"></p>
+      <p><input class="w3-input w3-padding-16" type="text" placeholder="Email" required name="Email"></p>
+      <p><input class="w3-input w3-padding-16" type="text" placeholder="Subject" required name="Subject"></p>
+      <p><input class="w3-input w3-padding-16" type="text" placeholder="Message" required name="Message"></p>
+      <p>
+        <button class="w3-button w3-light-grey w3-padding-large" type="submit">
+          <i class="fa fa-paper-plane"></i> SEND MESSAGE
+        </button>
+      </p>
+    </form>
+  </div>
+
+  <!-- Footer -->
+  <footer class="w3-content w3-padding-64 w3-text-grey w3-xlarge">
+    <i class="fa fa-facebook-official w3-hover-opacity"></i>
+    <i class="fa fa-instagram w3-hover-opacity"></i>
+    <i class="fa fa-snapchat w3-hover-opacity"></i>
+    <i class="fa fa-pinterest-p w3-hover-opacity"></i>
+    <i class="fa fa-twitter w3-hover-opacity"></i>
+    <i class="fa fa-linkedin w3-hover-opacity"></i>
+    <p class="w3-medium">Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank" class="w3-hover-text-green">w3.css</a></p>
+  </footer>
+</div>
+
+<script>
+// Tab functionality
+function openTab(tabName) {
+  var tabs = document.getElementsByClassName("tab-content");
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].style.display = "none";
+  }
+  document.getElementById(tabName).style.display = "block";
+}
+
+// Workout details with YouTube links
+const workouts = {
+  push1: [
+    ['Incline Bench Press', '3x8-10', 'https://www.youtube.com/watch?v=0G2_XV7slIg'],
+    ['Inclined Dumbbell Press', '3x10-12', 'https://www.youtube.com/watch?v=8iPEnn-ltC8'],
+    ['Flat Bench', '2x8-10', 'https://www.youtube.com/watch?v=rT7DgCr-3pg'],
+    ['Cable Cross', '2x16', 'https://www.youtube.com/watch?v=taI4XduLpTk'],
+    ['Shoulder Dumbbell Press', '3x8-10', 'https://www.youtube.com/watch?v=qEwKCR5JCog'],
+    ['Pulley Pushdown', '2x10-12', 'https://www.youtube.com/watch?v=2-LAMcpzODU'],
+    ['Overhead Triceps Extension', '2x10-12', 'https://www.youtube.com/watch?v=-Vyt2QdsR7E'],
+    ['Cardio', '20 mins', '#']
+  ],
+  push2: [
+    ['Flat Bench', '3x8-10', 'https://www.youtube.com/watch?v=rT7DgCr-3pg'],
+    ['Cable Cross', '3x16', 'https://www.youtube.com/watch?v=taI4XduLpTk'],
+    ['Shoulder Dumbbell Press', '3x8-10', 'https://www.youtube.com/watch?v=qEwKCR5JCog'],
+    ['Cable Side Raise', '3x16', 'https://www.youtube.com/watch?v=SWVV8HZ8Yqk'],
+    ['Face Pull', '3x16', 'https://www.youtube.com/watch?v=rep-qVOkqgk'],
+    ['Close-Grip Bench Press', '3x10-12', 'https://www.youtube.com/watch?v=0G2_XV7slIg'],
+    ['Overhead Dumbbell Extension', '3x10-12', 'https://www.youtube.com/watch?v=-Vyt2QdsR7E'],
+    ['Cardio', '20 mins', '#']
+  ],
+  pull1: [
+    ['Lat Pulldown Front', '3x10-12', 'https://www.youtube.com/watch?v=CAwf7n6Luuc'],
+    ['Seated Rowing', '3x10-12', 'https://www.youtube.com/watch?v=GZbfZ033n74'],
+    ['Cable Pulldown', '2x12', 'https://www.youtube.com/watch?v=2-LAMcpzODU'],
+    ['Dumbbell Curl', '3x12', 'https://www.youtube.com/watch?v=ykJmrZ5v0Oo'],
+    ['Hammer Curl', '3x12', 'https://www.youtube.com/watch?v=TwD-YGVP4Bk'],
+    ['Wrist Curl', '3 sets to failure', 'https://www.youtube.com/watch?v=qDcniWYq7dM'],
+    ['Roman Chair Sit-ups', '3x20', 'https://www.youtube.com/watch?v=1fbU_MkV7NE'],
+    ['Hanging Leg/Knee Raises', '3x20', 'https://www.youtube.com/watch?v=Pr1ieGZ5at8'],
+    ['Cardio', '20 mins', '#']
+  ],
+  pull2: [
+    ['Lat Pulldown Front', '3x10-12', 'https://www.youtube.com/watch?v=CAwf7n6Luuc'],
+    ['Seated Rowing', '3x10-12', 'https://www.youtube.com/watch?v=GZbfZ033n74'],
+    ['Barbell Bent-over Row', '2x10-12', 'https://www.youtube.com/watch?v=G8K2k4X2lf4'],
+    ['Preacher Curl', '3x12', 'https://www.youtube.com/watch?v=fIWP-FRFNU0'],
+    ['Hammer Curl', '3x12', 'https://www.youtube.com/watch?v=TwD-YGVP4Bk'],
+    ['Wrist Curl', '3 sets to failure', 'https://www.youtube.com/watch?v=qDcniWYq7dM'],
+    ['Roman Chair Sit-ups', '3x20', 'https://www.youtube.com/watch?v=1fbU_MkV7NE'],
+    ['Hanging Leg/Knee Raises', '3x20', 'https://www.youtube.com/watch?v=Pr1ieGZ5at8'],
+    ['Cardio', '20 mins', '#']
+  ],
+  leg1: [
+    ['Barbell Squat', '3x8-10', 'https://www.youtube.com/watch?v=SW_C1A-rejs'],
+    ['Leg Press', '3x10-12', 'https://www.youtube.com/watch?v=IZxyjW7MPJQ'],
+    ['Leg Extension', '2x12', 'https://www.youtube.com/watch?v=YyvSfVjQeL0'],
+    ['Leg Curl', '3x12', 'https://www.youtube.com/watch?v=1Tq3QdYUuHs'],
+    ['Standing Calf Raise', '3x12', 'https://www.youtube.com/watch?v=-M4-G8p8fmc'],
+    ['Donkey Calf Raise', '3x12', 'https://www.youtube.com/watch?v=-M4-G8p8fmc']
+  ],
+  leg2: [
+    ['Barbell Squat', '3x10-12', 'https://www.youtube.com/watch?v=SW_C1A-rejs'],
+    ['Bulgarian Lunges', '3x10-12', 'https://www.youtube.com/watch?v=QOVaHwm-Q6U'],
+    ['Leg Press (feet high for hamstring focus)', '3x10-12', 'https://www.youtube.com/watch?v=IZxyjW7MPJQ'],
+    ['Stiff Leg Deadlift', '3x10-12', 'https://www.youtube.com/watch?v=1Tq3QdYUuHs'],
+    ['Leg Extension', '3x12', 'https://www.youtube.com/watch?v=YyvSfVjQeL0'],
+    ['Hip Thrust', '3x12', 'https://www.youtube.com/watch?v=mvBTGX6YN9s'],
+    ['Standing Calf Raise', '3x12', 'https://www.youtube.com/watch?v=-M4-G8p8fmc'],
+    ['Donkey Calf Raise', '3x12', 'https://www.youtube.com/watch?v=-M4-G8p8fmc']
+  ]
+};
+
+function showWorkout(workoutType) {
+  let workoutDiv = document.getElementById('workoutPlan');
+  let workoutDetails = document.getElementById('workoutDetails');
+  let html = '<table><tr><th>Exercise</th><th>Sets & Reps</th></tr>';
+  workouts[workoutType].forEach(exercise => {
+    html += `<tr>
+              <td><a href="${exercise[2]}" target="_blank">${exercise[0]}</a></td>
+              <td>${exercise[1]}</td>
+            </tr>`;
+  });
+  html += '</table>';
+  workoutDiv.innerHTML = html;
+  workoutDetails.style.display = "block";
+}
+
+function hideWorkout() {
+  document.getElementById('workoutDetails').style.display = "none";
+}
+
+// Default open tab
+openTab('PushDay');
+</script>
+</body>
+</html>
