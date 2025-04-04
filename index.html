@@ -8,7 +8,6 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
 body, h1,h2,h3,h4,h5,h6 {font-family: "Montserrat", sans-serif}
 .w3-row-padding img {margin-bottom: 12px}
@@ -21,7 +20,7 @@ body, h1,h2,h3,h4,h5,h6 {font-family: "Montserrat", sans-serif}
 /* Home Section with Swiping Background */
 .home-section {
   position: relative;
-  height: 100vh; /* Full viewport height */
+  height: 100vh;
   overflow: hidden;
   color: white;
   display: flex;
@@ -39,9 +38,9 @@ body, h1,h2,h3,h4,h5,h6 {font-family: "Montserrat", sans-serif}
   bottom: 0;
   background: url('arnold.jpg') no-repeat center center;
   background-size: cover;
-  opacity: 0.3; /* Low opacity for background image */
+  opacity: 0.3;
   z-index: -1;
-  animation: swipeBackground 60s infinite; /* Swipe animation */
+  animation: swipeBackground 60s infinite;
 }
 
 @keyframes swipeBackground {
@@ -50,16 +49,15 @@ body, h1,h2,h3,h4,h5,h6 {font-family: "Montserrat", sans-serif}
   33.33% { background-image: url('rock.jpg'); }
   50% { background-image: url('chris.jpg'); }
   66.66% { background-image: url('sam.jpg'); }
-  83.33% { background-image: url('arn.jpg'); }
-  100% { background-image: url('cbu.jpg'); }
+  83.33% { background-image: url('jeet.jpg'); }
+  100% { background-image: url('ronnie.jpg'); }
 }
 
-/* Project Title Styling */
 .project-title {
   position: relative;
   z-index: 1;
   color: white;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Text shadow for better visibility */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 /* Table Styling */
@@ -76,25 +74,91 @@ th, td {
 }
 
 th {
-  background-color: #000; /* Black header */
-  color: #fff; /* White text */
+  background-color: #000;
+  color: #fff;
 }
 
 tr:nth-child(even) {
-  background-color: rgba(255, 255, 255, 0.1); /* Light gray for even rows */
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 tr:hover {
-  background-color: rgba(255, 255, 255, 0.2); /* Slightly darker gray on hover */
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 a {
-  color: #fff; /* White text for links */
+  color: #fff;
   text-decoration: none;
 }
 
 a:hover {
-  text-decoration: underline; /* Underline on hover */
+  text-decoration: underline;
+}
+
+/* Pro Section Styles */
+.pro-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.pro-card {
+  width: 200px;
+  background: #333;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.pro-card:hover {
+  transform: scale(1.05);
+}
+
+.pro-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.pro-info {
+  padding: 15px;
+  text-align: center;
+}
+
+.pro-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #fff;
+}
+
+.pro-specialty {
+  font-size: 14px;
+  color: #aaa;
+}
+
+.pro-workout {
+  margin-top: 30px;
+}
+
+.day-tabs {
+  display: flex;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.day-tab {
+  padding: 10px 20px;
+  background: #444;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.day-tab.active {
+  background: #000;
 }
 </style>
 </head>
@@ -141,11 +205,12 @@ a:hover {
     <h2 class="w3-text-light-grey">Workout Plans</h2>
     <hr style="width:200px" class="w3-opacity">
 
-    <!-- Tabs for PUSH, PULL, LEG DAY -->
+    <!-- Tabs for PUSH, PULL, LEG DAY, TRAIN LIKE PRO -->
     <div class="w3-bar w3-black">
       <button class="w3-bar-item w3-button" onclick="openTab('PushDay')">PUSH DAY</button>
       <button class="w3-bar-item w3-button" onclick="openTab('PullDay')">PULL DAY</button>
       <button class="w3-bar-item w3-button" onclick="openTab('LegDay')">LEG DAY</button>
+      <button class="w3-bar-item w3-button" onclick="openTab('TrainLikePro')">TRAIN LIKE PRO</button>
     </div>
 
     <!-- PUSH DAY Tab Content -->
@@ -156,7 +221,7 @@ a:hover {
           <div class="w3-container w3-padding-16 w3-light-grey">
             <h4>PUSH DAY 1</h4>
             <img src="PUSH2.jpg" style="width:100%">
-            <p>Chest-dominant push day with shoulders and triceps support.</p>
+            <p>Focus on chest, shoulders, and triceps.</p>
             <button class="w3-button w3-black w3-block" onclick="showWorkout('push1')">View Workout</button>
           </div>
         </div>
@@ -164,7 +229,7 @@ a:hover {
           <div class="w3-container w3-padding-16 w3-light-grey">
             <h4>PUSH DAY 2</h4>
             <img src="PUSH1.jpg" style="width:100%">
-            <p>Shoulder-focused push day with triceps and chest assistance.</p>
+            <p>Focus on shoulders, triceps, and chest.</p>
             <button class="w3-button w3-black w3-block" onclick="showWorkout('push2')">View Workout</button>
           </div>
         </div>
@@ -179,7 +244,7 @@ a:hover {
           <div class="w3-container w3-padding-16 w3-light-grey">
             <h4>PULL DAY 1</h4>
             <img src="pull1.jpg" style="width:100%">
-            <p>Upper back and biceps emphasis with core finishers.</p>
+            <p>Focus on back and biceps.</p>
             <button class="w3-button w3-black w3-block" onclick="showWorkout('pull1')">View Workout</button>
           </div>
         </div>
@@ -187,7 +252,7 @@ a:hover {
           <div class="w3-container w3-padding-16 w3-light-grey">
             <h4>PULL DAY 2</h4>
             <img src="pull2.jpg" style="width:100%">
-            <p>Mid-back and arms focused pull workout with curls and rows.</p>
+            <p>Focus on back and biceps.</p>
             <button class="w3-button w3-black w3-block" onclick="showWorkout('pull2')">View Workout</button>
           </div>
         </div>
@@ -202,7 +267,7 @@ a:hover {
           <div class="w3-container w3-padding-16 w3-light-grey">
             <h4>LEG DAY 1</h4>
             <img src="leg1.jpg" style="width:100%">
-            <p>Quad-dominant leg day with glutes, hamstrings, and calves.</p>
+            <p>Focus on quads, hamstrings, and glutes.</p>
             <button class="w3-button w3-black w3-block" onclick="showWorkout('leg1')">View Workout</button>
           </div>
         </div>
@@ -210,10 +275,97 @@ a:hover {
           <div class="w3-container w3-padding-16 w3-light-grey">
             <h4>LEG DAY 2</h4>
             <img src="leg2.jpg" style="width:100%">
-            <p>Hamstring and glute-focused leg day with quad activation.</p>
+            <p>Focus on quads, hamstrings, and glutes.</p>
             <button class="w3-button w3-black w3-block" onclick="showWorkout('leg2')">View Workout</button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- TRAIN LIKE PRO Tab Content -->
+    <div id="TrainLikePro" class="tab-content">
+      <h3 class="w3-padding-16 w3-text-light-grey">TRAIN LIKE PRO</h3>
+      <p>Select your fitness icon to follow their legendary workout routine</p>
+      
+      <div class="pro-container">
+        <!-- Jeff Nippard -->
+        <div class="pro-card" onclick="showProWorkout('jeff')">
+          <img src="jeff.jpg" alt="Jeff Nippard" class="pro-image">
+          <div class="pro-info">
+            <div class="pro-name">JEFF NIPPARD</div>
+            <div class="pro-specialty">Science-based training</div>
+          </div>
+        </div>
+        
+        <!-- Arnold Schwarzenegger -->
+        <div class="pro-card" onclick="showProWorkout('arnold')">
+          <img src="arnold.jpg" alt="Arnold Schwarzenegger" class="pro-image">
+          <div class="pro-info">
+            <div class="pro-name">ARNOLD SCHWARZENEGGER</div>
+            <div class="pro-specialty">Classic bodybuilding</div>
+          </div>
+        </div>
+        
+        <!-- Chris Bumstead -->
+        <div class="pro-card" onclick="showProWorkout('cbum')">
+          <img src="cbum.jpg" alt="Chris Bumstead" class="pro-image">
+          <div class="pro-info">
+            <div class="pro-name">CHRIS BUMSTEAD</div>
+            <div class="pro-specialty">Classic physique</div>
+          </div>
+        </div>
+        
+        <!-- Sam Sulek -->
+        <div class="pro-card" onclick="showProWorkout('sam')">
+          <img src="sam.jpg" alt="Sam Sulek" class="pro-image">
+          <div class="pro-info">
+            <div class="pro-name">SAM SULEK</div>
+            <div class="pro-specialty">High-volume training</div>
+          </div>
+        </div>
+        
+        <!-- Jeet Selal -->
+        <div class="pro-card" onclick="showProWorkout('jeet')">
+          <img src="jeet.jpg" alt="Jeet Selal" class="pro-image">
+          <div class="pro-info">
+            <div class="pro-name">JEET SELAL</div>
+            <div class="pro-specialty">Natural bodybuilding</div>
+          </div>
+        </div>
+        
+        <!-- Mukesh Gahlot -->
+        <div class="pro-card" onclick="showProWorkout('mukesh')">
+          <img src="mukesh.jpg" alt="Mukesh Gahlot" class="pro-image">
+          <div class="pro-info">
+            <div class="pro-name">MUKESH GAHLOT</div>
+            <div class="pro-specialty">Power-bodybuilding</div>
+          </div>
+        </div>
+        
+        <!-- Saket Gokhale -->
+        <div class="pro-card" onclick="showProWorkout('saket')">
+          <img src="saket.jpg" alt="Saket Gokhale" class="pro-image">
+          <div class="pro-info">
+            <div class="pro-name">SAKET GOKHALE</div>
+            <div class="pro-specialty">Evidence-based training</div>
+          </div>
+        </div>
+        
+        <!-- Ronnie Coleman -->
+        <div class="pro-card" onclick="showProWorkout('ronnie')">
+          <img src="ronnie.jpg" alt="Ronnie Coleman" class="pro-image">
+          <div class="pro-info">
+            <div class="pro-name">RONNIE COLEMAN</div>
+            <div class="pro-specialty">Power-volume routine</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Pro Workout Details Section -->
+      <div id="proWorkoutDetails" class="pro-workout" style="display:none;">
+        <h4 id="proWorkoutTitle"></h4>
+        <div class="day-tabs" id="dayTabs"></div>
+        <div id="proWorkoutPlan"></div>
       </div>
     </div>
   </div>
@@ -271,6 +423,11 @@ function openTab(tabName) {
     tabs[i].style.display = "none";
   }
   document.getElementById(tabName).style.display = "block";
+  
+  // Hide pro workout details when switching away
+  if (tabName !== 'TrainLikePro') {
+    document.getElementById('proWorkoutDetails').style.display = 'none';
+  }
 }
 
 // Workout details with YouTube links
@@ -337,6 +494,400 @@ const workouts = {
   ]
 };
 
+// Pro Workouts Database
+const proWorkouts = {
+  jeff: {
+    name: "Jeff Nippard",
+    description: "Science-based upper/lower split with progressive overload and mobility focus",
+    split: [
+      {
+        day: "Day 1: Upper Body (Strength)",
+        exercises: [
+          ["Bench Press", "4x5", "https://www.youtube.com/watch?v=rT7DgCr-3pg"],
+          ["Pull-ups", "4x6", "https://www.youtube.com/watch?v=eGo4IYlbE5g"],
+          ["Overhead Press", "3x8", "https://www.youtube.com/watch?v=qEwKCR5JCog"],
+          ["Barbell Row", "3x8", "https://www.youtube.com/watch?v=G8K2k4X2lf4"]
+        ]
+      },
+      {
+        day: "Day 2: Lower Body (Strength)",
+        exercises: [
+          ["Squats", "4x5", "https://www.youtube.com/watch?v=SW_C1A-rejs"],
+          ["Romanian Deadlift", "3x8", "https://www.youtube.com/watch?v=op9kVnSso6Q"],
+          ["Leg Press", "3x10", "https://www.youtube.com/watch?v=IZxyjW7MPJQ"],
+          ["Calf Raises", "3x12", "https://www.youtube.com/watch?v=-M4-G8p8fmc"]
+        ]
+      },
+      {
+        day: "Day 3: Upper Body (Hypertrophy)",
+        exercises: [
+          ["Incline Dumbbell Press", "3x10-12", "https://www.youtube.com/watch?v=8iPEnn-ltC8"],
+          ["Lat Pulldown", "3x10-12", "https://www.youtube.com/watch?v=CAwf7n6Luuc"],
+          ["Lateral Raises", "3x12-15", "https://www.youtube.com/watch?v=SWVV8HZ8Yqk"],
+          ["Face Pulls", "3x12-15", "https://www.youtube.com/watch?v=rep-qVOkqgk"]
+        ]
+      },
+      {
+        day: "Day 4: Lower Body (Hypertrophy)",
+        exercises: [
+          ["Front Squats", "3x8-10", "https://www.youtube.com/watch?v=uYumuL_G_V0"],
+          ["Bulgarian Split Squats", "3x10-12", "https://www.youtube.com/watch?v=QOVaHwm-Q6U"],
+          ["Leg Curls", "3x12-15", "https://www.youtube.com/watch?v=1Tq3QdYUuHs"],
+          ["Seated Calf Raises", "3x15-20", "https://www.youtube.com/watch?v=-M4-G8p8fmc"]
+        ]
+      }
+    ]
+  },
+  arnold: {
+    name: "Arnold Schwarzenegger",
+    description: "Classic high-volume 6-day double split with focus on symmetry and aesthetics",
+    split: [
+      {
+        day: "Day 1 AM: Chest & Back",
+        exercises: [
+          ["Bench Press", "5x10", "https://www.youtube.com/watch?v=rT7DgCr-3pg"],
+          ["Incline Dumbbell Press", "5x10", "https://www.youtube.com/watch?v=8iPEnn-ltC8"],
+          ["Pull-ups", "5x10", "https://www.youtube.com/watch?v=eGo4IYlbE5g"],
+          ["Bent-over Rows", "5x10", "https://www.youtube.com/watch?v=G8K2k4X2lf4"]
+        ]
+      },
+      {
+        day: "Day 1 PM: Arms",
+        exercises: [
+          ["Barbell Curls", "5x10", "https://www.youtube.com/watch?v=kwG2ipFRgfo"],
+          ["Preacher Curls", "5x10", "https://www.youtube.com/watch?v=fIWP-FRFNU0"],
+          ["Triceps Dips", "5x10", "https://www.youtube.com/watch?v=0326dy_-CzM"],
+          ["Triceps Extensions", "5x10", "https://www.youtube.com/watch?v=-Vyt2QdsR7E"]
+        ]
+      },
+      {
+        day: "Day 2 AM: Legs",
+        exercises: [
+          ["Squats", "5x10", "https://www.youtube.com/watch?v=SW_C1A-rejs"],
+          ["Leg Press", "5x10", "https://www.youtube.com/watch?v=IZxyjW7MPJQ"],
+          ["Leg Curls", "5x10", "https://www.youtube.com/watch?v=1Tq3QdYUuHs"],
+          ["Calf Raises", "5x15", "https://www.youtube.com/watch?v=-M4-G8p8fmc"]
+        ]
+      },
+      {
+        day: "Day 2 PM: Abs",
+        exercises: [
+          ["Hanging Leg Raises", "5x20", "https://www.youtube.com/watch?v=Pr1ieGZ5at8"],
+          ["Cable Crunches", "5x20", "https://www.youtube.com/watch?v=1fbU_MkV7NE"],
+          ["Oblique Twists", "5x20", "https://www.youtube.com/watch?v=9A3vA5_1rIE"]
+        ]
+      },
+      {
+        day: "Day 3 AM: Shoulders & Traps",
+        exercises: [
+          ["Military Press", "5x10", "https://www.youtube.com/watch?v=2yjwXTZQDDI"],
+          ["Lateral Raises", "5x10", "https://www.youtube.com/watch?v=SWVV8HZ8Yqk"],
+          ["Rear Delt Flyes", "5x10", "https://www.youtube.com/watch?v=rep-qVOkqgk"],
+          ["Shrugs", "5x10", "https://www.youtube.com/watch?v=g8bqJeXpK2I"]
+        ]
+      }
+    ]
+  },
+  cbum: {
+    name: "Chris Bumstead",
+    description: "Push/pull/legs split crafted for classic physique aesthetics and conditioning",
+    split: [
+      {
+        day: "Day 1: Push (Chest/Shoulders/Triceps)",
+        exercises: [
+          ["Incline Dumbbell Press", "4x8-12", "https://www.youtube.com/watch?v=8iPEnn-ltC8"],
+          ["Flat Dumbbell Press", "4x8-12", "https://www.youtube.com/watch?v=0G2_XV7slIg"],
+          ["Cable Flys", "4x12-15", "https://www.youtube.com/watch?v=taI4XduLpTk"],
+          ["Overhead Press", "4x8-12", "https://www.youtube.com/watch?v=qEwKCR5JCog"],
+          ["Lateral Raises", "4x12-15", "https://www.youtube.com/watch?v=SWVV8HZ8Yqk"],
+          ["Triceps Pushdown", "4x12-15", "https://www.youtube.com/watch?v=2-LAMcpzODU"]
+        ]
+      },
+      {
+        day: "Day 2: Pull (Back/Biceps)",
+        exercises: [
+          ["Pull-ups", "4x8-12", "https://www.youtube.com/watch?v=eGo4IYlbE5g"],
+          ["Barbell Rows", "4x8-12", "https://www.youtube.com/watch?v=G8K2k4X2lf4"],
+          ["Lat Pulldown", "4x12-15", "https://www.youtube.com/watch?v=CAwf7n6Luuc"],
+          ["Face Pulls", "4x12-15", "https://www.youtube.com/watch?v=rep-qVOkqgk"],
+          ["Dumbbell Curls", "4x12-15", "https://www.youtube.com/watch?v=ykJmrZ5v0Oo"],
+          ["Hammer Curls", "4x12-15", "https://www.youtube.com/watch?v=TwD-YGVP4Bk"]
+        ]
+      },
+      {
+        day: "Day 3: Legs",
+        exercises: [
+          ["Squats", "4x8-12", "https://www.youtube.com/watch?v=SW_C1A-rejs"],
+          ["Leg Press", "4x12-15", "https://www.youtube.com/watch?v=IZxyjW7MPJQ"],
+          ["Romanian Deadlifts", "4x8-12", "https://www.youtube.com/watch?v=op9kVnSso6Q"],
+          ["Leg Curls", "4x12-15", "https://www.youtube.com/watch?v=1Tq3QdYUuHs"],
+          ["Calf Raises", "4x15-20", "https://www.youtube.com/watch?v=-M4-G8p8fmc"]
+        ]
+      },
+      {
+        day: "Day 4: Rest",
+        exercises: [
+          ["Active Recovery", "", "#"],
+          ["Mobility Work", "", "#"],
+          ["Cardio (Optional)", "30 mins", "#"]
+        ]
+      }
+    ]
+  },
+    sam: {
+    name: "Sam Sulek",
+    description: "Raw high-volume push/pull/legs with no rest days and train-to-fatigue approach",
+    split: [
+      {
+        day: "Day 1: Push (Chest/Shoulders/Triceps)",
+        exercises: [
+          ["Incline Bench Press", "5x8-12", "https://www.youtube.com/watch?v=0G2_XV7slIg"],
+          ["Flat Dumbbell Press", "5x8-12", "https://www.youtube.com/watch?v=0G2_XV7slIg"],
+          ["Cable Flys", "5x12-15", "https://www.youtube.com/watch?v=taI4XduLpTk"],
+          ["Overhead Press", "5x8-12", "https://www.youtube.com/watch?v=qEwKCR5JCog"],
+          ["Lateral Raises", "5x12-15", "https://www.youtube.com/watch?v=SWVV8HZ8Yqk"],
+          ["Triceps Dips", "5xFailure", "https://www.youtube.com/watch?v=0326dy_-CzM"]
+        ]
+      },
+      {
+        day: "Day 2: Pull (Back/Biceps)",
+        exercises: [
+          ["Deadlifts", "5x5", "https://www.youtube.com/watch?v=op9kVnSso6Q"],
+          ["Pull-ups", "5xFailure", "https://www.youtube.com/watch?v=eGo4IYlbE5g"],
+          ["Barbell Rows", "5x8-12", "https://www.youtube.com/watch?v=G8K2k4X2lf4"],
+          ["Face Pulls", "5x12-15", "https://www.youtube.com/watch?v=rep-qVOkqgk"],
+          ["Barbell Curls", "5x12-15", "https://www.youtube.com/watch?v=kwG2ipFRgfo"],
+          ["Hammer Curls", "5x12-15", "https://www.youtube.com/watch?v=TwD-YGVP4Bk"]
+        ]
+      },
+      {
+        day: "Day 3: Legs",
+        exercises: [
+          ["Squats", "5x8-12", "https://www.youtube.com/watch?v=SW_C1A-rejs"],
+          ["Leg Press", "5x12-15", "https://www.youtube.com/watch?v=IZxyjW7MPJQ"],
+          ["Leg Curls", "5x12-15", "https://www.youtube.com/watch?v=1Tq3QdYUuHs"],
+          ["Calf Raises", "5x15-20", "https://www.youtube.com/watch?v=-M4-G8p8fmc"],
+          ["Hanging Leg Raises", "5xFailure", "https://www.youtube.com/watch?v=Pr1ieGZ5at8"]
+        ]
+      }
+    ]
+  },
+  jeet: {
+    name: "Jeet Selal",
+    description: "Clean and balanced natural split with an Indian training style and strict form",
+    split: [
+      {
+        day: "Day 1: Upper Body",
+        exercises: [
+          ["Bench Press", "4x8-10", "https://www.youtube.com/watch?v=rT7DgCr-3pg"],
+          ["Pull-ups", "4x8-10", "https://www.youtube.com/watch?v=eGo4IYlbE5g"],
+          ["Incline Dumbbell Press", "3x10-12", "https://www.youtube.com/watch?v=8iPEnn-ltC8"],
+          ["Seated Row", "3x10-12", "https://www.youtube.com/watch?v=GZbfZ033n74"],
+          ["Lateral Raises", "3x12-15", "https://www.youtube.com/watch?v=SWVV8HZ8Yqk"],
+          ["Face Pulls", "3x12-15", "https://www.youtube.com/watch?v=rep-qVOkqgk"]
+        ]
+      },
+      {
+        day: "Day 2: Lower Body",
+        exercises: [
+          ["Squats", "4x8-10", "https://www.youtube.com/watch?v=SW_C1A-rejs"],
+          ["Romanian Deadlifts", "3x8-10", "https://www.youtube.com/watch?v=op9kVnSso6Q"],
+          ["Bulgarian Split Squats", "3x10-12", "https://www.youtube.com/watch?v=QOVaHwm-Q6U"],
+          ["Leg Curls", "3x12-15", "https://www.youtube.com/watch?v=1Tq3QdYUuHs"],
+          ["Calf Raises", "3x15-20", "https://www.youtube.com/watch?v=-M4-G8p8fmc"]
+        ]
+      },
+      {
+        day: "Day 3: Rest/Active Recovery",
+        exercises: [
+          ["Yoga/Mobility", "30-45 mins", "#"],
+          ["Light Cardio", "20-30 mins", "#"]
+        ]
+      },
+      {
+        day: "Day 4: Upper Body",
+        exercises: [
+          ["Overhead Press", "4x8-10", "https://www.youtube.com/watch?v=qEwKCR5JCog"],
+          ["Lat Pulldown", "4x8-10", "https://www.youtube.com/watch?v=CAwf7n6Luuc"],
+          ["Incline Bench Press", "3x10-12", "https://www.youtube.com/watch?v=0G2_XV7slIg"],
+          ["Chest Supported Row", "3x10-12", "https://www.youtube.com/watch?v=GZbfZ033n74"],
+          ["Rear Delt Flyes", "3x12-15", "https://www.youtube.com/watch?v=rep-qVOkqgk"],
+          ["Bicep Curls", "3x12-15", "https://www.youtube.com/watch?v=ykJmrZ5v0Oo"]
+        ]
+      },
+      {
+        day: "Day 5: Lower Body",
+        exercises: [
+          ["Deadlifts", "4x5", "https://www.youtube.com/watch?v=op9kVnSso6Q"],
+          ["Front Squats", "3x8-10", "https://www.youtube.com/watch?v=uYumuL_G_V0"],
+          ["Leg Press", "3x10-12", "https://www.youtube.com/watch?v=IZxyjW7MPJQ"],
+          ["Seated Calf Raises", "3x15-20", "https://www.youtube.com/watch?v=-M4-G8p8fmc"],
+          ["Plank", "3x60 sec", "https://www.youtube.com/watch?v=pSHjTRCQxIw"]
+        ]
+      }
+    ]
+  },
+  mukesh: {
+    name: "Mukesh Gahlot",
+    description: "Strength-oriented bodybuilding with a powerlifting hybrid approach",
+    split: [
+      {
+        day: "Day 1: Heavy Upper",
+        exercises: [
+          ["Bench Press", "5x5", "https://www.youtube.com/watch?v=rT7DgCr-3pg"],
+          ["Weighted Pull-ups", "5x5", "https://www.youtube.com/watch?v=eGo4IYlbE5g"],
+          ["Overhead Press", "4x6-8", "https://www.youtube.com/watch?v=qEwKCR5JCog"],
+          ["Barbell Rows", "4x6-8", "https://www.youtube.com/watch?v=G8K2k4X2lf4"],
+          ["Close Grip Bench", "3x8-10", "https://www.youtube.com/watch?v=0G2_XV7slIg"]
+        ]
+      },
+      {
+        day: "Day 2: Heavy Lower",
+        exercises: [
+          ["Squats", "5x5", "https://www.youtube.com/watch?v=SW_C1A-rejs"],
+          ["Romanian Deadlifts", "4x6-8", "https://www.youtube.com/watch?v=op9kVnSso6Q"],
+          ["Leg Press", "3x8-10", "https://www.youtube.com/watch?v=IZxyjW7MPJQ"],
+          ["Standing Calf Raises", "4x10-12", "https://www.youtube.com/watch?v=-M4-G8p8fmc"]
+        ]
+      },
+      {
+        day: "Day 3: Rest",
+        exercises: [
+          ["Active Recovery", "", "#"],
+          ["Mobility Work", "", "#"]
+        ]
+      },
+      {
+        day: "Day 4: Hypertrophy Upper",
+        exercises: [
+          ["Incline Dumbbell Press", "4x8-12", "https://www.youtube.com/watch?v=8iPEnn-ltC8"],
+          ["Lat Pulldown", "4x8-12", "https://www.youtube.com/watch?v=CAwf7n6Luuc"],
+          ["Dumbbell Shoulder Press", "3x10-12", "https://www.youtube.com/watch?v=qEwKCR5JCog"],
+          ["Chest Supported Row", "3x10-12", "https://www.youtube.com/watch?v=GZbfZ033n74"],
+          ["Lateral Raises", "3x12-15", "https://www.youtube.com/watch?v=SWVV8HZ8Yqk"]
+        ]
+      },
+      {
+        day: "Day 5: Hypertrophy Lower",
+        exercises: [
+          ["Front Squats", "4x8-10", "https://www.youtube.com/watch?v=uYumuL_G_V0"],
+          ["Bulgarian Split Squats", "3x10-12", "https://www.youtube.com/watch?v=QOVaHwm-Q6U"],
+          ["Leg Curls", "3x12-15", "https://www.youtube.com/watch?v=1Tq3QdYUuHs"],
+          ["Seated Calf Raises", "4x15-20", "https://www.youtube.com/watch?v=-M4-G8p8fmc"]
+        ]
+      }
+    ]
+  },
+  saket: {
+    name: "Saket Gokhale",
+    description: "Smart push/pull/legs split with evidence-backed techniques and joint-friendly lifts",
+    split: [
+      {
+        day: "Day 1: Push",
+        exercises: [
+          ["Machine Chest Press", "4x8-12", "https://www.youtube.com/watch?v=1s1GJv8NtT8"],
+          ["Incline Dumbbell Press", "3x10-12", "https://www.youtube.com/watch?v=8iPEnn-ltC8"],
+          ["Machine Shoulder Press", "3x10-12", "https://www.youtube.com/watch?v=1s1GJv8NtT8"],
+          ["Cable Lateral Raises", "3x12-15", "https://www.youtube.com/watch?v=SWVV8HZ8Yqk"],
+          ["Triceps Pushdown", "3x12-15", "https://www.youtube.com/watch?v=2-LAMcpzODU"]
+        ]
+      },
+      {
+        day: "Day 2: Pull",
+        exercises: [
+          ["Lat Pulldown", "4x8-12", "https://www.youtube.com/watch?v=CAwf7n6Luuc"],
+          ["Seated Cable Row", "3x10-12", "https://www.youtube.com/watch?v=GZbfZ033n74"],
+          ["Face Pulls", "3x12-15", "https://www.youtube.com/watch?v=rep-qVOkqgk"],
+          ["Reverse Pec Deck", "3x12-15", "https://www.youtube.com/watch?v=rep-qVOkqgk"],
+          ["Hammer Curls", "3x12-15", "https://www.youtube.com/watch?v=TwD-YGVP4Bk"]
+        ]
+      },
+      {
+        day: "Day 3: Legs",
+        exercises: [
+          ["Hack Squat", "4x8-12", "https://www.youtube.com/watch?v=0tn5K9NlCfo"],
+          ["Leg Press", "3x10-12", "https://www.youtube.com/watch?v=IZxyjW7MPJQ"],
+          ["Romanian Deadlift", "3x10-12", "https://www.youtube.com/watch?v=op9kVnSso6Q"],
+          ["Leg Curls", "3x12-15", "https://www.youtube.com/watch?v=1Tq3QdYUuHs"],
+          ["Seated Calf Raises", "4x15-20", "https://www.youtube.com/watch?v=-M4-G8p8fmc"]
+        ]
+      },
+      {
+        day: "Day 4: Rest/Active Recovery",
+        exercises: [
+          ["Walking/Yoga", "30-45 mins", "#"],
+          ["Mobility Work", "", "#"]
+        ]
+      }
+    ]
+  },
+  ronnie: {
+    name: "Ronnie Coleman",
+    description: "Brutal 6-day power-volume routine with max effort on compound lifts",
+    split: [
+      {
+        day: "Day 1: Chest",
+        exercises: [
+          ["Flat Bench Press", "5x5", "https://www.youtube.com/watch?v=rT7DgCr-3pg"],
+          ["Incline Bench Press", "4x8-10", "https://www.youtube.com/watch?v=0G2_XV7slIg"],
+          ["Dumbbell Flyes", "4x10-12", "https://www.youtube.com/watch?v=taI4XduLpTk"],
+          ["Dips", "4xFailure", "https://www.youtube.com/watch?v=0326dy_-CzM"],
+          ["Cable Crossovers", "4x12-15", "https://www.youtube.com/watch?v=taI4XduLpTk"]
+        ]
+      },
+      {
+        day: "Day 2: Back",
+        exercises: [
+          ["Deadlifts", "5x5", "https://www.youtube.com/watch?v=op9kVnSso6Q"],
+          ["T-Bar Rows", "4x8-10", "https://www.youtube.com/watch?v=G8K2k4X2lf4"],
+          ["Lat Pulldown", "4x10-12", "https://www.youtube.com/watch?v=CAwf7n6Luuc"],
+          ["Seated Cable Row", "4x10-12", "https://www.youtube.com/watch?v=GZbfZ033n74"],
+          ["Hyperextensions", "4x15", "https://www.youtube.com/watch?v=1fbU_MkV7NE"]
+        ]
+      },
+      {
+        day: "Day 3: Shoulders",
+        exercises: [
+          ["Overhead Press", "5x5", "https://www.youtube.com/watch?v=qEwKCR5JCog"],
+          ["Dumbbell Lateral Raises", "4x10-12", "https://www.youtube.com/watch?v=SWVV8HZ8Yqk"],
+          ["Rear Delt Flyes", "4x10-12", "https://www.youtube.com/watch?v=rep-qVOkqgk"],
+          ["Shrugs", "4x10-12", "https://www.youtube.com/watch?v=g8bqJeXpK2I"],
+          ["Face Pulls", "4x12-15", "https://www.youtube.com/watch?v=rep-qVOkqgk"]
+        ]
+      },
+      {
+        day: "Day 4: Arms",
+        exercises: [
+          ["Barbell Curls", "4x8-10", "https://www.youtube.com/watch?v=kwG2ipFRgfo"],
+          ["Close Grip Bench", "4x8-10", "https://www.youtube.com/watch?v=0G2_XV7slIg"],
+          ["Preacher Curls", "4x10-12", "https://www.youtube.com/watch?v=fIWP-FRFNU0"],
+          ["Skull Crushers", "4x10-12", "https://www.youtube.com/watch?v=-Vyt2QdsR7E"],
+          ["Hammer Curls", "4x10-12", "https://www.youtube.com/watch?v=TwD-YGVP4Bk"],
+          ["Triceps Pushdown", "4x12-15", "https://www.youtube.com/watch?v=2-LAMcpzODU"]
+        ]
+      },
+      {
+        day: "Day 5: Legs",
+        exercises: [
+          ["Squats", "5x5", "https://www.youtube.com/watch?v=SW_C1A-rejs"],
+          ["Leg Press", "4x8-10", "https://www.youtube.com/watch?v=IZxyjW7MPJQ"],
+          ["Hack Squat", "4x10-12", "https://www.youtube.com/watch?v=0tn5K9NlCfo"],
+          ["Leg Extensions", "4x12-15", "https://www.youtube.com/watch?v=YyvSfVjQeL0"],
+          ["Leg Curls", "4x12-15", "https://www.youtube.com/watch?v=1Tq3QdYUuHs"],
+          ["Standing Calf Raises", "5x15-20", "https://www.youtube.com/watch?v=-M4-G8p8fmc"]
+        ]
+      },
+      {
+        day: "Day 6: Rest/Active Recovery",
+        exercises: [
+          ["Light Cardio", "20-30 mins", "#"],
+          ["Stretching", "", "#"]
+        ]
+      }
+    ]
+  }
+};
+
 function showWorkout(workoutType) {
   let workoutDiv = document.getElementById('workoutPlan');
   let workoutDetails = document.getElementById('workoutDetails');
@@ -354,6 +905,63 @@ function showWorkout(workoutType) {
 
 function hideWorkout() {
   document.getElementById('workoutDetails').style.display = "none";
+}
+
+function showProWorkout(proName) {
+  const pro = proWorkouts[proName];
+  const workoutDetails = document.getElementById('proWorkoutDetails');
+  const title = document.getElementById('proWorkoutTitle');
+  const dayTabs = document.getElementById('dayTabs');
+  const workoutPlan = document.getElementById('proWorkoutPlan');
+  
+  // Set title
+  title.textContent = `${pro.name}'s Training Split: ${pro.description}`;
+  
+  // Create day tabs
+  dayTabs.innerHTML = '';
+  pro.split.forEach((day, index) => {
+    const tab = document.createElement('div');
+    tab.className = `day-tab ${index === 0 ? 'active' : ''}`;
+    tab.textContent = day.day.split(':')[0]; // Just show "Day 1", "Day 2" etc.
+    tab.onclick = () => showProDay(proName, index);
+    dayTabs.appendChild(tab);
+  });
+  
+  // Show first day by default
+  showProDay(proName, 0);
+  
+  // Show the workout details section
+  workoutDetails.style.display = 'block';
+  workoutDetails.scrollIntoView({ behavior: 'smooth' });
+}
+
+function showProDay(proName, dayIndex) {
+  const pro = proWorkouts[proName];
+  const day = pro.split[dayIndex];
+  const workoutPlan = document.getElementById('proWorkoutPlan');
+  
+  // Update active tab
+  const tabs = document.querySelectorAll('.day-tab');
+  tabs.forEach((tab, index) => {
+    if (index === dayIndex) {
+      tab.classList.add('active');
+    } else {
+      tab.classList.remove('active');
+    }
+  });
+  
+  // Build workout table
+  let html = `<h5>${day.day}</h5><table><tr><th>Exercise</th><th>Sets & Reps</th></tr>`;
+  
+  day.exercises.forEach(exercise => {
+    html += `<tr>
+              <td><a href="${exercise[2]}" target="_blank">${exercise[0]}</a></td>
+              <td>${exercise[1]}</td>
+            </tr>`;
+  });
+  
+  html += '</table>';
+  workoutPlan.innerHTML = html;
 }
 
 // Default open tab
