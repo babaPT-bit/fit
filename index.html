@@ -12,13 +12,6 @@
 body, h1,h2,h3,h4,h5,h6 {font-family: "Montserrat", sans-serif}
 .w3-row-padding img {margin-bottom: 12px}
 .w3-sidebar {width: 120px;background: #222;}
-#trainLikePro {
-  padding: 64px 16px;
-}
-
-.pro-section {
-  display: none; /* Initially hidden */
-}
 #main {margin-left: 120px}
 @media only screen and (max-width: 600px) {#main {margin-left: 0}}
 .tab-content {display: none;}
@@ -174,31 +167,24 @@ a:hover {
 <!-- Icon Bar (Sidebar - hidden on small screens) -->
 <nav class="w3-sidebar w3-bar-block w3-small w3-hide-small w3-center">
   <img src="dumbell.jpg" style="width:100%">
-  <a href="#" class="w3-bar-item w3-button w3-padding-large w3-black">
+  <a href="#home" class="w3-bar-item w3-button w3-padding-large w3-black">
     <i class="fa fa-home w3-xxlarge"></i>
     <p>HOME</p>
   </a>
   <a href="#workouts" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
     <i class="fas fa-dumbbell w3-xxlarge"></i>
     <p>WORKOUTS</p>
- <a href="#TrainLikePro" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
-  <i class="fas fa-trophy w3-xxlarge"></i>
-  <p>TRAIN LIKE PRO</p>
-</a>
-<a href="#contact" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
-  <i class="fa fa-envelope w3-xxlarge"></i>
-  <p>CONTACT</p>
-</a>
-
+  </a>
+  <a href="#trainLikePro" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+    <i class="fas fa-trophy w3-xxlarge"></i>
+    <p>TRAIN LIKE PRO</p>
+  </a>
+  <a href="#contact" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+    <i class="fa fa-envelope w3-xxlarge"></i>
+    <p>CONTACT</p>
+  </a>
 </nav>
 
-<!-- Navbar on small screens -->
-<div class="w3-bar w3-black w3-opacity w3-hover-opacity-off w3-center w3-small">
-  <a href="#home" class="w3-bar-item w3-button" style="width:25% !important">HOME</a>
-  <a href="#workouts" class="w3-bar-item w3-button" style="width:25% !important">WORKOUTS</a>
-  <a href="#TrainLikePro" class="w3-bar-item w3-button" style="width:25% !important">PRO</a>
-  <a href="#contact" class="w3-bar-item w3-button" style="width:25% !important">CONTACT</a>
-</div>
 <!-- Page Content -->
 <div class="w3-padding-large" id="main">
   <!-- Header/Home with Swiping Background -->
@@ -214,12 +200,11 @@ a:hover {
     <h2 class="w3-text-light-grey">Workout Plans</h2>
     <hr style="width:200px" class="w3-opacity">
 
-    <!-- Tabs for PUSH, PULL, LEG DAY, TRAIN LIKE PRO -->
+    <!-- Tabs for PUSH, PULL, LEG DAY -->
     <div class="w3-bar w3-black">
       <button class="w3-bar-item w3-button" onclick="openTab('PushDay')">PUSH DAY</button>
       <button class="w3-bar-item w3-button" onclick="openTab('PullDay')">PULL DAY</button>
       <button class="w3-bar-item w3-button" onclick="openTab('LegDay')">LEG DAY</button>
-    
     </div>
 
     <!-- PUSH DAY Tab Content -->
@@ -290,109 +275,104 @@ a:hover {
         </div>
       </div>
     </div>
-</div>
- <div id="workoutDetails" class="w3-padding-64 w3-content" style="display:none;">
+  </div>
+
+  <!-- Workout Details Section -->
+  <div id="workoutDetails" class="w3-padding-64 w3-content" style="display:none;">
     <h2 class="w3-text-light-grey">Workout Plan</h2>
     <hr style="width:200px" class="w3-opacity">
     <div id="workoutPlan"></div>
     <button class="w3-button w3-light-grey w3-padding-large" onclick="hideWorkout()">Close</button>
   </div>
-    <!-- TRAIN LIKE PRO Tab Content -->
-    <div class="w3-padding-64 w3-content pro-section" id="trainLikePro">
+
+  <!-- Train Like Pro Section -->
+  <div class="w3-padding-64 w3-content" id="trainLikePro">
     <h2 class="w3-text-light-grey">Train Like a Pro</h2>
     <hr style="width:200px" class="w3-opacity">
     <p>Select your fitness icon to follow their legendary workout routine</p>
-      <div class="pro-container">
-        <!-- Jeff Nippard -->
-        <div class="pro-card" onclick="showProWorkout('jeff')">
-          <img src="jeff.jpg" alt="Jeff Nippard" class="pro-image">
-          <div class="pro-info">
-            <div class="pro-name">JEFF NIPPARD</div>
-            <div class="pro-specialty">Science-based training</div>
-          </div>
-        </div>
-        
-        <!-- Arnold Schwarzenegger -->
-        <div class="pro-card" onclick="showProWorkout('arnold')">
-          <img src="arnold.jpg" alt="Arnold Schwarzenegger" class="pro-image">
-          <div class="pro-info">
-            <div class="pro-name">ARNOLD SCHWARZENEGGER</div>
-            <div class="pro-specialty">Classic bodybuilding</div>
-          </div>
-        </div>
-        
-        <!-- Chris Bumstead -->
-        <div class="pro-card" onclick="showProWorkout('cbum')">
-          <img src="cbum.jpg" alt="Chris Bumstead" class="pro-image">
-          <div class="pro-info">
-            <div class="pro-name">CHRIS BUMSTEAD</div>
-            <div class="pro-specialty">Classic physique</div>
-          </div>
-        </div>
-        
-        <!-- Sam Sulek -->
-        <div class="pro-card" onclick="showProWorkout('sam')">
-          <img src="sam.jpg" alt="Sam Sulek" class="pro-image">
-          <div class="pro-info">
-            <div class="pro-name">SAM SULEK</div>
-            <div class="pro-specialty">High-volume training</div>
-          </div>
-        </div>
-        
-        <!-- Jeet Selal -->
-        <div class="pro-card" onclick="showProWorkout('jeet')">
-          <img src="jeet.jpg" alt="Jeet Selal" class="pro-image">
-          <div class="pro-info">
-            <div class="pro-name">JEET SELAL</div>
-            <div class="pro-specialty">Natural bodybuilding</div>
-          </div>
-        </div>
-        
-        <!-- Mukesh Gahlot -->
-        <div class="pro-card" onclick="showProWorkout('mukesh')">
-          <img src="mukesh.jpg" alt="Mukesh Gahlot" class="pro-image">
-          <div class="pro-info">
-            <div class="pro-name">MUKESH GAHLOT</div>
-            <div class="pro-specialty">Power-bodybuilding</div>
-          </div>
-        </div>
-        
-        <!-- Saket Gokhale -->
-        <div class="pro-card" onclick="showProWorkout('saket')">
-          <img src="saket.jpg" alt="Saket Gokhale" class="pro-image">
-          <div class="pro-info">
-            <div class="pro-name">SAKET GOKHALE</div>
-            <div class="pro-specialty">Evidence-based training</div>
-          </div>
-        </div>
-        
-        <!-- Ronnie Coleman -->
-        <div class="pro-card" onclick="showProWorkout('ronnie')">
-          <img src="ronnie.jpg" alt="Ronnie Coleman" class="pro-image">
-          <div class="pro-info">
-            <div class="pro-name">RONNIE COLEMAN</div>
-            <div class="pro-specialty">Power-volume routine</div>
-          </div>
+    
+    <div class="pro-container">
+      <!-- Jeff Nippard -->
+      <div class="pro-card" onclick="showProWorkout('jeff')">
+        <img src="jeff.jpg" alt="Jeff Nippard" class="pro-image">
+        <div class="pro-info">
+          <div class="pro-name">JEFF NIPPARD</div>
+          <div class="pro-specialty">Science-based training</div>
         </div>
       </div>
       
-      <!-- Pro Workout Details Section -->
-      <div id="proWorkoutDetails" class="pro-workout" style="display:none;">
-        <h4 id="proWorkoutTitle"></h4>
-        <div class="day-tabs" id="dayTabs"></div>
-        <div id="proWorkoutPlan"></div>
+      <!-- Arnold Schwarzenegger -->
+      <div class="pro-card" onclick="showProWorkout('arnold')">
+        <img src="arnold.jpg" alt="Arnold Schwarzenegger" class="pro-image">
+        <div class="pro-info">
+          <div class="pro-name">ARNOLD SCHWARZENEGGER</div>
+          <div class="pro-specialty">Classic bodybuilding</div>
+        </div>
+      </div>
+      
+      <!-- Chris Bumstead -->
+      <div class="pro-card" onclick="showProWorkout('cbum')">
+        <img src="cbum.jpg" alt="Chris Bumstead" class="pro-image">
+        <div class="pro-info">
+          <div class="pro-name">CHRIS BUMSTEAD</div>
+          <div class="pro-specialty">Classic physique</div>
+        </div>
+      </div>
+      
+      <!-- Sam Sulek -->
+      <div class="pro-card" onclick="showProWorkout('sam')">
+        <img src="sam.jpg" alt="Sam Sulek" class="pro-image">
+        <div class="pro-info">
+          <div class="pro-name">SAM SULEK</div>
+          <div class="pro-specialty">High-volume training</div>
+        </div>
+      </div>
+      
+      <!-- Jeet Selal -->
+      <div class="pro-card" onclick="showProWorkout('jeet')">
+        <img src="jeet.jpg" alt="Jeet Selal" class="pro-image">
+        <div class="pro-info">
+          <div class="pro-name">JEET SELAL</div>
+          <div class="pro-specialty">Natural bodybuilding</div>
+        </div>
+      </div>
+      
+      <!-- Mukesh Gahlot -->
+      <div class="pro-card" onclick="showProWorkout('mukesh')">
+        <img src="mukesh.jpg" alt="Mukesh Gahlot" class="pro-image">
+        <div class="pro-info">
+          <div class="pro-name">MUKESH GAHLOT</div>
+          <div class="pro-specialty">Power-bodybuilding</div>
+        </div>
+      </div>
+      
+      <!-- Saket Gokhale -->
+      <div class="pro-card" onclick="showProWorkout('saket')">
+        <img src="saket.jpg" alt="Saket Gokhale" class="pro-image">
+        <div class="pro-info">
+          <div class="pro-name">SAKET GOKHALE</div>
+          <div class="pro-specialty">Evidence-based training</div>
+        </div>
+      </div>
+      
+      <!-- Ronnie Coleman -->
+      <div class="pro-card" onclick="showProWorkout('ronnie')">
+        <img src="ronnie.jpg" alt="Ronnie Coleman" class="pro-image">
+        <div class="pro-info">
+          <div class="pro-name">RONNIE COLEMAN</div>
+          <div class="pro-specialty">Power-volume routine</div>
+        </div>
       </div>
     </div>
-  </div>
-
-  <!-- Workout Details Section -->
- 
-<div id="proWorkoutDetails" class="pro-workout" style="display:none;">
+    
+    <!-- Pro Workout Details Section -->
+    <div id="proWorkoutDetails" class="pro-workout" style="display:none;">
       <h4 id="proWorkoutTitle"></h4>
       <div class="day-tabs" id="dayTabs"></div>
       <div id="proWorkoutPlan"></div>
     </div>
   </div>
+
   <!-- Contact Section -->
   <div class="w3-padding-64 w3-content w3-text-grey" id="contact">
     <h2 class="w3-text-light-grey">Contact Me</h2>
@@ -432,9 +412,13 @@ a:hover {
 
 <script>
 // Tab functionality
-   if(sectionId === 'workouts') {
-    openTab('PushDay');
+function openTab(tabName) {
+  var tabs = document.getElementsByClassName("tab-content");
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].style.display = "none";
   }
+  document.getElementById(tabName).style.display = "block";
+}
 
 // Workout details with YouTube links
 const workouts = {
@@ -972,7 +956,7 @@ function showProDay(proName, dayIndex) {
 
 // Default open tab
 openTab('PushDay');
-  openTab('PushDay');
+
 
 // Smooth scrolling for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
