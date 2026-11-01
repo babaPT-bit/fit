@@ -1,0 +1,396 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Cable Fly Reel</title>
+<style>
+  html, body { margin: 0; background: #0b0f17; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="model.js"></script>
+<script>
+const M = window.FlyModel;
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+const W = 1080, H = 1920;
+
+// ---------- timeline (seconds) ----------
+const FPS = 30;
+const INTRO = 1.2;          // title in
+const REP = 3.4;            // one full rep
+const REPS = 3;
+const OUTRO = 3.6;          // end card
+const DURATION = INTRO + REP * REPS + OUTRO;
+window.DURATION = DURATION; window.FPS = FPS;
+
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const fade = (t, a, b) => clamp((t - a) / (b - a));
+
+// rep progress 0 (stretch) -> 1 (squeeze)
+function repProgress(t) {
+  const tt = t - INTRO;
+  if (tt < 0) return 0;
+  if (tt >= REP * REPS) return 0;
+  const r = tt % REP;
+  const CON = 1.5, HOLD = 0.45, ECC = 1.25;
+  if (r < CON) return ease(r / CON);
+  if (r < CON + HOLD) return 1;
+  if (r < CON + HOLD + ECC) return 1 - ease((r - CON - HOLD) / ECC);
+  return 0;
+}
+// how much of the graph is revealed (draws during the first concentric)
+function reveal(t) {
+  const tt = t - INTRO;
+  if (tt < 0) return 0;
+  if (tt < 1.5) return ease(tt / 1.5);
+  return 1;
+}
+
+// ---------- palette ----------
+const C = {
+  bg0: '#0b0f17', bg1: '#141b2b', panel: 'rgba(255,255,255,0.025)',
+  line: 'rgba(148,163,184,0.18)', text: '#e5e7eb', dim: '#94a3b8', faint: '#64748b',
+  accent: '#8fb4ff', skin: '#e9e4dc', skinShade: '#c9c2b7', shorts: '#1f2633',
+  steel: '#3b4558', steelHi: '#5b677d', cable: '#cbd5e1', force: '#f2c14e',
+};
+const MUS = M.MUSCLES;
+
+// ---------- helpers ----------
+function txt(s, x, y, font, color, align = 'center', alpha = 1) {
+  ctx.save(); ctx.globalAlpha *= alpha; ctx.font = font; ctx.fillStyle = color;
+  ctx.textAlign = align; ctx.textBaseline = 'alphabetic'; ctx.fillText(s, x, y); ctx.restore();
+}
+function rrect(x, y, w, h, r) {
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+function hexA(hex, a) {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`;
+}
+// tapered limb between two screen points
+function limb(a, b, wa, wb, fill) {
+  const dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1;
+  const nx = -dy / l, ny = dx / l;
+  ctx.fillStyle = fill;
+  ctx.beginPath();
+  ctx.moveTo(a[0] + nx * wa, a[1] + ny * wa); ctx.lineTo(b[0] + nx * wb, b[1] + ny * wb);
+  ctx.lineTo(b[0] - nx * wb, b[1] - ny * wb); ctx.lineTo(a[0] - nx * wa, a[1] - ny * wa);
+  ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.arc(a[0], a[1], wa, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(b[0], b[1], wb, 0, Math.PI * 2); ctx.fill();
+}
+
+// ---------- background ----------
+function background() {
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, C.bg1); g.addColorStop(0.55, C.bg0); g.addColorStop(1, '#090c13');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  // perspective floor grid at the bottom, like a studio floor
+  ctx.save(); ctx.strokeStyle = 'rgba(143,180,255,0.05)'; ctx.lineWidth = 1;
+  const hy = 1690;
+  for (let i = -12; i <= 12; i++) { ctx.beginPath(); ctx.moveTo(W / 2 + i * 30, hy); ctx.lineTo(W / 2 + i * 260, H); ctx.stroke(); }
+  for (let j = 0; j < 8; j++) { const y = hy + Math.pow(j / 7, 1.8) * (H - hy); ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+  ctx.restore();
+}
+
+// ---------- header ----------
+function header(t) {
+  const a = ease(fade(t, 0, 0.8));
+  const dy = (1 - a) * 20;
+  txt('CABLE FLY  ·  3 ANGLES', W / 2, 96 + dy, '600 26px "JetBrains Mono"', C.accent, 'center', a);
+  txt('Where does the load go?', W / 2, 176 + dy, 'italic 400 66px "DejaVu Serif"', C.text, 'center', a);
+  ctx.save(); ctx.globalAlpha = a; ctx.strokeStyle = C.accent; ctx.lineWidth = 3;
+  const w = 380 * ease(fade(t, 0.3, 1.1));
+  ctx.beginPath(); ctx.moveTo(W / 2 - w, 204); ctx.lineTo(W / 2 + w, 204); ctx.stroke(); ctx.restore();
+}
+
+// ---------- figure ----------
+const COLS = [180, 540, 900];
+const FLOOR_Y = 800, K = 158;  // px per metre
+
+function proj(cx, p, side) { // side: +1 right arm, -1 left (mirrored)
+  const persp = 1 + p[1] * 0.10;
+  return [cx + side * p[0] * K * persp, FLOOR_Y - p[2] * K];
+}
+
+function figure(cx, d, s, alphaIn) {
+  ctx.save(); ctx.globalAlpha = alphaIn;
+  const P = (x, z) => [cx + x * K, FLOOR_Y - z * K];
+
+  // floor
+  ctx.strokeStyle = C.steel; ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(cx - 172, FLOOR_Y + 2); ctx.lineTo(cx + 172, FLOOR_Y + 2); ctx.stroke();
+
+  // towers + pulleys
+  for (const side of [-1, 1]) {
+    const tx = cx + side * M.TOWER_X * K;
+    const top = FLOOR_Y - 2.45 * K;
+    ctx.fillStyle = C.steel; ctx.fillRect(tx - 6, top, 12, FLOOR_Y - top);
+    ctx.fillStyle = C.steelHi; ctx.fillRect(tx - 6, top, 3, FLOOR_Y - top);
+    ctx.fillStyle = C.steel; ctx.fillRect(tx - 18, FLOOR_Y - 4, 36, 6);
+    ctx.fillRect(tx - 14, top - 4, 28, 8);
+    // pulley housing
+    const py = FLOOR_Y - d.pulleyZ * K;
+    ctx.fillStyle = '#2a3242'; rrect(tx - 13, py - 13, 26, 26, 6); ctx.fill();
+    ctx.beginPath(); ctx.arc(tx, py, 8, 0, Math.PI * 2); ctx.fillStyle = '#9aa7bd'; ctx.fill();
+    ctx.beginPath(); ctx.arc(tx, py, 3, 0, Math.PI * 2); ctx.fillStyle = '#2a3242'; ctx.fill();
+  }
+
+  const skin = C.skin, shade = C.skinShade;
+  // legs (slight staggered stance)
+  limb(P(-0.09, 0.9), P(-0.11, 0.48), 13, 10, shade);
+  limb(P(-0.11, 0.48), P(-0.12, 0.07), 10, 7, shade);
+  limb(P(0.09, 0.9), P(0.11, 0.48), 13, 10, skin);
+  limb(P(0.11, 0.48), P(0.12, 0.07), 10, 7, skin);
+  ctx.fillStyle = '#2b3140';
+  for (const sx of [-1, 1]) { ctx.beginPath(); ctx.ellipse(cx + sx * 0.13 * K, FLOOR_Y - 4, 13, 6, 0, 0, Math.PI * 2); ctx.fill(); }
+  // shorts
+  ctx.fillStyle = C.shorts; ctx.beginPath();
+  const sh = [[-0.16, 0.99], [0.16, 0.99], [0.18, 0.7], [0.02, 0.7], [0, 0.82], [-0.02, 0.7], [-0.18, 0.7]];
+  sh.forEach((q, i) => { const p = P(q[0], q[1]); i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]); });
+  ctx.closePath(); ctx.fill();
+
+  // torso
+  ctx.fillStyle = skin; ctx.beginPath();
+  const tor = [[-0.06, 1.54], [0.06, 1.54], [0.21, 1.47], [0.2, 1.3], [0.15, 1.12], [0.16, 0.99], [-0.16, 0.99], [-0.15, 1.12], [-0.2, 1.3], [-0.21, 1.47]];
+  tor.forEach((q, i) => { const p = P(q[0], q[1]); i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]); });
+  ctx.closePath(); ctx.fill();
+  // abs hint
+  ctx.strokeStyle = 'rgba(0,0,0,0.12)'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(...P(0, 1.22)); ctx.lineTo(...P(0, 1.0)); ctx.stroke();
+  for (const z of [1.16, 1.09]) { ctx.beginPath(); ctx.moveTo(...P(-0.07, z)); ctx.lineTo(...P(0.07, z)); ctx.stroke(); }
+
+  // pecs: three fibre bands per side, lit by live load
+  const lv = s.load.map(x => x / M.maxLoad);
+  const bands = [[1.355, 1.44, 0], [1.29, 1.355, 1], [1.215, 1.29, 2]];
+  for (const side of [-1, 1]) {
+    ctx.save();
+    ctx.beginPath();
+    const p0 = P(side * 0.012, 1.43), p1 = P(side * 0.19, 1.44), p2 = P(side * 0.2, 1.3), p3 = P(side * 0.1, 1.205), p4 = P(side * 0.012, 1.24);
+    ctx.moveTo(...p0); ctx.lineTo(...p1);
+    ctx.quadraticCurveTo(p2[0] + side * 4, p2[1], p3[0], p3[1]);
+    ctx.quadraticCurveTo(p4[0] + side * 6, p4[1] + 4, p4[0], p4[1]);
+    ctx.closePath();
+    ctx.fillStyle = '#ddd6cb'; ctx.fill();
+    ctx.clip();
+    for (const [z0, z1, k] of bands) {
+      const a = 0.08 + 0.92 * clamp(lv[k] * 1.15);
+      const y0 = FLOOR_Y - z1 * K, y1 = FLOOR_Y - z0 * K;
+      ctx.fillStyle = hexA(MUS[k].color, a);
+      ctx.fillRect(cx - 0.25 * K, y0, 0.5 * K, y1 - y0);
+    }
+    // fibre lines
+    ctx.strokeStyle = 'rgba(0,0,0,0.15)'; ctx.lineWidth = 1;
+    for (let i = 0; i < 7; i++) {
+      const z = 1.22 + i * 0.035;
+      ctx.beginPath(); ctx.moveTo(...P(side * 0.015, z)); ctx.lineTo(...P(side * 0.19, 1.37 + (z - 1.33) * 0.3)); ctx.stroke();
+    }
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(0,0,0,0.25)'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(...p0); ctx.lineTo(...p1); ctx.quadraticCurveTo(p2[0] + side * 4, p2[1], p3[0], p3[1]); ctx.quadraticCurveTo(p4[0] + side * 6, p4[1] + 4, p4[0], p4[1]); ctx.stroke();
+  }
+
+  // neck + head
+  limb(P(0, 1.52), P(0, 1.6), 9, 9, shade);
+  ctx.fillStyle = skin; ctx.beginPath(); ctx.ellipse(...P(0, 1.69), 0.085 * K, 0.105 * K, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#262a33'; ctx.beginPath(); ctx.ellipse(...P(0, 1.745), 0.088 * K, 0.06 * K, 0, Math.PI, Math.PI * 2); ctx.fill();
+
+  // arms, cables, delts
+  for (const side of [-1, 1]) {
+    const S = M.SHOULDER, Hd = s.H;
+    const mid = [(S[0] + Hd[0]) / 2, (S[1] + Hd[1]) / 2, (S[2] + Hd[2]) / 2];
+    const E = [mid[0] + 0.035, mid[1] - 0.08, mid[2] - 0.07];
+    const sS = proj(cx, S, side), sE = proj(cx, E, side), sH = proj(cx, Hd, side);
+    const sPul = proj(cx, d.P, side);
+    // cable
+    ctx.strokeStyle = C.cable; ctx.lineWidth = 2.2;
+    ctx.beginPath(); ctx.moveTo(...sPul); ctx.lineTo(...sH); ctx.stroke();
+    const col = side > 0 ? skin : shade;
+    limb(sS, sE, 12, 10, col);
+    limb(sE, sH, 10, 7.5, col);
+    // delt cap lit by load
+    ctx.beginPath(); ctx.arc(sS[0] - side * 1, sS[1] + 2, 13, 0, Math.PI * 2);
+    ctx.fillStyle = '#ddd6cb'; ctx.fill();
+    ctx.fillStyle = hexA(MUS[3].color, 0.08 + 0.92 * clamp(lv[3] * 1.15)); ctx.fill();
+    // handle
+    ctx.fillStyle = '#1b1f27'; ctx.beginPath(); ctx.arc(...sH, 8, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#7d8799'; ctx.lineWidth = 2; ctx.stroke();
+
+    if (side > 0) {
+      // moment arm (projected) from shoulder to the cable line
+      const ax = sPul[0] - sH[0], ay = sPul[1] - sH[1], al = Math.hypot(ax, ay);
+      const ux = ax / al, uy = ay / al;
+      const tproj = (sS[0] - sH[0]) * ux + (sS[1] - sH[1]) * uy;
+      const foot = [sH[0] + ux * tproj, sH[1] + uy * tproj];
+      ctx.save(); ctx.setLineDash([5, 5]); ctx.strokeStyle = 'rgba(229,231,235,0.35)'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(sH[0], sH[1]); ctx.lineTo(foot[0], foot[1]); ctx.stroke();
+      ctx.setLineDash([]); ctx.strokeStyle = C.force; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(...sS); ctx.lineTo(...foot); ctx.stroke(); ctx.restore();
+      ctx.beginPath(); ctx.arc(...sS, 4.5, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill();
+      // force arrow at the hand, along the cable
+      const L = 44, tip = [sH[0] + ux * L, sH[1] + uy * L];
+      ctx.strokeStyle = C.force; ctx.fillStyle = C.force; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(...sH); ctx.lineTo(...tip); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(tip[0] + ux * 9, tip[1] + uy * 9);
+      ctx.lineTo(tip[0] - uy * 6, tip[1] + ux * 6); ctx.lineTo(tip[0] + uy * 6, tip[1] - ux * 6); ctx.closePath(); ctx.fill();
+      txt('F', tip[0] + ux * 14 - uy * 14, tip[1] + uy * 14 + ux * 14 + 6, 'italic 600 20px "DejaVu Serif"', C.force);
+    }
+  }
+  ctx.restore();
+}
+
+// ---------- per-column readout under the figure ----------
+function readout(cx, d, s, a) {
+  ctx.save(); ctx.globalAlpha = a;
+  txt(d.title, cx, 310, '700 36px Inter', C.text);
+  const tk = { 'Lower chest': 2, 'Mid chest': 1, 'Upper chest': 0 }[d.target];
+  txt('→ ' + d.target.toUpperCase(), cx, 350, '600 21px "JetBrains Mono"', MUS[tk].color);
+  // leverage meter
+  const y = 852;
+  txt('LEVERAGE', cx - 140, y, '600 19px "JetBrains Mono"', C.force, 'left');
+  txt(Math.round(s.moment * 100) + ' cm', cx + 140, y, '600 22px "JetBrains Mono"', C.text, 'right');
+  ctx.fillStyle = 'rgba(255,255,255,0.07)'; rrect(cx - 140, y + 12, 280, 10, 5); ctx.fill();
+  ctx.fillStyle = C.force; rrect(cx - 140, y + 12, 280 * s.moment / M.maxMoment, 10, 5); ctx.fill();
+  ctx.restore();
+}
+
+// ---------- graph ----------
+const GY0 = 1010, GY1 = 1310;
+function legend(a) {
+  ctx.save(); ctx.globalAlpha = a;
+  const items = MUS.map(m => m.name).concat(['Total']);
+  ctx.font = '500 22px Inter';
+  const widths = items.map(s => ctx.measureText(s).width + 50);
+  let x = W / 2 - widths.reduce((p, q) => p + q, 0) / 2;
+  items.forEach((s, i) => {
+    if (i < MUS.length) { ctx.fillStyle = MUS[i].color; rrect(x, 936, 26, 8, 4); ctx.fill(); }
+    else { ctx.strokeStyle = C.dim; ctx.setLineDash([5, 4]); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x, 940); ctx.lineTo(x + 26, 940); ctx.stroke(); ctx.setLineDash([]); }
+    txt(s, x + 34, 948, '500 22px Inter', C.dim, 'left');
+    x += widths[i];
+  });
+  ctx.restore();
+}
+function graph(cx, d, p, rv, a) {
+  const x0 = cx - 145, x1 = cx + 145;
+  ctx.save(); ctx.globalAlpha = a;
+  // frame + grid
+  ctx.strokeStyle = C.line; ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) { const y = GY0 + (GY1 - GY0) * i / 4; ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke(); }
+  txt('stretch', x0, GY1 + 30, '500 18px "JetBrains Mono"', C.faint, 'left');
+  txt('squeeze', x1, GY1 + 30, '500 18px "JetBrains Mono"', C.faint, 'right');
+  const X = q => x0 + (x1 - x0) * q;
+  const Y = v => GY1 - (GY1 - GY0) * v / M.maxMoment * 0.95;
+  const n = Math.max(1, Math.floor(rv * (d.samples.length - 1)));
+  // total (moment) dashed
+  ctx.save(); ctx.beginPath(); ctx.rect(x0 - 2, GY0 - 10, (x1 - x0) * rv + 4, GY1 - GY0 + 20); ctx.clip();
+  ctx.setLineDash([6, 5]); ctx.strokeStyle = 'rgba(148,163,184,0.75)'; ctx.lineWidth = 2;
+  ctx.beginPath(); d.samples.forEach((s, i) => { const xx = X(s.p), yy = Y(s.moment); i ? ctx.lineTo(xx, yy) : ctx.moveTo(xx, yy); }); ctx.stroke();
+  ctx.setLineDash([]);
+  // muscle lines, dominant drawn last
+  const order = [0, 1, 2, 3].sort((i, j) => d.totals[i] - d.totals[j]);
+  for (const k of order) {
+    if (d.totals[k] < 0.02) continue;
+    const g = ctx.createLinearGradient(0, GY0, 0, GY1);
+    g.addColorStop(0, hexA(MUS[k].color, 0.28)); g.addColorStop(1, hexA(MUS[k].color, 0));
+    ctx.beginPath(); ctx.moveTo(X(0), GY1);
+    d.samples.forEach(s => ctx.lineTo(X(s.p), Y(s.load[k])));
+    ctx.lineTo(X(1), GY1); ctx.closePath(); ctx.fillStyle = g; ctx.fill();
+    ctx.beginPath(); d.samples.forEach((s, i) => { const xx = X(s.p), yy = Y(s.load[k]); i ? ctx.lineTo(xx, yy) : ctx.moveTo(xx, yy); });
+    ctx.strokeStyle = MUS[k].color; ctx.lineWidth = 3.5; ctx.stroke();
+  }
+  ctx.restore();
+  // peak marker
+  if (rv >= 1) {
+    const pk = d.peak;
+    ctx.strokeStyle = 'rgba(242,193,78,0.5)'; ctx.setLineDash([3, 4]); ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(X(pk.p), GY0 - 8); ctx.lineTo(X(pk.p), GY1); ctx.stroke(); ctx.setLineDash([]);
+    txt('peak', X(pk.p), GY0 - 14, '600 17px "JetBrains Mono"', C.force);
+  }
+  // playhead
+  const s = M.sampleAt(d, p);
+  const hx = X(Math.min(p, rv));
+  ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(hx, GY0); ctx.lineTo(hx, GY1); ctx.stroke();
+  for (const k of [0, 1, 2, 3]) {
+    if (d.totals[k] < 0.02) continue;
+    ctx.beginPath(); ctx.arc(hx, Y(s.load[k]), 6, 0, Math.PI * 2); ctx.fillStyle = MUS[k].color; ctx.fill();
+    ctx.strokeStyle = C.bg0; ctx.lineWidth = 2; ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// ---------- share bars ----------
+function bars(cx, d, grow, a) {
+  ctx.save(); ctx.globalAlpha = a;
+  const short = ['Upper', 'Mid', 'Lower', 'Delt'];
+  const best = d.totals.indexOf(Math.max(...d.totals));
+  for (let k = 0; k < 4; k++) {
+    const y = 1425 + k * 50;
+    const v = d.totals[k] * grow;
+    const isBest = k === best;
+    txt(short[k], cx - 145, y, (isBest ? '700' : '500') + ' 21px Inter', isBest ? MUS[k].color : C.dim, 'left');
+    txt(Math.round(v * 100) + '%', cx + 145, y, '600 21px "JetBrains Mono"', isBest ? C.text : C.dim, 'right');
+    ctx.fillStyle = 'rgba(255,255,255,0.06)'; rrect(cx - 145, y + 9, 290, 9, 4.5); ctx.fill();
+    ctx.fillStyle = hexA(MUS[k].color, isBest ? 1 : 0.7);
+    if (v > 0.004) { rrect(cx - 145, y + 9, Math.max(9, 290 * v), 9, 4.5); ctx.fill(); }
+  }
+  ctx.restore();
+}
+
+// ---------- bottom message ----------
+function rich(parts, y, font) {
+  ctx.font = font;
+  const w = parts.reduce((s, [t]) => s + ctx.measureText(t).width, 0);
+  let x = W / 2 - w / 2;
+  for (const [t, c] of parts) { ctx.fillStyle = c; ctx.textAlign = 'left'; ctx.fillText(t, x, y); x += ctx.measureText(t).width; }
+}
+function bottom(t) {
+  const tEndReps = INTRO + REP * REPS;
+  const a1 = fade(t, INTRO + 2.0, INTRO + 2.6) * (1 - fade(t, tEndReps - 0.2, tEndReps + 0.3));
+  const a2 = ease(fade(t, tEndReps + 0.1, tEndReps + 0.8));
+  const F = '700 40px Inter';
+  ctx.save(); ctx.globalAlpha = a1;
+  rich([['Tension peaks ', C.accent], ['early in the rep', C.force]], 1730, F);
+  rich([['— not at the squeeze', C.accent]], 1782, F);
+  ctx.restore();
+  ctx.save(); ctx.globalAlpha = a2;
+  const dy = (1 - a2) * 16;
+  rich([['Pull from ', C.accent], ['high', C.text], [' → ', C.accent], ['lower chest', MUS[2].color]], 1730 + dy, F);
+  rich([['Pull from ', C.accent], ['low', C.text], [' → ', C.accent], ['upper chest', MUS[0].color]], 1782 + dy, F);
+  ctx.restore();
+  txt('Model estimate: moment arm × fibre direction. Read the caption.', W / 2, 1880, '400 22px Inter', C.faint, 'center', fade(t, INTRO, INTRO + 1));
+}
+
+// ---------- frame ----------
+window.drawFrame = function (t) {
+  background();
+  header(t);
+  const p = repProgress(t);
+  const rv = reveal(t);
+  const tEndReps = INTRO + REP * REPS;
+  const grow = ease(fade(t, INTRO, INTRO + 1.5));
+  M.data.forEach((d, i) => {
+    const cx = COLS[i];
+    const a = ease(fade(t, 0.3 + i * 0.15, 1.0 + i * 0.15));
+    // column panel
+    ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = C.panel; rrect(cx - 172, 255, 344, 1375, 22); ctx.fill(); ctx.restore();
+    const s = M.sampleAt(d, p);
+    readout(cx, d, s, a);
+    figure(cx, d, s, a);
+    graph(cx, d, p, rv, a);
+    // emphasise the winner bar at the end
+    bars(cx, d, grow, a);
+  });
+  legend(ease(fade(t, 0.8, 1.5)));
+  txt('SHARE OF THE WORK', W / 2, 1382, '600 19px "JetBrains Mono"', C.faint, 'center', ease(fade(t, 0.8, 1.5)));
+  bottom(t);
+};
+window.drawFrame(INTRO + 0.6);
+</script>
+</body>
+</html>
