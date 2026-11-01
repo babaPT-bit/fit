@@ -11,44 +11,99 @@
 <body>
 <canvas id="c" width="1080" height="1920"></canvas>
 <script src="model.js"></script>
+<script src="voice/lines.js"></script>
 <script>
 const M = window.FlyModel;
 const cv = document.getElementById('c');
 const ctx = cv.getContext('2d');
 const W = 1080, H = 1920;
 
-// ---------- timeline (seconds) ----------
+// ---------- timeline (seconds), driven by the voiceover line lengths ----------
 const FPS = 30;
-const INTRO = 1.2;          // title in
-const REP = 3.4;            // one full rep
-const REPS = 3;
-const OUTRO = 3.6;          // end card
-const DURATION = INTRO + REP * REPS + OUTRO;
-window.DURATION = DURATION; window.FPS = FPS;
-
 const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
 const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 const fade = (t, a, b) => clamp((t - a) / (b - a));
+const PARAMS = new URLSearchParams(location.search);
+const SHOW_CAPTIONS = PARAMS.get('captions') !== '0';
 
-// rep progress 0 (stretch) -> 1 (squeeze)
-function repProgress(t) {
-  const tt = t - INTRO;
-  if (tt < 0) return 0;
-  if (tt >= REP * REPS) return 0;
-  const r = tt % REP;
-  const CON = 1.5, HOLD = 0.45, ECC = 1.25;
-  if (r < CON) return ease(r / CON);
-  if (r < CON + HOLD) return 1;
-  if (r < CON + HOLD + ECC) return 1 - ease((r - CON - HOLD) / ECC);
-  return 0;
+const VO = window.VOICE || [];
+const GAP = 0.25, TAIL = 0.6;
+// segment for each line: [start, end]; the voice starts GAP after the segment start
+const SEG = {};
+let tcur = 0;
+for (const ln of VO) { SEG[ln.id] = { start: tcur, vo: tcur + GAP, end: tcur + GAP + ln.dur + 0.3, line: ln }; tcur = SEG[ln.id].end; }
+const DURATION = tcur + TAIL;
+window.DURATION = DURATION; window.FPS = FPS;
+window.VO_TIMES = VO.map(ln => ({ file: ln.file, at: SEG[ln.id].vo }));
+
+// approximate time a word is spoken (proportional to characters)
+function wordTime(id, needle) {
+  const s = SEG[id], txt = s.line.text, i = txt.indexOf(needle);
+  return s.vo + s.line.dur * (i < 0 ? 0.5 : i / txt.length);
 }
-// how much of the graph is revealed (draws during the first concentric)
-function reveal(t) {
-  const tt = t - INTRO;
-  if (tt < 0) return 0;
-  if (tt < 1.5) return ease(tt / 1.5);
-  return 1;
+// featured moment for each variant: the "peak" callout is centred on this word
+const FEATURE = { h2l: 'peak', mid: 'peaks', l2h: 'Upper chest' };
+const KEYS = ['h2l', 'mid', 'l2h'];
+
+// per-column keyframes [time, progress, linear?]  progress: 0 stretch -> 1 squeeze
+const TRACKS = KEYS.map((key, i) => {
+  const d = M.data[i], pk = d.peak.p;
+  const kf = [[0, 0]];
+  const intro = SEG.intro;
+  if (intro) kf.push([intro.start + 0.6, 0], [intro.start + 2.7, 1], [intro.start + 3.1, 1], [intro.start + 5.0, 0]);
+  const s = SEG[key];
+  let feat = null;
+  if (s) {
+    const tk = wordTime(key, FEATURE[key]);
+    const approach = tk - 0.5 - 2.0;
+    if (approach - s.start > 3.9) kf.push([s.start + 0.2, 0], [s.start + 1.9, 1], [s.start + 2.3, 1], [s.start + 3.8, 0]);
+    kf.push([Math.max(approach, s.start + 0.1), 0], [tk - 0.5, pk - 0.02], [tk + 1.1, pk + 0.05, true], [tk + 2.1, 1], [tk + 2.6, 1]);
+    feat = { tk, from: tk - 0.5, to: tk + 2.1, squeeze: tk + 2.1, start: s.start, end: s.end };
+  }
+  const o = SEG.outro;
+  if (o) {
+    const backBy = o.start + 0.25;
+    const last = kf[kf.length - 1][0];
+    kf.push([Math.min(last + 1.8, backBy), 0], [o.start + 0.4, 0], [o.start + 2.2, 1], [o.start + 2.7, 1], [o.start + 4.4, 0]);
+  }
+  // keep keyframes monotonic
+  for (let j = 1; j < kf.length; j++) if (kf[j][0] <= kf[j - 1][0]) kf[j][0] = kf[j - 1][0] + 0.05;
+  return { kf, feat };
+});
+function repProgressCol(i, t) {
+  const kf = TRACKS[i].kf;
+  if (t <= kf[0][0]) return kf[0][1];
+  for (let j = 1; j < kf.length; j++) {
+    if (t <= kf[j][0]) {
+      const [t0, p0] = kf[j - 1], [t1, p1, lin] = kf[j];
+      const u = (t - t0) / (t1 - t0);
+      return p0 + (p1 - p0) * (lin ? u : ease(u));
+    }
+  }
+  return kf[kf.length - 1][1];
 }
+// how much of the column's graph is revealed (drawn during its featured rep)
+function revealCol(i, t) {
+  const f = TRACKS[i].feat;
+  if (!f) return 1;
+  if (t < f.start) return 0;
+  if (t > f.squeeze) return 1;
+  // running max of progress since the featured segment began
+  let m = 0;
+  for (let tt = f.start; tt <= t; tt += 1 / 60) m = Math.max(m, repProgressCol(i, tt));
+  return m;
+}
+// 1 when this column is in focus (or nothing is), dimmed otherwise
+function focusCol(i, t) {
+  let a = 1;
+  KEYS.forEach((key, j) => {
+    const s = SEG[key]; if (!s || j === i) return;
+    const w = fade(t, s.start - 0.1, s.start + 0.4) * (1 - fade(t, s.end - 0.2, s.end + 0.3));
+    a = Math.min(a, 1 - 0.72 * w);
+  });
+  return a;
+}
+function isFocused(i, t) { const s = SEG[KEYS[i]]; return s ? fade(t, s.start - 0.1, s.start + 0.4) * (1 - fade(t, s.end - 0.2, s.end + 0.3)) : 0; }
 
 // ---------- palette ----------
 const C = {
@@ -287,7 +342,7 @@ function graph(cx, d, p, rv, a) {
   const Y = v => GY1 - (GY1 - GY0) * v / M.maxMoment * 0.95;
   const n = Math.max(1, Math.floor(rv * (d.samples.length - 1)));
   // total (moment) dashed
-  ctx.save(); ctx.beginPath(); ctx.rect(x0 - 2, GY0 - 10, (x1 - x0) * rv + 4, GY1 - GY0 + 20); ctx.clip();
+  ctx.save(); ctx.beginPath(); ctx.rect(x0 - 2, GY0 - 10, rv < 0.01 ? 0 : (x1 - x0) * rv + 4, GY1 - GY0 + 20); ctx.clip();
   ctx.setLineDash([6, 5]); ctx.strokeStyle = 'rgba(148,163,184,0.75)'; ctx.lineWidth = 2;
   ctx.beginPath(); d.samples.forEach((s, i) => { const xx = X(s.p), yy = Y(s.moment); i ? ctx.lineTo(xx, yy) : ctx.moveTo(xx, yy); }); ctx.stroke();
   ctx.setLineDash([]);
@@ -304,8 +359,9 @@ function graph(cx, d, p, rv, a) {
     ctx.strokeStyle = MUS[k].color; ctx.lineWidth = 3.5; ctx.stroke();
   }
   ctx.restore();
+  if (rv < 0.01) txt('?', cx, (GY0 + GY1) / 2 + 24, '700 72px Inter', 'rgba(148,163,184,0.25)');
   // peak marker
-  if (rv >= 1) {
+  if (rv >= d.peak.p) {
     const pk = d.peak;
     ctx.strokeStyle = 'rgba(242,193,78,0.5)'; ctx.setLineDash([3, 4]); ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.moveTo(X(pk.p), GY0 - 8); ctx.lineTo(X(pk.p), GY1); ctx.stroke(); ctx.setLineDash([]);
@@ -314,6 +370,7 @@ function graph(cx, d, p, rv, a) {
   // playhead
   const s = M.sampleAt(d, p);
   const hx = X(Math.min(p, rv));
+  if (rv < 0.01) { ctx.restore(); return; }
   ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 1.5;
   ctx.beginPath(); ctx.moveTo(hx, GY0); ctx.lineTo(hx, GY1); ctx.stroke();
   for (const k of [0, 1, 2, 3]) {
@@ -343,54 +400,117 @@ function bars(cx, d, grow, a) {
 }
 
 // ---------- bottom message ----------
-function rich(parts, y, font) {
-  ctx.font = font;
-  const w = parts.reduce((s, [t]) => s + ctx.measureText(t).width, 0);
-  let x = W / 2 - w / 2;
-  for (const [t, c] of parts) { ctx.fillStyle = c; ctx.textAlign = 'left'; ctx.fillText(t, x, y); x += ctx.measureText(t).width; }
+// ---------- captions ----------
+function chunksFor(ln, start) {
+  const words = ln.text.split(' ');
+  const chunks = []; let cur = [];
+  words.forEach((w, i) => {
+    cur.push(w);
+    const brk = /[.,!?]$/.test(w) || cur.length >= 4;
+    if (brk || i === words.length - 1) { chunks.push(cur.join(' ')); cur = []; }
+  });
+  const total = ln.text.length; let acc = 0;
+  return chunks.map(c => { const t0 = start + ln.dur * acc / total; acc += c.length + 1; return { text: c, t0, t1: start + ln.dur * Math.min(1, acc / total) }; });
 }
-function bottom(t) {
-  const tEndReps = INTRO + REP * REPS;
-  const a1 = fade(t, INTRO + 2.0, INTRO + 2.6) * (1 - fade(t, tEndReps - 0.2, tEndReps + 0.3));
-  const a2 = ease(fade(t, tEndReps + 0.1, tEndReps + 0.8));
-  const F = '700 40px Inter';
-  ctx.save(); ctx.globalAlpha = a1;
-  rich([['Tension peaks ', C.accent], ['early in the rep', C.force]], 1730, F);
-  rich([['— not at the squeeze', C.accent]], 1782, F);
+const CHUNKS = VO.flatMap(ln => chunksFor(ln, SEG[ln.id].vo));
+window.CHUNKS = CHUNKS;
+function wordColor(w) {
+  const s = w.toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (s === 'lower') return MUS[2].color;
+  if (s === 'mid' || s === 'middle') return MUS[1].color;
+  if (s === 'upper') return MUS[0].color;
+  if (s === 'delts' || s === 'front') return MUS[3].color;
+  if (s.startsWith('peak') || s === 'sixty' || s === 'percent' || s === 'half') return C.force;
+  return '#ffffff';
+}
+function captions(t) {
+  if (!SHOW_CAPTIONS) return;
+  const c = CHUNKS.find((c, i) => t >= c.t0 && t < (CHUNKS[i + 1] && CHUNKS[i + 1].t0 - c.t1 < 0.6 ? CHUNKS[i + 1].t0 : c.t1 + 0.35));
+  if (!c) return;
+  const k = ease(fade(t, c.t0, c.t0 + 0.14));
+  const words = c.text.split(' ');
+  ctx.save();
+  ctx.font = '800 58px Inter';
+  const sp = ctx.measureText(' ').width;
+  const w = words.reduce((s, x) => s + ctx.measureText(x).width, 0) + sp * (words.length - 1);
+  ctx.translate(W / 2, 1765); ctx.scale(0.9 + 0.1 * k, 0.9 + 0.1 * k); ctx.globalAlpha = k;
+  let x = -w / 2;
+  ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
+  for (const word of words) {
+    ctx.lineWidth = 10; ctx.strokeStyle = 'rgba(0,0,0,0.85)'; ctx.strokeText(word, x, 0);
+    ctx.fillStyle = wordColor(word); ctx.fillText(word, x, 0);
+    x += ctx.measureText(word).width + sp;
+  }
   ctx.restore();
-  ctx.save(); ctx.globalAlpha = a2;
-  const dy = (1 - a2) * 16;
-  rich([['Pull from ', C.accent], ['high', C.text], [' → ', C.accent], ['lower chest', MUS[2].color]], 1730 + dy, F);
-  rich([['Pull from ', C.accent], ['low', C.text], [' → ', C.accent], ['upper chest', MUS[0].color]], 1782 + dy, F);
+}
+
+// ---------- peak callout ----------
+function pill(text, x, y, color, a, filled) {
+  ctx.save(); ctx.globalAlpha *= a; ctx.font = '700 22px "JetBrains Mono"';
+  const w = ctx.measureText(text).width + 28;
+  rrect(x - w / 2, y - 19, w, 38, 19);
+  ctx.fillStyle = filled ? color : 'rgba(11,15,23,0.85)'; ctx.fill();
+  ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
+  ctx.fillStyle = filled ? '#0b0f17' : color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(text, x, y + 1); ctx.restore();
+}
+function callout(i, t) {
+  const f = TRACKS[i].feat; if (!f) return;
+  const a = fade(t, f.from - 0.1, f.from + 0.3) * (1 - fade(t, f.to + 0.8, f.to + 1.2));
+  if (a <= 0) return;
+  const d = M.data[i], cx = COLS[i];
+  const best = d.totals.indexOf(Math.max(...d.totals));
+  const col = MUS[best].color;
+  const pulse = 0.5 + 0.5 * Math.sin((t - f.from) * 9);
+  // chest glow
+  ctx.save(); ctx.globalAlpha = a * (0.55 + 0.45 * pulse);
+  ctx.shadowColor = col; ctx.shadowBlur = 24; ctx.strokeStyle = col; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.ellipse(cx, FLOOR_Y - 1.33 * K, 0.27 * K, 0.15 * K, 0, 0, Math.PI * 2); ctx.stroke();
   ctx.restore();
-  txt('Model estimate: moment arm × fibre direction. Read the caption.', W / 2, 1880, '400 22px Inter', C.faint, 'center', fade(t, INTRO, INTRO + 1));
+  pill('PEAK · ' + Math.round(d.peak.moment * 100) + ' cm', cx, 455, C.force, a, true);
+  pill(MUS[best].name.toUpperCase() + ' ' + Math.round(d.totals[best] * 100) + '%', cx, 395, col, a, false);
+  // ring on the graph at the peak
+  const x0 = cx - 145, x1 = cx + 145;
+  const X = q => x0 + (x1 - x0) * q;
+  const Y = v => GY1 - (GY1 - GY0) * v / M.maxMoment * 0.95;
+  ctx.save(); ctx.globalAlpha = a;
+  ctx.strokeStyle = col; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(X(d.peak.p), Y(d.peak.load[best]), 12 + 8 * pulse, 0, Math.PI * 2); ctx.stroke();
+  ctx.restore();
 }
 
 // ---------- frame ----------
 window.drawFrame = function (t) {
   background();
   header(t);
-  const p = repProgress(t);
-  const rv = reveal(t);
-  const tEndReps = INTRO + REP * REPS;
-  const grow = ease(fade(t, INTRO, INTRO + 1.5));
   M.data.forEach((d, i) => {
     const cx = COLS[i];
-    const a = ease(fade(t, 0.3 + i * 0.15, 1.0 + i * 0.15));
-    // column panel
-    ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = C.panel; rrect(cx - 172, 255, 344, 1375, 22); ctx.fill(); ctx.restore();
+    const a = ease(fade(t, 0.15 + i * 0.12, 0.7 + i * 0.12)) * focusCol(i, t);
+    const foc = isFocused(i, t);
+    // column panel (+ outline in the target colour when featured)
+    ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = C.panel; rrect(cx - 172, 255, 344, 1375, 22); ctx.fill();
+    if (foc > 0) {
+      const best = d.totals.indexOf(Math.max(...d.totals));
+      ctx.globalAlpha = a * foc; ctx.strokeStyle = hexA(MUS[best].color, 0.7); ctx.lineWidth = 2.5; ctx.stroke();
+    }
+    ctx.restore();
+    const p = repProgressCol(i, t);
     const s = M.sampleAt(d, p);
     readout(cx, d, s, a);
     figure(cx, d, s, a);
+    const rv = revealCol(i, t);
     graph(cx, d, p, rv, a);
-    // emphasise the winner bar at the end
+    const f = TRACKS[i].feat;
+    const grow = f ? ease(fade(t, f.squeeze - 0.2, f.squeeze + 0.8)) : 1;
     bars(cx, d, grow, a);
+    callout(i, t);
   });
-  legend(ease(fade(t, 0.8, 1.5)));
-  txt('SHARE OF THE WORK', W / 2, 1382, '600 19px "JetBrains Mono"', C.faint, 'center', ease(fade(t, 0.8, 1.5)));
-  bottom(t);
+  legend(ease(fade(t, 0.6, 1.2)));
+  txt('SHARE OF THE WORK', W / 2, 1382, '600 19px "JetBrains Mono"', C.faint, 'center', ease(fade(t, 0.6, 1.2)) * focusCol(1, t));
+  captions(t);
+  txt('Model estimate: moment arm × fibre direction', W / 2, 1890, '400 20px Inter', C.faint, 'center', fade(t, 0.5, 1.2));
 };
-window.drawFrame(INTRO + 0.6);
+window.drawFrame(8);
 </script>
 </body>
 </html>
