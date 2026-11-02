@@ -68,18 +68,18 @@ Every video follows the same 5 beats:
 ## 5. Dumbbell lateral raise vs cable lateral raise
 **Title:** Why cables win for side delts.
 
-- **Hook:** "Lateral raises with dumbbells waste the first half of every rep."
+- **Hook:** "Lateral raises with dumbbells waste half of every rep."
 - **A, dumbbell:** "At the bottom, the dumbbell hangs straight down, so your side delt has almost nothing to do. It only gets hard near the top."
-- **B, cable:** "A low cable pulls across your body, so your side delt works from the very first inch."
+- **B, cable:** "A cable pulls from the side, so you can put the hardest part exactly where your delt is strongest."
 - **Setup (show this step by step):**
-  - "Set the pulley at about knee height."
-  - "Stand side-on, about an arm's length from the machine."
-  - "Hold the handle in your far hand, so the cable runs across your body."
-  - "Lean slightly away, and lift with your elbow until your arm is level with your shoulder."
-- **Takeaway:** "Same shoulder, more work per rep. Save this."
-- **Zoom bubble:** shoulder cap split into front, side and rear delt, with the side delt red. A tension arrow:
-  - **Dumbbell:** zero at the bottom.
-  - **Cable:** strong from the start.
+  - "Set the pulley at arm height."
+  - "Stand side-on, about an arm's length from the machine, and hold the handle in your far hand."
+  - "Raise your arm. When it's halfway up, the cable and your arm should make a ninety-degree angle. That's where the pull is strongest."
+  - "Lift with your elbow, to shoulder height, and lower slowly."
+- **Takeaway:** "Same shoulder, more work where it counts. Save this."
+- **Zoom bubble:** shoulder cap split into front, side and rear delt, with the side delt red.
+  - **Dumbbell:** the tension arrow is zero at the bottom.
+  - **Cable:** a hand-drawn right-angle mark (90°) between the cable and the arm, with the biggest tension arrow at that point.
 - **Note:** the setup needs its own ~6 s beat, so A and B run about 7 s each.
 
 ## 6. Squat vs Romanian deadlift
@@ -102,15 +102,22 @@ Every video follows the same 5 beats:
 - **Takeaway:** "If your gym has both, pick seated. Save this."
 - **Zoom bubble:** hamstring drawn as a rubber band from hip to knee. In the lying view it's short and slack; in the seated view it's long and taut, with a red stretch arrow.
 
-## 8. Standing vs seated calf raise
-**Title:** Straight knees or bent knees?
+## 8. Why your calves won't grow
+**Title:** Still got skinny calves?
 
-- **Hook:** "Your calf is two muscles, and your knees decide which one works."
-- **A, standing calf raise:** "Knees straight: the gastrocnemius, the diamond-shaped muscle you can see, does the work."
-- **B, seated calf raise:** "Knees bent: the gastrocnemius goes slack, and the soleus underneath takes over."
-- **Why:** "The gastrocnemius crosses your knee. The soleus doesn't."
-- **Takeaway:** "Do both, and go slow at the bottom. Save this."
-- **Zoom bubble:** lower leg with the gastrocnemius (two bellies, top) over the soleus (underneath, wider at the bottom).
+- **Hook:** "Calves are the most stubborn muscle in your body. Still got skinny legs?"
+  - **On screen:** a skinny-calf stickman shivering (wobble lines, sweat drops) next to a big-calf stickman flexing his calves, which pop in red.
+- **The mistake:** "Most people bounce through tiny half reps. That's your Achilles tendon doing the work, like a spring, not the muscle."
+  - **On screen:** the skinny guy bouncing fast; the Achilles drawn as a coiled spring.
+- **Fix 1, the stretch:** "Go all the way down and pause for two seconds in the stretch. One study found reps in the bottom half grew calves more than reps at the top."
+- **Fix 2, both muscles:** "Straight knees train the gastrocnemius. Bent knees train the soleus underneath. Do both."
+- **The plan:** "Ten to twenty slow reps, close to failure, three to four sets, two or three times a week."
+  - **On screen:** a handwritten plan card.
+- **Takeaway:** "Genetics matter, but slow, deep reps beat bouncing every time. Save this."
+  - **On screen:** the skinny guy's calves grow a little and he stops shivering.
+- **Zoom bubble:** lower leg with the gastrocnemius (two bellies, top) over the soleus (underneath), and the Achilles tendon at the bottom.
+  - **Bouncing:** the spring (tendon) is red.
+  - **Paused stretch:** the muscle is red.
 
 ## 9. Lat pulldown: wide grip vs close grip
 **Title:** Does grip width change your back?
@@ -145,4 +152,5 @@ Every video follows the same 5 beats:
 - Every pair shifts **emphasis**; the other muscles still work. The voiceover says "more" or "takes over", never "only", except for the straight-arm pulldown (no elbow bend means the biceps can't help) and the crunch/leg-raise explanation.
 - #3 and #7 cite single studies (Maeo et al.: overhead vs pushdown triceps, seated vs lying leg curl). The voiceover says "one study" so it doesn't overclaim.
 - #2 uses the common evidence-based ranges: hypertrophy works across roughly 6–30 reps when sets are close to failure; strength is best built with heavy 1–6 rep work on the lifts you want to get strong at.
+- #8: the bottom-half calf finding is from Kassiano et al. 2023 (partial reps in the stretched position); the script says "one study".
 - #9: research shows small differences between grip widths, so the script doesn't claim one is clearly better.
