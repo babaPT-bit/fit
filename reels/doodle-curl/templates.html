@@ -1,0 +1,30 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Doodle Templates</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+@font-face { font-family: "Patrick Hand"; src: url(../lib/fonts/patrick-hand.woff2); }
+@font-face { font-family: "Permanent Marker"; src: url(../lib/fonts/permanent-marker.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script>
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const D = window.Doodle;
+const tpl = new URLSearchParams(location.search).get('tpl') || 'paper';
+window.drawFrame = function (t, c = 1) {
+  ctx.clearRect(0, 0, D.W, D.H);
+  ctx.drawImage(D.background(tpl), 0, 0);
+  const K = D.kit(ctx, tpl, 1 + Math.floor(t * 8));         // new seed 8x/sec = "boiling" hand-drawn lines
+  if (tpl === 'kraft') { D.card(ctx, 60, 300, 960, 640, 11, -0.012); D.card(ctx, 60, 1000, 960, 640, 12, 0.01); }
+  K.title('Same curl. Two heads.', tpl === 'notebook' ? null : 'where your elbow goes decides it');
+  const a = D.preacher(K, c, 430, 900, 450);
+  const b = D.cableCurl(K, c, 600, 1620, 400);
+  K.note('short head', 860, 420, [a.muscle[0] + 40, a.muscle[1] - 10]);
+  K.note('long head', 900, 1080, [b.muscle[0] + 45, b.muscle[1] - 10]);
+  K.caption('Arm in front vs arm behind', 1810);
+  return cv.toDataURL('image/png');
+};
+document.fonts.load('700 40px Caveat').then(() => document.fonts.load('40px "Patrick Hand"')).then(() => document.fonts.load('40px "Permanent Marker"')).then(() => { window.ready = true; });
+</script></body></html>
