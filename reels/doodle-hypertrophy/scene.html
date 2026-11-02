@@ -1,0 +1,252 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Hypertrophy vs Strength Reel</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+@font-face { font-family: "Patrick Hand"; src: url(../lib/fonts/patrick-hand.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const D = window.Doodle, W = 1080, H = 1920;
+const INK = '#1a1a1a', RED = '#d7261e', SOFT = 'rgba(26,26,26,0.35)';
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const fade = (t, a, b) => clamp((t - a) / (b - a));
+const rad = d => d * Math.PI / 180;
+
+// ---------- voice-driven timeline (brisk: short gaps) ----------
+const VO = window.VOICE; const SEG = {}; let tc = 0;
+for (const ln of VO) { SEG[ln.id] = { start: tc, vo: tc + 0.12, end: tc + 0.12 + ln.dur + 0.18, line: ln }; tc = SEG[ln.id].end; }
+window.DURATION = tc + 0.4; window.VO_TIMES = VO.map(ln => ({ file: ln.file, at: SEG[ln.id].vo }));
+function segAt(t) { let id = VO[0].id; for (const ln of VO) if (t >= SEG[ln.id].start) id = ln.id; const s = SEG[id]; return { id, s, u: clamp((t - s.start) / (s.end - s.start)) }; }
+const speaking = (id, t) => t >= SEG[id].vo && t <= SEG[id].vo + SEG[id].line.dur;
+const rep = (t, period = 2.2) => 0.5 - 0.5 * Math.cos(2 * Math.PI * t / period);
+
+let K, rc, SEED;
+const ro = (e = {}) => Object.assign({ stroke: INK, strokeWidth: 7, roughness: 1.4, bowing: 1.2, seed: SEED }, e);
+
+// ---------- front-view stickman rig ----------
+// o = { x, y (feet), s (px per unit) }; pose = { squat 0..1, arms: { L: [a1, a2], R: [a1, a2] }, face, look, flex, mouth }
+function man(o, pose = {}) {
+  const P = p => [o.x + p[0] * o.s, o.y - p[1] * o.s];
+  const sq = pose.squat || 0;
+  const hip = [0, 0.92 - 0.36 * sq], neck = [0, hip[1] + 0.56], sh = [0, hip[1] + 0.5];
+  const head = [0, hip[1] + 0.71];
+  const line = (pts, w = 7, col = INK) => rc.linearPath(pts.map(P), ro({ strokeWidth: w, stroke: col }));
+  // legs
+  for (const s of [-1, 1]) {
+    const foot = [s * (0.15 + 0.07 * sq), 0];
+    const knee = [s * (0.1 + 0.2 * sq), 0.47 - 0.1 * sq];
+    line([hip, knee, foot]); line([foot, [foot[0] + s * 0.07, 0]], 7);
+  }
+  line([hip, neck]);
+  // arms
+  const out = {};
+  for (const [side, s] of [['L', -1], ['R', 1]]) {
+    let E, Hd;
+    if (pose.hands && pose.hands[side]) { Hd = pose.hands[side]; E = [(sh[0] + Hd[0]) / 2 + s * 0.08, (sh[1] + Hd[1]) / 2 - 0.08]; }
+    else {
+      const [a1, a2] = (pose.arms && pose.arms[side]) || [12, 6];
+      const u = [s * Math.sin(rad(a1)), -Math.cos(rad(a1))], f = [s * Math.sin(rad(a1 + a2)), -Math.cos(rad(a1 + a2))];
+      E = [sh[0] + u[0] * 0.3, sh[1] + u[1] * 0.3]; Hd = [E[0] + f[0] * 0.28, E[1] + f[1] * 0.28];
+    }
+    line([sh, E, Hd]);
+    out[side] = { E: P(E), H: P(Hd), Ew: E, Hw: Hd };
+    if (pose.flex && side === 'R') {     // biceps balloon on the right arm
+      const m = [(sh[0] + E[0]) / 2 + 0.03, (sh[1] + E[1]) / 2 + 0.02], mp = P(m);
+      const ang = Math.atan2(-(E[1] - sh[1]), E[0] - sh[0]);
+      ctx.save(); ctx.translate(...mp); ctx.rotate(ang);
+      rc.ellipse(0, 0, (0.2 + 0.08 * pose.flex) * o.s, (0.05 + 0.12 * pose.flex) * o.s, ro({ stroke: RED, strokeWidth: 5, fill: RED, fillStyle: 'hachure', hachureGap: 7, fillWeight: 3 }));
+      ctx.restore();
+      if (pose.flex > 0.6) for (const da of [-0.5, 0, 0.5]) {
+        const a = -Math.PI / 2 + da, r0 = (0.16 + 0.1 * pose.flex) * o.s;
+        rc.line(mp[0] + Math.cos(a) * r0, mp[1] + Math.sin(a) * r0, mp[0] + Math.cos(a) * (r0 + 30), mp[1] + Math.sin(a) * (r0 + 30), ro({ stroke: RED, strokeWidth: 5, roughness: 0.8 }));
+      }
+    }
+  }
+  // head + face
+  const hp = P(head), R = 0.12 * o.s, look = (pose.look || 0) * R * 0.3;
+  rc.circle(hp[0], hp[1], R * 2, ro({ strokeWidth: 7, fill: '#f4f1ea', fillStyle: 'solid' }));
+  ctx.fillStyle = INK;
+  const face = pose.face || 'smile';
+  for (const s of [-1, 1]) { ctx.beginPath(); ctx.ellipse(hp[0] + s * R * 0.35 + look, hp[1] - R * 0.15, R * 0.09, R * (face === 'shout' ? 0.09 : 0.14), 0, 0, 7); ctx.fill(); }
+  if (face === 'shout') {
+    for (const s of [-1, 1]) rc.line(hp[0] + s * R * 0.55 + look, hp[1] - R * 0.5, hp[0] + s * R * 0.15 + look, hp[1] - R * 0.32, ro({ strokeWidth: 4, roughness: 0.6 }));
+    const open = pose.mouth ?? 1;
+    ctx.beginPath(); ctx.ellipse(hp[0] + look, hp[1] + R * 0.42, R * 0.28, R * (0.08 + 0.22 * open), 0, 0, 7); ctx.fill();
+  } else if (face === 'confused') {
+    rc.curve([[hp[0] - R * 0.35 + look, hp[1] + R * 0.45], [hp[0] - R * 0.1 + look, hp[1] + R * 0.35], [hp[0] + R * 0.1 + look, hp[1] + R * 0.5], [hp[0] + R * 0.35 + look, hp[1] + R * 0.4]], ro({ strokeWidth: 4, roughness: 0.6 }));
+    rc.line(hp[0] - R * 0.55 + look, hp[1] - R * 0.5, hp[0] - R * 0.15 + look, hp[1] - R * 0.45, ro({ strokeWidth: 4, roughness: 0.6 }));
+  } else {
+    rc.arc(hp[0] + look, hp[1] + R * 0.2, R * 0.9, R * 0.6, 0.35, Math.PI - 0.35, false, ro({ strokeWidth: 5 }));
+  }
+  out.head = hp; out.headR = R;
+  return out;
+}
+
+// ---------- props ----------
+function dumbbell(p, s, ang = 0) {
+  ctx.save(); ctx.translate(...p); ctx.rotate(ang);
+  rc.line(-0.08 * s, 0, 0.08 * s, 0, ro({ stroke: '#4a4a4a', strokeWidth: 8 }));
+  for (const x of [-0.085, 0.085]) rc.rectangle(x * s - 0.025 * s, -0.06 * s, 0.05 * s, 0.12 * s, ro({ strokeWidth: 4, fill: INK, fillStyle: 'solid' }));
+  ctx.restore();
+}
+function bubble(x, y, w, h, tail, text, col = INK, size = 66) {
+  rc.ellipse(x, y, w, h, ro({ stroke: col, strokeWidth: 5, fill: '#fbf9f3', fillStyle: 'solid' }));
+  rc.linearPath([[x - 20, y + h / 2 - 8], tail, [x + 20, y + h / 2 - 8]], ro({ stroke: col, strokeWidth: 5 }));
+  ctx.font = `700 ${size}px Caveat`; ctx.fillStyle = col; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, x, y + 4); ctx.textBaseline = 'alphabetic';
+}
+function sticky(x, y, w, h, rot, lines, appear = 1) {
+  if (appear <= 0) return;
+  ctx.save(); ctx.translate(x + w / 2, y + h / 2); ctx.rotate(rot); ctx.globalAlpha = appear; ctx.scale(0.9 + 0.1 * appear, 0.9 + 0.1 * appear);
+  ctx.shadowColor = 'rgba(0,0,0,0.25)'; ctx.shadowBlur = 18; ctx.shadowOffsetY = 8;
+  ctx.fillStyle = '#fff3a6'; ctx.fillRect(-w / 2, -h / 2, w, h); ctx.shadowColor = 'transparent';
+  ctx.fillStyle = 'rgba(240,230,190,0.8)'; ctx.fillRect(-60, -h / 2 - 16, 120, 32);
+  let yy = -h / 2 + 70;
+  for (const [txt, size, col] of lines) { ctx.font = `700 ${size}px Caveat`; ctx.fillStyle = col || INK; ctx.textAlign = 'center'; ctx.fillText(txt, 0, yy); yy += size * 1.05; }
+  ctx.restore();
+}
+function heading(a, b) {
+  ctx.textAlign = 'center'; ctx.font = '700 96px Caveat'; ctx.fillStyle = INK; ctx.fillText(a, 540, 150);
+  if (b) { ctx.font = '700 64px Caveat'; ctx.fillStyle = RED; ctx.fillText(b, 540, 222); }
+}
+function question(x, y, t, size = 110) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(0.18 * Math.sin(t * 4));
+  ctx.font = `700 ${size}px Caveat`; ctx.fillStyle = RED; ctx.textAlign = 'center'; ctx.fillText('?', 0, 0); ctx.restore();
+}
+function clock(x, y, r, t) {
+  rc.circle(x, y, r * 2, ro({ strokeWidth: 5 }));
+  rc.line(x, y, x + Math.cos(t * 2 - Math.PI / 2) * r * 0.75, y + Math.sin(t * 2 - Math.PI / 2) * r * 0.75, ro({ strokeWidth: 5, stroke: RED }));
+  rc.line(x, y, x, y - r * 0.5, ro({ strokeWidth: 5 }));
+  ctx.font = '700 46px Caveat'; ctx.fillStyle = INK; ctx.textAlign = 'center'; ctx.fillText('rest 3–5 min', x, y + r + 50);
+}
+
+// ---------- scenes ----------
+function sceneArgue(t, id) {
+  const s = 340, fy = 1480;
+  const aTalk = speaking('hookA', t), bTalk = speaking('hookB', t);
+  const mouth = 0.4 + 0.6 * Math.abs(Math.sin(t * 18));
+  man({ x: 190, y: fy, s }, { face: aTalk ? 'shout' : 'smile', mouth, look: 1, arms: { L: [35, -100], R: [85, aTalk ? 0 : 20] } });
+  man({ x: 890, y: fy, s }, { face: bTalk ? 'shout' : 'smile', mouth, look: -1, arms: { L: [85, bTalk ? 0 : 20], R: [35, -100] } });
+  const look = t < SEG.hookB.start ? -1 : t < SEG.hookN.start ? 1 : 0;
+  man({ x: 540, y: fy + 20, s: s * 0.95 }, { face: 'confused', look, arms: { L: [40, 100], R: [40, 100] } });
+  if (t >= SEG.hookA.vo - 0.05) bubble(280, 640, 470, 200, [200, 800], 'HEAVY! 6 reps!', INK, 60);
+  if (t >= SEG.hookB.vo - 0.05) bubble(800, 900, 470, 200, [880, 1050], 'LIGHT! 12 reps!', INK, 60);
+  if (id === 'hookN') {
+    const a = fade(t, SEG.hookN.start, SEG.hookN.start + 0.3);
+    question(470, 790, t); question(610, 760, t + 1, 90);
+    ctx.globalAlpha = a; heading("What's your goal?", null); ctx.globalAlpha = 1;
+  } else if (t > SEG.hookB.start) question(540, 800, t, 90);
+}
+function sceneHyp(t, u) {
+  heading('SIZE', '= hypertrophy');
+  const c = rep(t, 2.0), s = 560;
+  const o = man({ x: 470, y: 1560, s }, { arms: { L: [40, -110], R: [8, 10 + 140 * c] }, flex: (0.25 + 0.75 * ease(u)) * (0.6 + 0.4 * c) });
+  dumbbell(o.R.H, s, 0);
+  sticky(640, 330, 400, 360, 0.04, [['6–30 reps', 66, RED], ['close to failure', 58], ['10–20 hard sets', 58], ['per muscle / week', 50]], fade(u, 0.15, 0.3));
+}
+function sceneStr(t, u) {
+  heading('STRENGTH', '= lift more');
+  const d = rep(t, 2.6), s = 470, o = { x: 540, y: 1640, s };
+  const hipY = 0.92 - 0.36 * d, barY = hipY + 0.53, bend = 0.09;
+  const P = p => [o.x + p[0] * s, o.y - p[1] * s];
+  man(o, { squat: d, face: 'shout', mouth: 0.35, hands: { L: [-0.33, barY], R: [0.33, barY] } });
+  rc.curve([[-0.95, barY - bend], [-0.5, barY - bend * 0.3], [0, barY], [0.5, barY - bend * 0.3], [0.95, barY - bend]].map(P), ro({ stroke: '#4a4a4a', strokeWidth: 10 }));
+  for (const sx of [-1, 1]) for (const k of [0, 1]) {
+    const px = sx * (0.78 + k * 0.08), py = barY - bend * 0.8;
+    const pp = P([px, py]); rc.rectangle(pp[0] - 0.03 * s, pp[1] - 0.2 * s, 0.06 * s, 0.4 * s, ro({ strokeWidth: 4, fill: INK, fillStyle: 'solid' }));
+  }
+  sticky(60, 330, 380, 300, -0.04, [['1–6 reps', 66, RED], ['heavy', 58], ['same lifts, lots', 52], ['of practice', 52]], fade(u, 0.1, 0.25));
+  clock(850, 470, 90, t);
+}
+function fibreBubble(cx, cy, r, grow) {
+  rc.circle(cx, cy, r * 2, ro({ strokeWidth: 8, fill: '#fbf9f3', fillStyle: 'solid' }));
+  for (let i = 0; i < 4; i++) {
+    const y = cy - r * 0.45 + i * r * 0.3, th = (0.06 + 0.06 * grow) * r;
+    rc.rectangle(cx - r * 0.65, y - th, r * 1.3, th * 2, ro({ strokeWidth: 4, stroke: RED, fill: RED, fillStyle: 'hachure', hachureGap: 8, fillWeight: 2.5 }));
+  }
+  ctx.font = '700 54px Caveat'; ctx.fillStyle = RED; ctx.textAlign = 'center';
+  ctx.fillText('SIZE', cx, cy + r + 70); ctx.fillStyle = INK; ctx.font = '700 46px Caveat'; ctx.fillText('thicker fibres', cx, cy + r + 120);
+}
+function nerveBubble(cx, cy, r, lit, t) {
+  rc.circle(cx, cy, r * 2, ro({ strokeWidth: 8, fill: '#fbf9f3', fillStyle: 'solid' }));
+  const n = 5;
+  rc.line(cx, cy - r * 0.85, cx, cy - r * 0.35, ro({ strokeWidth: 5 }));
+  for (let i = 0; i < n; i++) {
+    const y = cy - r * 0.25 + i * r * 0.2, on = i < Math.round(lit * n);
+    rc.line(cx, cy - r * 0.35, cx - r * 0.55 + i * r * 0.1, y, ro({ strokeWidth: 3, stroke: SOFT }));
+    rc.rectangle(cx - r * 0.6, y - r * 0.06, r * 1.2, r * 0.12, ro({ strokeWidth: 4, stroke: on ? RED : INK, fill: on ? RED : undefined, fillStyle: 'hachure', hachureGap: 8 }));
+  }
+  // lightning bolt
+  const bx = cx + r * 0.35, by = cy - r * 0.7, k = 0.8 + 0.2 * Math.sin(t * 12);
+  rc.linearPath([[bx, by], [bx - 25 * k, by + 45 * k], [bx + 5, by + 45 * k], [bx - 20 * k, by + 95 * k]], ro({ stroke: RED, strokeWidth: 6, roughness: 0.6 }));
+  ctx.font = '700 54px Caveat'; ctx.fillStyle = RED; ctx.textAlign = 'center';
+  ctx.fillText('STRENGTH', cx, cy + r + 70); ctx.fillStyle = INK; ctx.font = '700 46px Caveat'; ctx.fillText('more fibres firing', cx, cy + r + 120);
+}
+function sceneWhy(t, u) {
+  heading('Why the difference?', null);
+  fibreBubble(285, 860, 230, ease(clamp(u * 1.8)));
+  nerveBubble(795, 860, 230, ease(clamp((u - 0.35) * 1.8)), t);
+  // brain doodle feeding the nerve
+  const bx = 795, by = 520; rc.ellipse(bx, by, 150, 100, ro({ strokeWidth: 5 })); rc.curve([[bx - 50, by], [bx - 20, by - 20], [bx + 10, by + 10], [bx + 45, by - 10]], ro({ strokeWidth: 3 }));
+  rc.line(bx, by + 50, bx, 640, ro({ strokeWidth: 5, stroke: RED }));
+}
+function scenePlan(t, u) {
+  heading('Both were right!', null);
+  const shake = 6 * Math.sin(t * 10), s = 330, fy = 1000;
+  man({ x: 355, y: fy, s }, { look: 1, arms: { L: [35, -100], R: [72 + shake, 18] } });
+  man({ x: 725, y: fy, s }, { look: -1, arms: { L: [72 - shake, 18], R: [35, -100] } });
+  sticky(70, 1080, 450, 520, -0.03, [['BIG LIFTS', 64, RED], ['heavy · 3–6 reps', 52], ['squat', 50], ['bench', 50], ['deadlift', 50], ['→ STRENGTH', 56, RED]], fade(u, 0.1, 0.25));
+  sticky(560, 1090, 450, 520, 0.03, [['SMALL MUSCLES', 60, RED], ['10–15 reps', 52], ['arms', 50], ['shoulders', 50], ['calves', 50], ['→ SIZE', 56, RED]], fade(u, 0.35, 0.5));
+  if (u > 0.85) {
+    ctx.save(); ctx.translate(820, 330); ctx.rotate(-0.12);
+    rc.rectangle(-170, -70, 340, 120, ro({ stroke: RED, strokeWidth: 6, roughness: 2 }));
+    ctx.font = '700 72px Caveat'; ctx.fillStyle = RED; ctx.textAlign = 'center'; ctx.fillText('Save this!', 0, 18); ctx.restore();
+  }
+}
+
+// ---------- captions ----------
+function chunks() {
+  const out = [];
+  for (const ln of VO) {
+    const words = ln.text.split(' '), cs = []; let cur = [];
+    words.forEach((w, i) => { cur.push(w); if (/[.,!?]$/.test(w) || cur.length >= 4 || i === words.length - 1) { cs.push(cur.join(' ')); cur = []; } });
+    let acc = 0; const total = ln.text.length, st = SEG[ln.id].vo;
+    for (const c of cs) { const t0 = st + ln.dur * acc / total; acc += c.length + 1; out.push({ text: c, t0, t1: st + ln.dur * Math.min(1, acc / total) }); }
+  }
+  return out;
+}
+const CH = chunks();
+const KEY = /^(heavy|light|six|twelve|goal|hypertrophy|strength|size|failure|bigger|thicker|brain|compound|smaller|higher|right)/i;
+function caption(t) {
+  const c = CH.find((c, i) => t >= c.t0 && t < (CH[i + 1] && CH[i + 1].t0 - c.t1 < 0.6 ? CH[i + 1].t0 : c.t1 + 0.3));
+  if (!c) return;
+  const words = c.text.split(' ');
+  ctx.font = '700 80px Caveat';
+  const sp = ctx.measureText(' ').width, w = words.reduce((s, x) => s + ctx.measureText(x).width, 0) + sp * (words.length - 1);
+  ctx.fillStyle = 'rgba(244,241,234,0.88)'; ctx.fillRect(540 - w / 2 - 30, 1792, w + 60, 100);
+  let x = 540 - w / 2; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  for (const word of words) { ctx.fillStyle = KEY.test(word) ? RED : INK; ctx.fillText(word, x, 1842); x += ctx.measureText(word).width + sp; }
+  ctx.textBaseline = 'alphabetic';
+}
+
+window.drawFrame = function (t) {
+  ctx.drawImage(D.background('paper'), 0, 0);
+  SEED = 1 + Math.floor(t * 8); K = D.kit(ctx, 'paper', SEED); rc = K.rc;
+  const { id, s, u } = segAt(t);
+  if (id.startsWith('hook')) sceneArgue(t, id);
+  else if (id === 'hyp') sceneHyp(t, u);
+  else if (id === 'str') sceneStr(t, u);
+  else if (id === 'why') sceneWhy(t, u);
+  else scenePlan(t, u);
+  const since = t - s.start;
+  if (!id.startsWith('hook') && since < 0.12) { ctx.fillStyle = `rgba(244,241,234,${1 - since / 0.12})`; ctx.fillRect(0, 0, W, H); }
+  caption(t);
+  return cv.toDataURL('image/png');
+};
+document.fonts.load('700 40px Caveat').then(() => { window.ready = true; });
+</script></body></html>
