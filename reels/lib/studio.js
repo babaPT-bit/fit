@@ -67,6 +67,8 @@ const SKIN2 = new THREE.MeshStandardMaterial({ color: 0xc9b9a8, roughness: 0.65 
 const SHORTS = new THREE.MeshStandardMaterial({ color: 0x1d2433, roughness: 0.85 });
 const HAIR = new THREE.MeshStandardMaterial({ color: 0x23262d, roughness: 0.9 });
 const SHOE = new THREE.MeshStandardMaterial({ color: 0x2b3140, roughness: 0.7 });
+const SOLE = new THREE.MeshStandardMaterial({ color: 0xe8e6e1, roughness: 0.6 });
+const TRIM = new THREE.MeshStandardMaterial({ color: 0xff7a45, roughness: 0.6 });
 export const GLOW = 0xff5a36;
 function muscleMat(base = 0xd2c0ae) {
   return new THREE.MeshStandardMaterial({ color: base, roughness: 0.55, emissive: new THREE.Color(GLOW), emissiveIntensity: 0 });
@@ -96,103 +98,179 @@ export function twoBone(a, c, L1, L2, pole) {
   return a.clone().addScaledVector(dir, x).addScaledVector(p, h);
 }
 
+// muscle piece: ellipsoid with radii (rx, ry, rz)
+function blob(parent, mat, pos, radii, rot) {
+  const m = mesh(SPH, mat, parent); m.position.set(...pos); m.scale.set(...radii);
+  if (rot) m.rotation.set(...rot);
+  return m;
+}
+// orthonormal frame for a limb segment: y along the bone, z toward ref
+function segFrame(a, b, ref) {
+  const y = new THREE.Vector3().subVectors(b, a).normalize();
+  let z = ref.clone().sub(y.clone().multiplyScalar(ref.dot(y)));
+  if (z.lengthSq() < 1e-6) z = Math.abs(y.x) < 0.9 ? V3(1, 0, 0) : V3(0, 0, 1);
+  z.normalize();
+  const x = new THREE.Vector3().crossVectors(y, z);
+  return new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(x, y, z));
+}
+// a group that follows a bone: local y runs 0..1 along it (scaled by length)
+function boneGroup(parent) { const g = new THREE.Group(); parent.add(g); return g; }
+function placeBone(g, a, b, ref) { g.position.copy(a); g.quaternion.copy(segFrame(a, b, ref)); g.userData.L = a.distanceTo(b); }
+// add an ellipsoid to a bone group at fraction t along it (re-placed every frame)
+function onBone(g, mat, t, off, radii, rot) {
+  const m = mesh(SPH, mat, g); m.userData.bone = { t, off, radii }; if (rot) m.rotation.set(...rot); return m;
+}
+function layoutBone(g) {
+  const L = g.userData.L || 0.3;
+  for (const m of g.children) { const b = m.userData.bone; if (!b) continue;
+    m.position.set(b.off[0], b.t * L, b.off[1]); m.scale.set(b.radii[0], b.radii[1] * (L / 0.3), b.radii[2]); }
+}
+
 export class Athlete {
   constructor(scene) {
     this.root = new THREE.Group(); scene.add(this.root);
     this.torso = new THREE.Group(); this.root.add(this.torso);
     const T = this.torso;
     this.muscles = {};
-    const M = (name, base) => (this.muscles[name] = this.muscles[name] || muscleMat(base));
-    // torso (local: x lateral, y up from pelvis, z = chest forward)
-    this.rib = mesh(SPH, SKIN, T); this.rib.position.set(0, 0.37, -0.005); this.rib.scale.set(0.185, 0.2, 0.125);
-    const ab = mesh(SPH, SKIN, T); ab.position.set(0, 0.18, 0.0); ab.scale.set(0.145, 0.17, 0.105);
-    const pel = mesh(SPH, SHORTS, T); pel.position.set(0, 0.01, -0.005); pel.scale.set(0.168, 0.115, 0.115);
-    this.pecs = [-1, 1].map(s => { const p = mesh(SPH, M('pec'), T); p.position.set(s * 0.085, 0.42, 0.075); p.scale.set(0.095, 0.07, 0.055); p.rotation.z = s * 0.25; return p; });
-    for (let i = 0; i < 3; i++) for (const s of [-1, 1]) { const a = mesh(SPH, SKIN2, T); a.position.set(s * 0.04, 0.27 - i * 0.065, 0.09); a.scale.set(0.035, 0.026, 0.02); }
-    this.lats = [-1, 1].map(s => { const l = mesh(SPH, M('lat'), T); l.position.set(s * 0.13, 0.3, -0.06); l.scale.set(0.075, 0.17, 0.065); l.rotation.z = s * -0.25; return l; });
-    this.serratus = [];
-    for (const s of [-1, 1]) for (let i = 0; i < 4; i++) {
-      const g = mesh(SPH, M('serratus'), T); g.position.set(s * 0.172, 0.43 - i * 0.042, 0.04 - i * 0.004);
-      g.scale.set(0.02, 0.018, 0.05); g.rotation.set(0.0, s * 0.5, s * 0.55); this.serratus.push(g);
+    const M = name => (this.muscles[name] = this.muscles[name] || muscleMat(0xd5c6b6));
+    const S = SKIN;
+    // ---- torso: local x = lateral, y = up from pelvis, z = chest forward ----
+    this.rib = blob(T, S, [0, 0.36, -0.01], [0.17, 0.2, 0.125]);
+    blob(T, S, [0, 0.17, 0.0], [0.125, 0.16, 0.098]);                         // waist
+    blob(T, SHORTS, [0, 0.0, -0.005], [0.158, 0.11, 0.112]);                  // pelvis
+    for (const s of [-1, 1]) blob(T, SHORTS, [s * 0.075, -0.035, -0.065], [0.088, 0.095, 0.085]); // glutes
+    blob(T, TRIM, [0, 0.085, 0], [0.135, 0.016, 0.104]);                      // waistband
+    // abs: 3 rows of blocks + obliques
+    for (let i = 0; i < 3; i++) for (const s of [-1, 1]) blob(T, S, [s * 0.034, 0.275 - i * 0.058, 0.088 - i * 0.004], [0.032, 0.026, 0.022]);
+    for (const s of [-1, 1]) blob(T, S, [s * 0.1, 0.16, 0.05], [0.045, 0.09, 0.055], [0, 0, s * -0.12]);
+    // pecs: big fan plus a lower edge
+    for (const s of [-1, 1]) {
+      blob(T, M('pec'), [s * 0.083, 0.41, 0.083], [0.105, 0.072, 0.055], [0.1, s * 0.28, s * 0.12]);
+      blob(T, M('pec'), [s * 0.075, 0.37, 0.09], [0.088, 0.04, 0.045], [0, s * 0.2, s * -0.1]);
     }
-    this.traps = mesh(SPH, M('trap'), T); this.traps.position.set(0, 0.5, -0.06); this.traps.scale.set(0.15, 0.06, 0.06);
+    // lats: V-taper wings
+    for (const s of [-1, 1]) {
+      blob(T, M('lat'), [s * 0.135, 0.31, -0.04], [0.075, 0.17, 0.075], [0, 0, s * -0.32]);
+      blob(T, M('lat'), [s * 0.105, 0.21, -0.04], [0.05, 0.1, 0.05], [0, 0, s * -0.2]);
+    }
+    // traps: upper slopes + diamond on the back, spinal erectors
+    for (const s of [-1, 1]) blob(T, M('trap'), [s * 0.075, 0.5, -0.035], [0.1, 0.05, 0.055], [0, 0, s * 0.42]);
+    blob(T, M('trap'), [0, 0.39, -0.105], [0.09, 0.13, 0.03]);
+    // serratus anterior: saw-tooth slips on the side of the ribs, each pointing down-forward
+    for (const s of [-1, 1]) for (let i = 0; i < 5; i++) {
+      const g = mesh(SPH, M('serratus'), T);
+      g.position.set(s * (0.162 - i * 0.004), 0.39 - i * 0.034, 0.03 + i * 0.012);
+      g.scale.set(0.017, 0.017, 0.055 - i * 0.004);
+      g.quaternion.setFromUnitVectors(V3(0, 0, 1), V3(s * 0.25, -0.42, 0.87).normalize());
+    }
+    // shoulder blades (with infraspinatus on top) that glide round the ribcage
     this.scaps = [-1, 1].map(s => {
-      const g = new THREE.Group(); T.add(g);
-      const geo = new THREE.CylinderGeometry(1, 1, 1, 3); const m = mesh(geo, M('scap', 0xcdbba9), g);
-      m.scale.set(0.085, 0.012, 0.085); m.rotation.set(Math.PI / 2, 0, s > 0 ? Math.PI / 2 : -Math.PI / 2 ); m.rotation.z = Math.PI;
-      g.userData.side = s; return g;
+      const g = new THREE.Group(); T.add(g); g.userData.side = s;
+      blob(g, M('scap'), [0, 0, 0], [0.068, 0.075, 0.022]);
+      blob(g, M('scap'), [s * 0.02, -0.04, -0.005], [0.04, 0.045, 0.024]);
+      return g;
     });
-    // limbs
+    // ---- head ----
     const R = this.root;
-    this.neck = limbMesh(0.05, SKIN2, R);
-    this.head = mesh(SPH, SKIN, R); this.head.scale.set(0.095, 0.115, 0.105);
-    this.hair = mesh(SPH, HAIR, R); this.hair.scale.set(0.1, 0.085, 0.108);
-    this.nose = mesh(SPH, SKIN, R); this.nose.scale.set(0.018, 0.024, 0.02);
-    this.side = [-1, 1].map(() => ({
-      delt: mesh(SPH, M('delt'), R),
-      upper: limbMesh(0.05, SKIN, R), bicep: mesh(SPH, SKIN, R),
-      fore: limbMesh(0.04, SKIN, R), foreM: mesh(SPH, M('forearm'), R),
-      hand: mesh(SPH, SKIN2, R),
-      thigh: limbMesh(0.072, SHORTS, R), thighS: limbMesh(0.068, SKIN, R), shin: limbMesh(0.052, SKIN, R), calf: mesh(SPH, SKIN, R),
-      foot: mesh(new THREE.BoxGeometry(1, 1, 1), SHOE, R),
-    }));
-    for (const s of this.side) {
-      s.delt.scale.set(0.078, 0.075, 0.08); s.bicep.scale.set(0.05, 0.085, 0.052); s.foreM.scale.set(0.047, 0.09, 0.047);
-      s.hand.scale.set(0.045, 0.06, 0.03); s.calf.scale.set(0.055, 0.1, 0.06);
-    }
+    this.neck = limbMesh(0.058, S, R);
+    this.head = mesh(SPH, S, R); this.head.scale.set(0.09, 0.112, 0.102);
+    this.jaw = mesh(SPH, S, R); this.jaw.scale.set(0.07, 0.05, 0.075);
+    this.hair = mesh(SPH, HAIR, R); this.hair.scale.set(0.094, 0.082, 0.104);
+    this.nose = mesh(SPH, S, R); this.nose.scale.set(0.016, 0.024, 0.02);
+    this.ears = [0, 1].map(() => { const e = mesh(SPH, S, R); e.scale.set(0.012, 0.028, 0.018); return e; });
+    // ---- limbs ----
+    this.side = [-1, 1].map(() => {
+      const up = boneGroup(R), fo = boneGroup(R), th = boneGroup(R), sh = boneGroup(R);
+      const o = {
+        up, fo, th, sh,
+        delt: [mesh(SPH, M('delt'), R), mesh(SPH, M('delt'), R), mesh(SPH, M('delt'), R)],
+        upperCore: limbMesh(0.045, S, R), foreCore: limbMesh(0.036, S, R),
+        thighCore: limbMesh(0.07, S, R), shinCore: limbMesh(0.045, S, R),
+        hand: mesh(SPH, SKIN2, R),
+        foot: new THREE.Group(),
+      };
+      // upper arm: biceps (front), triceps (back + long head)
+      onBone(up, S, 0.55, [0, 0.03], [0.048, 0.1, 0.05]);
+      onBone(up, S, 0.45, [0, -0.032], [0.052, 0.12, 0.048]);
+      onBone(up, S, 0.35, [0.022, -0.02], [0.038, 0.09, 0.04]);
+      // forearm: brachioradialis + flexors near the elbow (the grip muscles)
+      onBone(fo, M('forearm'), 0.25, [0.012, 0.012], [0.047, 0.1, 0.045]);
+      onBone(fo, M('forearm'), 0.3, [-0.012, -0.012], [0.042, 0.1, 0.04]);
+      // thigh: quads (front), vastus medialis teardrop, hamstrings (back), shorts over the top
+      onBone(th, S, 0.55, [0.012, 0.035], [0.068, 0.17, 0.062]);
+      onBone(th, S, 0.82, [-0.03, 0.03], [0.05, 0.065, 0.05]);
+      onBone(th, S, 0.55, [0, -0.03], [0.066, 0.16, 0.06]);
+      onBone(th, SHORTS, 0.16, [0, 0], [0.098, 0.1, 0.095]);
+      // calf
+      onBone(sh, S, 0.3, [0, -0.032], [0.056, 0.12, 0.058]);
+      onBone(sh, S, 0.3, [0.01, -0.025], [0.05, 0.1, 0.05]);
+      // sneaker: upper + white sole
+      R.add(o.foot);
+      const shoe = mesh(new THREE.BoxGeometry(1, 1, 1), SHOE, o.foot); shoe.scale.set(0.09, 0.075, 0.235); shoe.position.set(0, 0, 0.0);
+      const sole = mesh(new THREE.BoxGeometry(1, 1, 1), SOLE, o.foot); sole.scale.set(0.095, 0.025, 0.245); sole.position.set(0, -0.045, 0.0);
+      const swoosh = mesh(new THREE.BoxGeometry(1, 1, 1), TRIM, o.foot); swoosh.scale.set(0.092, 0.012, 0.11); swoosh.position.set(0, -0.005, 0.02); swoosh.rotation.x = -0.25;
+      o.delt.forEach(d => d.scale.set(0.072, 0.07, 0.066));
+      o.hand.scale.set(0.045, 0.06, 0.03);
+      return o;
+    });
     this.L = { up: 0.3, fore: 0.27, thigh: 0.44, shin: 0.43 };
   }
-  // pose: { pelvis: V3, up: V3, fwd: V3, protract 0..1, elevate (m), breathe 0..1,
-  //         hands: [L,R] wrist targets, elbowPole, ankles: [L,R], kneePole, headTilt, handFwd }
+  // pose: { pelvis, up, fwd, protract 0..1, elevate (m), breathe 0..1, hands: [L,R], elbowPole,
+  //         armRef (which way the biceps face), handDir, ankles: [L,R], kneePole, toeDir, headTilt }
   set(p) {
     const up = p.up.clone().normalize();
     const fwd = p.fwd.clone().sub(up.clone().multiplyScalar(p.fwd.dot(up))).normalize();
     const lat = new THREE.Vector3().crossVectors(up, fwd).normalize();
-    const basis = new THREE.Matrix4().makeBasis(lat, up, fwd);
-    const q = new THREE.Quaternion().setFromRotationMatrix(basis);
+    const q = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(lat, up, fwd));
     this.torso.position.copy(p.pelvis); this.torso.quaternion.copy(q);
     const W = (x, y, z) => V3(x, y, z).applyQuaternion(q).add(p.pelvis);
     const pr = p.protract ?? 0.5, el = p.elevate ?? 0, br = p.breathe ?? 0;
-    this.rib.scale.set(0.185 * (1 + 0.03 * br), 0.2, 0.125 * (1 + 0.06 * br));
-    // scapulae slide around the ribcage
+    this.rib.scale.set(0.17 * (1 + 0.025 * br), 0.2, 0.125 * (1 + 0.05 * br));
     this.scaps.forEach(g => {
       const s = g.userData.side;
-      g.position.set(s * (0.075 + 0.05 * pr), 0.405 + el, -0.118 + 0.025 * pr);
-      g.rotation.set(0, s * (0.15 + 0.45 * pr), s * (-0.1 + 0.15 * el * 10) * 0.5);
+      g.position.set(s * (0.07 + 0.05 * pr), 0.4 + el, -0.11 + 0.03 * pr);
+      g.rotation.set(0, s * (0.2 + 0.5 * pr), s * 0.1);
     });
-    this.traps.position.y = 0.5 + el * 0.8;
-    const shoulders = [-1, 1].map(s => W(s * (0.19 + 0.02 * pr), 0.47 + el, -0.02 + 0.05 * (pr - 0.5)));
+    const shoulders = [-1, 1].map(s => W(s * (0.205 + 0.02 * pr), 0.47 + el, -0.02 + 0.05 * (pr - 0.5)));
     this.shoulders = shoulders;
-    const neckB = W(0, 0.52 + el * 0.3, -0.015), headUp = up.clone().applyAxisAngle(lat, p.headTilt || 0);
-    const headC = neckB.clone().addScaledVector(headUp, 0.17).addScaledVector(fwd, 0.015);
-    placeLimb(this.neck, neckB, neckB.clone().addScaledVector(headUp, 0.07));
-    const hq = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(lat, headUp, new THREE.Vector3().crossVectors(lat, headUp)));
-    this.head.position.copy(headC); this.head.quaternion.copy(hq);
+    const neckB = W(0, 0.5 + el * 0.3, -0.02), headUp = up.clone().applyAxisAngle(lat, p.headTilt || 0);
     const hf = new THREE.Vector3().crossVectors(lat, headUp);
-    this.hair.position.copy(headC).addScaledVector(headUp, 0.03).addScaledVector(hf, -0.015); this.hair.quaternion.copy(hq);
-    this.nose.position.copy(headC).addScaledVector(hf, 0.1).addScaledVector(headUp, -0.01);
+    const headC = neckB.clone().addScaledVector(headUp, 0.19).addScaledVector(hf, 0.015);
+    placeLimb(this.neck, neckB, neckB.clone().addScaledVector(headUp, 0.09));
+    const hq = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(lat, headUp, hf));
+    this.head.position.copy(headC); this.head.quaternion.copy(hq);
+    this.jaw.position.copy(headC).addScaledVector(headUp, -0.06).addScaledVector(hf, 0.015); this.jaw.quaternion.copy(hq);
+    this.hair.position.copy(headC).addScaledVector(headUp, 0.032).addScaledVector(hf, -0.018); this.hair.quaternion.copy(hq);
+    this.nose.position.copy(headC).addScaledVector(hf, 0.098).addScaledVector(headUp, -0.012);
+    this.ears.forEach((e, i) => { e.position.copy(headC).addScaledVector(lat, (i ? 1 : -1) * 0.088).addScaledVector(headUp, -0.005); e.quaternion.copy(hq); });
     this.headC = headC;
     [-1, 1].forEach((s, i) => {
-      const S = this.side[i], sh = shoulders[i];
-      const wr = p.hands[i];
+      const S = this.side[i], sh = shoulders[i], wr = p.hands[i];
       const pole = (p.elbowPole || fwd.clone().negate()).clone().add(lat.clone().multiplyScalar(s * 0.3));
       const elb = twoBone(sh, wr, this.L.up, this.L.fore, pole);
-      S.delt.position.copy(sh); S.delt.quaternion.copy(q);
-      placeLimb(S.upper, sh, elb); placeLimb(S.fore, elb, wr);
-      const ud = elb.clone().sub(sh).normalize(), fd = wr.clone().sub(elb).normalize();
-      S.bicep.position.copy(sh).lerp(elb, 0.55).addScaledVector(fwd, 0.012); S.bicep.quaternion.setFromUnitVectors(V3(0, 1, 0), ud);
-      S.foreM.position.copy(elb).lerp(wr, 0.32); S.foreM.quaternion.setFromUnitVectors(V3(0, 1, 0), fd);
-      S.hand.position.copy(wr).addScaledVector(p.handDir ? p.handDir : fd, 0.05); S.hand.quaternion.setFromUnitVectors(V3(0, 1, 0), p.handDir || fd);
-      const hip = W(s * 0.09, -0.02, 0), an = p.ankles[i];
+      const armRef = p.armRef || fwd;
+      placeLimb(S.upperCore, sh, elb); placeLimb(S.foreCore, elb, wr);
+      placeBone(S.up, sh, elb, armRef); layoutBone(S.up);
+      placeBone(S.fo, elb, wr, armRef); layoutBone(S.fo);
+      // deltoid: front, side and rear heads around the shoulder
+      const ad = elb.clone().sub(sh).normalize();
+      const out = lat.clone().multiplyScalar(s);
+      S.delt[0].position.copy(sh).addScaledVector(fwd, 0.035).addScaledVector(ad, 0.035);
+      S.delt[1].position.copy(sh).addScaledVector(out, 0.03).addScaledVector(ad, 0.03).addScaledVector(up, 0.01);
+      S.delt[2].position.copy(sh).addScaledVector(fwd, -0.035).addScaledVector(ad, 0.035);
+      S.delt.forEach(d => d.quaternion.copy(segFrame(sh, elb, fwd)));
+      const hd = p.handDir || wr.clone().sub(elb).normalize();
+      S.hand.position.copy(wr).addScaledVector(hd, 0.05); S.hand.quaternion.setFromUnitVectors(V3(0, 1, 0), hd);
+      // legs
+      const hip = W(s * 0.088, -0.02, 0), an = p.ankles[i];
       const knee = twoBone(hip, an, this.L.thigh, this.L.shin, p.kneePole || fwd);
-      placeLimb(S.thigh, hip, hip.clone().lerp(knee, 0.45)); placeLimb(S.thighS, hip.clone().lerp(knee, 0.4), knee); placeLimb(S.shin, knee, an);
-      const sd = an.clone().sub(knee).normalize();
-      S.calf.position.copy(knee).lerp(an, 0.3).addScaledVector(fwd, -0.02); S.calf.quaternion.setFromUnitVectors(V3(0, 1, 0), sd);
-      const toe = p.toeDir || fwd;
-      S.foot.position.copy(an).addScaledVector(toe, 0.07).addScaledVector(sd, 0.03);
+      placeLimb(S.thighCore, hip, knee); placeLimb(S.shinCore, knee, an);
+      placeBone(S.th, hip, knee, p.kneePole || fwd); layoutBone(S.th);
+      placeBone(S.sh, knee, an, p.kneePole || fwd); layoutBone(S.sh);
+      const sd = an.clone().sub(knee).normalize(), toe = p.toeDir || fwd;
       const fy = sd.clone().negate(), fz = toe.clone().sub(fy.clone().multiplyScalar(toe.dot(fy))).normalize(), fx = new THREE.Vector3().crossVectors(fy, fz);
+      S.foot.position.copy(an).addScaledVector(fz, 0.06).addScaledVector(sd, 0.035);
       S.foot.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(fx, fy, fz));
-      S.foot.scale.set(0.09, 0.07, 0.24);
     });
   }
   glow(levels) { for (const [k, m] of Object.entries(this.muscles)) m.emissiveIntensity = (levels[k] || 0) * 1.6; }

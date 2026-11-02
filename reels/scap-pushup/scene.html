@@ -30,7 +30,7 @@ function plank(pr, depth = 0, breathe = 0) {
   const hip = pelvis.clone().addScaledVector(up, -0.02);
   const ank = hip.clone().addScaledVector(up, -0.86);
   A.set({ pelvis, up, fwd, protract: pr, elevate: 0, breathe,
-    hands: [V(0.02, 0.055, 0.235), V(0.02, 0.055, -0.235)], elbowPole: V(-1, 0.2, 0), handDir: V(1, 0, 0),
+    hands: [V(0.02, 0.055, 0.235), V(0.02, 0.055, -0.235)], elbowPole: V(-1, 0.2, 0), handDir: V(1, 0, 0), armRef: up,
     ankles: [ank.clone().add(V(0, 0, 0.1)), ank.clone().add(V(0, 0, -0.1))], kneePole: fwd.clone().negate(), toeDir: fwd, headTilt: 0.15 });
 }
 // reps: smooth 0 -> 1 -> 0
@@ -38,7 +38,7 @@ function cycle(t, period) { const r = ((t % period) + period) % period / period;
 
 const SHOTS = {
   hook:   { from: { pos: [2.0, 1.25, 2.5], target: [-0.45, 0.28, 0], fov: 50 }, to: { pos: [1.5, 0.95, 1.95], target: [-0.4, 0.3, 0] } },
-  muscle: { from: { pos: [0.45, 0.32, 1.6], target: [-0.15, 0.45, 0.08], fov: 46 }, to: { pos: [0.25, 0.36, 1.3], target: [-0.15, 0.46, 0.08] } },
+  muscle: { from: { pos: [-0.35, 0.2, 1.15], target: [-0.18, 0.44, 0.12], fov: 44 }, to: { pos: [-0.25, 0.22, 0.85], target: [-0.18, 0.45, 0.14] } },
   use:    { from: { pos: [-1.35, 2.3, 0.45], target: [-0.12, 0.58, 0], fov: 46 }, to: { pos: [-1.05, 2.05, 1.15], target: [-0.12, 0.56, 0] } },
   how1:   { from: { pos: [-0.35, 0.55, 3.4], target: [-0.4, 0.38, 0], fov: 46 }, to: { pos: [-0.3, 0.6, 3.1], target: [-0.4, 0.38, 0] } },
   how2:   { from: { pos: [0.75, 0.8, 1.95], target: [-0.18, 0.5, 0], fov: 46 }, to: { pos: [0.5, 0.75, 1.6], target: [-0.18, 0.5, 0] } },
