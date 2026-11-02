@@ -223,8 +223,8 @@
     K.line(P, [hip, [-0.1, 0.48], [-0.24, 0.04]], 8, tp.inkSoft);
     K.line(P, [hip, sh, add(hc, [-0.01, -0.11])], 8);
     K.line(P, [add(sh, [-0.02, 0]), [0.05, 1.14], [0.08, 0.9]], 6, tp.inkSoft);
-    const uDir = norm([-0.42, -0.91]), E = add(sh, uDir, 0.3);
-    const theta = -(20 + 120 * c) * Math.PI / 180, fDir = rot(uDir, theta), hand = add(E, fDir, 0.29);
+    const uDir = norm([-0.6, -0.8]), E = add(sh, uDir, 0.3);           // upper arm stays behind the body
+    const theta = (3 + 140 * c) * Math.PI / 180, fDir = rot(uDir, theta), hand = add(E, fDir, 0.29); // starts straight toward the pulley (stretch), forearm sweeps down past the hip and up to the shoulder
     K.line(P, [pul, hand], 3, tp.steel);
     K.line(P, [sh, E, hand], 8);
     const m = K.biceps(P, s, sh, E, hand, c);
