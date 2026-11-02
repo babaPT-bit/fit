@@ -1,0 +1,32 @@
+[
+ {
+  "id": "hook",
+  "text": "Same curl. But where your elbow goes decides which biceps head grows.",
+  "file": "hook.wav",
+  "dur": 4.544
+ },
+ {
+  "id": "a",
+  "text": "Arm in front, on the pad. The long head goes slack, so the short head does the heavy lifting.",
+  "file": "a.wav",
+  "dur": 5.675
+ },
+ {
+  "id": "b",
+  "text": "Arm behind your body. Now the long head is stretched, and it takes over.",
+  "file": "b.wav",
+  "dur": 4.523
+ },
+ {
+  "id": "why",
+  "text": "Why? The long head crosses your shoulder. Move the arm, and you change its length.",
+  "file": "why.wav",
+  "dur": 4.736
+ },
+ {
+  "id": "out",
+  "text": "Do one curl in front, one behind, and you've trained the whole biceps. Save this.",
+  "file": "out.wav",
+  "dur": 4.608
+ }
+]
