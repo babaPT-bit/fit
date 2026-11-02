@@ -1,0 +1,145 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Stick Curl Reel</title>
+<style>html,body{margin:0;background:#07090e}canvas{display:block}</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script>
+const ctx = document.getElementById('c').getContext('2d');
+const W = 1080, H = 1920;
+const C = { bg0: '#1b2333', bg1: '#07090e', line: '#ece6dc', dim: 'rgba(236,230,220,0.35)', steel: '#5b677d', steelD: '#3b4558',
+  glow: '#ff5a36', glowHi: '#ffb38a', text: '#e5e7eb', faint: '#64748b', cable: '#cbd5e1' };
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const rot = (v, a) => [v[0] * Math.cos(a) - v[1] * Math.sin(a), v[0] * Math.sin(a) + v[1] * Math.cos(a)];
+const add = (a, b, s = 1) => [a[0] + b[0] * s, a[1] + b[1] * s];
+const norm = v => { const l = Math.hypot(v[0], v[1]); return [v[0] / l, v[1] / l]; };
+
+function background() {
+  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, C.bg0); g.addColorStop(1, C.bg1);
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+}
+// world (metres, y up) -> screen for a panel
+function view(ox, oy, k) { return p => [ox + p[0] * k, oy - p[1] * k]; }
+function stroke(P, pts, w, color = C.line) {
+  ctx.strokeStyle = color; ctx.lineWidth = w; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.beginPath(); pts.forEach((p, i) => { const s = P(p); i ? ctx.lineTo(...s) : ctx.moveTo(...s); }); ctx.stroke();
+}
+function floor(P, x0, x1) { stroke(P, [[x0, 0], [x1, 0]], 4, C.steelD); }
+
+// biceps that pops up with contraction c (0..1) on the side the forearm folds toward
+function biceps(P, k, S, E, hand, c, t) {
+  const u = norm([E[0] - S[0], E[1] - S[1]]), L = Math.hypot(E[0] - S[0], E[1] - S[1]);
+  let n = [-u[1], u[0]];
+  const toHand = [hand[0] - E[0], hand[1] - E[1]];
+  if (n[0] * toHand[0] + n[1] * toHand[1] < 0) n = [-n[0], -n[1]];
+  const bulge = 0.018 + 0.05 * c;
+  const ctr = add(add(S, u, L * 0.55), n, bulge * 0.55);
+  const sc = P(ctr), ang = Math.atan2(-(u[1]), u[0]);
+  ctx.save();
+  ctx.translate(...sc); ctx.rotate(ang);
+  const rx = L * 0.3 * k, ry = bulge * k;
+  ctx.shadowColor = C.glow; ctx.shadowBlur = 40 * c;
+  const g = ctx.createRadialGradient(-rx * 0.2, -ry * 0.4 * Math.sign(n[1] || 1), 2, 0, 0, rx);
+  g.addColorStop(0, C.glowHi); g.addColorStop(0.55, C.glow); g.addColorStop(1, '#c2361c');
+  ctx.fillStyle = c > 0.05 ? g : C.line;
+  ctx.beginPath(); ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+  // "pop" burst lines
+  if (c > 0.6) {
+    const a = clamp((c - 0.6) / 0.4);
+    const pc = add(ctr, n, bulge * 1.1);
+    ctx.save(); ctx.globalAlpha = a; ctx.strokeStyle = C.glowHi; ctx.lineWidth = 6; ctx.lineCap = 'round';
+    for (const da of [-0.55, 0, 0.55]) {
+      const d = rot(n, da), a0 = add(pc, d, 0.03), a1 = add(pc, d, 0.03 + 0.05 * a);
+      ctx.beginPath(); ctx.moveTo(...P(a0)); ctx.lineTo(...P(a1)); ctx.stroke();
+    }
+    ctx.restore();
+  }
+}
+function dumbbell(P, k, hand, ang) {
+  const s = P(hand);
+  ctx.save(); ctx.translate(...s); ctx.rotate(ang);
+  ctx.fillStyle = C.steel; ctx.fillRect(-0.07 * k, -0.012 * k, 0.14 * k, 0.024 * k);
+  ctx.fillStyle = '#1b1f27'; ctx.strokeStyle = C.steel; ctx.lineWidth = 3;
+  for (const x of [-0.075, 0.075]) { ctx.beginPath(); ctx.roundRect(x * k - 0.025 * k, -0.06 * k, 0.05 * k, 0.12 * k, 8); ctx.fill(); ctx.stroke(); }
+  ctx.restore();
+}
+function head(P, k, c) {
+  const s = P(c); ctx.strokeStyle = C.line; ctx.lineWidth = 12; ctx.fillStyle = '#0d121c';
+  ctx.beginPath(); ctx.arc(s[0], s[1], 0.11 * k, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+}
+function label(x, y, title, sub) {
+  ctx.textAlign = 'left';
+  ctx.font = '800 46px Inter'; ctx.fillStyle = C.text; ctx.fillText(title, x, y);
+  ctx.font = '600 28px "JetBrains Mono"'; ctx.fillStyle = C.glow; ctx.fillText(sub, x, y + 44);
+}
+
+// ---- setup 1: preacher curl (upper arm in FRONT of the shoulder) ----
+function preacher(c, ox, oy, k) {
+  const P = view(ox, oy, k);
+  floor(P, -0.9, 1.1);
+  // bench: seat + angled pad + post
+  stroke(P, [[-0.25, 0.5], [0.2, 0.5]], 22, C.steelD);
+  stroke(P, [[0.0, 0.5], [0.0, 0.02]], 12, C.steelD);
+  stroke(P, [[0.2, 0.62], [0.2, 0.02]], 12, C.steelD);
+  stroke(P, [[-0.15, 0.02], [0.35, 0.02]], 10, C.steelD);
+  const hip = [-0.06, 0.58], sh = [0.07, 1.1], hc = [0.12, 1.3];
+  const knee = [0.32, 0.58], foot = [0.36, 0.04];
+  stroke(P, [hip, knee, foot], 16);
+  stroke(P, [hip, sh], 16);
+  stroke(P, [sh, add(hc, [-0.01, -0.11])], 16);                    // neck
+  head(P, k, hc);
+  // arm resting on the pad, down and forward
+  const uDir = norm([0.77, -0.64]), E = add(sh, uDir, 0.31);
+  const padN = [-uDir[1], uDir[0]].map(v => -v);                     // below the upper arm
+  const pa = add(add(sh, uDir, 0.05), padN, 0.06), pb = add(add(E, uDir, 0.07), padN, 0.06);
+  stroke(P, [[pb[0] - 0.05, pb[1] - 0.03], [0.2, 0.62]], 12, C.steelD);  // pad support
+  stroke(P, [pa, pb], 34, C.steel);                                   // arm pad
+  const theta = (20 + 115 * c) * Math.PI / 180;                     // elbow flexion
+  const fDir = rot(uDir, theta), hand = add(E, fDir, 0.29);
+  stroke(P, [sh, E, hand], 16);
+  biceps(P, k, sh, E, hand, c);
+  dumbbell(P, k, hand, -Math.atan2(fDir[1], fDir[0]) + Math.PI / 2);
+}
+
+// ---- setup 2: cable curl facing away from a low pulley (upper arm BEHIND the shoulder) ----
+function bayesian(c, ox, oy, k) {
+  const P = view(ox, oy, k);
+  floor(P, -1.0, 1.0);
+  // cable tower behind him
+  const tx = -0.78;
+  stroke(P, [[tx, 0], [tx, 1.3]], 16, C.steelD);
+  stroke(P, [[tx - 0.15, 0.02], [tx + 0.15, 0.02]], 10, C.steelD);
+  const pul = [tx + 0.04, 0.3];
+  const ps = P(pul); ctx.fillStyle = '#2a3242'; ctx.beginPath(); ctx.roundRect(ps[0] - 18, ps[1] - 18, 36, 36, 8); ctx.fill();
+  ctx.fillStyle = '#9aa7bd'; ctx.beginPath(); ctx.arc(ps[0], ps[1], 10, 0, Math.PI * 2); ctx.fill();
+  // staggered stance, slight forward lean
+  const hip = [0.0, 0.92], sh = [0.07, 1.42], hc = [0.12, 1.63];
+  stroke(P, [hip, [0.14, 0.5], [0.24, 0.04]], 16);
+  stroke(P, [hip, [-0.1, 0.48], [-0.24, 0.04]], 16, C.dim);
+  stroke(P, [hip, sh], 16);
+  stroke(P, [sh, add(hc, [-0.01, -0.11])], 16);
+  head(P, k, hc);
+  // far arm relaxed (dim)
+  stroke(P, [add(sh, [-0.02, 0]), [0.05, 1.14], [0.08, 0.9]], 12, C.dim);
+  // working arm: upper arm stays BEHIND the body
+  const uDir = norm([-0.42, -0.91]), E = add(sh, uDir, 0.3);
+  const theta = -(20 + 120 * c) * Math.PI / 180;                    // folds forward/up
+  const fDir = rot(uDir, theta), hand = add(E, fDir, 0.29);
+  stroke(P, [pul, hand], 4, C.cable);
+  stroke(P, [sh, E, hand], 16);
+  biceps(P, k, sh, E, hand, c);
+  const hs = P(hand); ctx.fillStyle = '#1b1f27'; ctx.strokeStyle = '#7d8799'; ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.arc(hs[0], hs[1], 16, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+}
+
+window.drawFrame = function (t, c = 1) {
+  background();
+  // divider
+  ctx.strokeStyle = 'rgba(148,163,184,0.15)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(60, 960); ctx.lineTo(1020, 960); ctx.stroke();
+  label(70, 120, 'ARM IN FRONT', 'preacher curl · short head');
+  preacher(c, 430, 925, 470);
+  label(70, 1050, 'ARM BEHIND', 'cable curl · long head');
+  bayesian(c, 560, 1840, 470);
+  return document.getElementById('c').toDataURL('image/png');
+};
+window.ready = true;
+</script></body></html>
