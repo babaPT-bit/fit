@@ -83,7 +83,9 @@ window.drawFrame = (t) => {
     result: { forearm: 0.8, lat: 0.7, delt: 0.5 },
     outro:  { forearm: 0.6, lat: 0.5, delt: 0.4 },
   }[id];
-  A.glow(G);
+  // rep pulse: a grip "squeeze" ripple every 1.8 s, running up the forearm and lats
+  const ph = (t % 1.8) / 1.8;
+  A.glow(G, { phase: -0.3 + 1.7 * ph, amp: 1 - fade(ph, 0.7, 1) });
   applyShot(camera, SHOTS[id], u);
   // soft cut: brief dip at each segment change
   renderer.render(scene, camera);

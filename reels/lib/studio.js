@@ -131,8 +131,10 @@ export class Athlete {
     this.root = new THREE.Group(); scene.add(this.root);
     this.torso = new THREE.Group(); this.root.add(this.torso);
     const T = this.torso;
-    this.muscles = {};
-    const M = name => (this.muscles[name] = this.muscles[name] || muscleMat(0xd5c6b6));
+    this.parts = {};
+    // every muscle piece gets its own material and a position k (0..1) along the muscle,
+    // so a "rep pulse" ripple can run through it
+    const M = (name, k = 0.5) => { const m = muscleMat(0xd5c6b6); (this.parts[name] = this.parts[name] || []).push({ m, k }); return m; };
     const S = SKIN;
     // ---- torso: local x = lateral, y = up from pelvis, z = chest forward ----
     this.rib = blob(T, S, [0, 0.36, -0.01], [0.17, 0.2, 0.125]);
@@ -145,20 +147,20 @@ export class Athlete {
     for (const s of [-1, 1]) blob(T, S, [s * 0.1, 0.16, 0.05], [0.045, 0.09, 0.055], [0, 0, s * -0.12]);
     // pecs: big fan plus a lower edge
     for (const s of [-1, 1]) {
-      blob(T, M('pec'), [s * 0.083, 0.41, 0.083], [0.105, 0.072, 0.055], [0.1, s * 0.28, s * 0.12]);
-      blob(T, M('pec'), [s * 0.075, 0.37, 0.09], [0.088, 0.04, 0.045], [0, s * 0.2, s * -0.1]);
+      blob(T, M('pec', 0.3), [s * 0.083, 0.41, 0.083], [0.105, 0.072, 0.055], [0.1, s * 0.28, s * 0.12]);
+      blob(T, M('pec', 0.8), [s * 0.075, 0.37, 0.09], [0.088, 0.04, 0.045], [0, s * 0.2, s * -0.1]);
     }
     // lats: V-taper wings
     for (const s of [-1, 1]) {
-      blob(T, M('lat'), [s * 0.135, 0.31, -0.04], [0.075, 0.17, 0.075], [0, 0, s * -0.32]);
-      blob(T, M('lat'), [s * 0.105, 0.21, -0.04], [0.05, 0.1, 0.05], [0, 0, s * -0.2]);
+      blob(T, M('lat', 0.35), [s * 0.135, 0.31, -0.04], [0.075, 0.17, 0.075], [0, 0, s * -0.32]);
+      blob(T, M('lat', 0.85), [s * 0.105, 0.21, -0.04], [0.05, 0.1, 0.05], [0, 0, s * -0.2]);
     }
     // traps: upper slopes + diamond on the back, spinal erectors
-    for (const s of [-1, 1]) blob(T, M('trap'), [s * 0.075, 0.5, -0.035], [0.1, 0.05, 0.055], [0, 0, s * 0.42]);
-    blob(T, M('trap'), [0, 0.39, -0.105], [0.09, 0.13, 0.03]);
+    for (const s of [-1, 1]) blob(T, M('trap', 0.2), [s * 0.075, 0.5, -0.035], [0.1, 0.05, 0.055], [0, 0, s * 0.42]);
+    blob(T, M('trap', 0.8), [0, 0.39, -0.105], [0.09, 0.13, 0.03]);
     // serratus anterior: saw-tooth slips on the side of the ribs, each pointing down-forward
     for (const s of [-1, 1]) for (let i = 0; i < 5; i++) {
-      const g = mesh(SPH, M('serratus'), T);
+      const g = mesh(SPH, M('serratus', 1 - i / 4), T);
       g.position.set(s * (0.162 - i * 0.004), 0.39 - i * 0.034, 0.03 + i * 0.012);
       g.scale.set(0.017, 0.017, 0.055 - i * 0.004);
       g.quaternion.setFromUnitVectors(V3(0, 0, 1), V3(s * 0.25, -0.42, 0.87).normalize());
@@ -166,8 +168,8 @@ export class Athlete {
     // shoulder blades (with infraspinatus on top) that glide round the ribcage
     this.scaps = [-1, 1].map(s => {
       const g = new THREE.Group(); T.add(g); g.userData.side = s;
-      blob(g, M('scap'), [0, 0, 0], [0.068, 0.075, 0.022]);
-      blob(g, M('scap'), [s * 0.02, -0.04, -0.005], [0.04, 0.045, 0.024]);
+      blob(g, M('scap', 0.3), [0, 0, 0], [0.068, 0.075, 0.022]);
+      blob(g, M('scap', 0.8), [s * 0.02, -0.04, -0.005], [0.04, 0.045, 0.024]);
       return g;
     });
     // ---- head ----
@@ -183,7 +185,7 @@ export class Athlete {
       const up = boneGroup(R), fo = boneGroup(R), th = boneGroup(R), sh = boneGroup(R);
       const o = {
         up, fo, th, sh,
-        delt: [mesh(SPH, M('delt'), R), mesh(SPH, M('delt'), R), mesh(SPH, M('delt'), R)],
+        delt: [mesh(SPH, M('delt', 0.1), R), mesh(SPH, M('delt', 0.5), R), mesh(SPH, M('delt', 0.9), R)],
         upperCore: limbMesh(0.045, S, R), foreCore: limbMesh(0.036, S, R),
         thighCore: limbMesh(0.07, S, R), shinCore: limbMesh(0.045, S, R),
         hand: mesh(SPH, SKIN2, R),
@@ -194,8 +196,8 @@ export class Athlete {
       onBone(up, S, 0.45, [0, -0.032], [0.052, 0.12, 0.048]);
       onBone(up, S, 0.35, [0.022, -0.02], [0.038, 0.09, 0.04]);
       // forearm: brachioradialis + flexors near the elbow (the grip muscles)
-      onBone(fo, M('forearm'), 0.25, [0.012, 0.012], [0.047, 0.1, 0.045]);
-      onBone(fo, M('forearm'), 0.3, [-0.012, -0.012], [0.042, 0.1, 0.04]);
+      onBone(fo, M('forearm', 0.75), 0.25, [0.012, 0.012], [0.047, 0.1, 0.045]);
+      onBone(fo, M('forearm', 0.25), 0.3, [-0.012, -0.012], [0.042, 0.1, 0.04]);
       // thigh: quads (front), vastus medialis teardrop, hamstrings (back), shorts over the top
       onBone(th, S, 0.55, [0.012, 0.035], [0.068, 0.17, 0.062]);
       onBone(th, S, 0.82, [-0.03, 0.03], [0.05, 0.065, 0.05]);
@@ -273,7 +275,16 @@ export class Athlete {
       S.foot.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(fx, fy, fz));
     });
   }
-  glow(levels) { for (const [k, m] of Object.entries(this.muscles)) m.emissiveIntensity = (levels[k] || 0) * 1.6; }
+  // levels: { muscle: 0..1 }; wave: { phase (-0.3..1.3), amp 0..1 } = the rep pulse
+  glow(levels, wave) {
+    for (const [name, list] of Object.entries(this.parts)) {
+      const L = levels[name] || 0;
+      for (const { m, k } of list) {
+        const r = wave ? wave.amp * Math.exp(-((k - wave.phase) ** 2) / 0.025) : 0;
+        m.emissiveIntensity = L * 1.6 * (0.7 + 1.1 * r);
+      }
+    }
+  }
 }
 
 // ---------- camera ----------
