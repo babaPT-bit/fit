@@ -1,0 +1,101 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Dead Hang Reel</title>
+<style>html,body{margin:0;background:#07090e}canvas{display:block}#gl{position:absolute;left:-99999px}</style></head>
+<body>
+<canvas id="out" width="1080" height="1920"></canvas>
+<script src="voice/lines.js"></script>
+<script type="module">
+import { THREE, W, H, createStage, Athlete, buildTimeline, segAt, applyShot, makeChunks, drawCaption, clamp, ease, fade, lerp } from '../lib/studio.js';
+const V = (x, y, z) => new THREE.Vector3(x, y, z);
+const { renderer, scene, camera } = createStage();
+renderer.domElement.id = 'gl'; document.body.appendChild(renderer.domElement);
+const out = document.getElementById('out').getContext('2d');
+const A = new Athlete(scene);
+const TL = buildTimeline(window.VOICE);
+window.DURATION = TL.duration; window.VO_TIMES = TL.times;
+const CH = makeChunks(window.VOICE, TL);
+
+// pull-up bar
+const STEEL = new THREE.MeshStandardMaterial({ color: 0x9aa4b5, metalness: 0.85, roughness: 0.3 });
+const FRAME = new THREE.MeshStandardMaterial({ color: 0x2b3343, metalness: 0.4, roughness: 0.5 });
+const BAR_Y = 2.25;
+const bar = new THREE.Mesh(new THREE.CylinderGeometry(0.017, 0.017, 2.2, 24), STEEL);
+bar.rotation.x = Math.PI / 2; bar.position.set(0, BAR_Y, 0); bar.castShadow = true; scene.add(bar);
+for (const z of [-1.1, 1.1]) {
+  const post = new THREE.Mesh(new THREE.BoxGeometry(0.07, BAR_Y + 0.1, 0.07), FRAME);
+  post.position.set(0, (BAR_Y + 0.1) / 2, z); post.castShadow = true; post.receiveShadow = true; scene.add(post);
+  const foot = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.05, 0.1), FRAME); foot.position.set(0, 0.025, z); foot.receiveShadow = true; scene.add(foot);
+}
+const PIV = V(0, BAR_Y, 0);
+// fists wrapped around the bar (overhand grip, thumbs around)
+const SKINM = A.side[0].hand.material;
+const fists = [0.27, -0.27].map(z => {
+  const g = new THREE.Group(); scene.add(g);
+  const f = new THREE.Mesh(new THREE.CapsuleGeometry(0.036, 0.06, 8, 20), SKINM); f.rotation.x = Math.PI / 2; f.castShadow = true; g.add(f);
+  for (let k = 0; k < 4; k++) { const kn = new THREE.Mesh(new THREE.SphereGeometry(0.014, 12, 10), SKINM); kn.position.set(0.03, 0.012, -0.033 + k * 0.022); g.add(kn); }
+  const th = new THREE.Mesh(new THREE.CapsuleGeometry(0.012, 0.035, 6, 10), SKINM); th.position.set(0.028, -0.03, z > 0 ? -0.04 : 0.04); th.rotation.x = Math.PI / 2; g.add(th);
+  g.position.set(0, BAR_Y, z); return g;
+});
+A.side.forEach(sd => sd.hand.visible = false);
+function hang(t, el, breathe, sway) {
+  const rot = v => v.clone().sub(PIV).applyAxisAngle(V(0, 0, 1), sway).add(PIV);
+  const rotD = v => v.clone().applyAxisAngle(V(0, 0, 1), sway);
+  const up = V(0, 1, 0), fwd = V(1, 0, 0);
+  const sy = BAR_Y - 0.05 - Math.sqrt(0.57 * 0.57 - 0.07 * 0.07) + 0.01;
+  const pelvis = V(0.0, sy - 0.47 - el, 0);
+  const hip = pelvis.clone().add(V(0, -0.02, 0));
+  const ankY = hip.y - 0.85;
+  A.set({ pelvis: rot(pelvis), up: rotD(up), fwd: rotD(fwd), protract: 0.55, elevate: el, breathe,
+    hands: [V(0, BAR_Y - 0.05, 0.27), V(0, BAR_Y - 0.05, -0.27)], elbowPole: V(-1, 0, 0), handDir: V(0, 1, 0),
+    ankles: [rot(V(0.05, ankY, 0.075)), rot(V(0.05, ankY, -0.075))], kneePole: rotD(fwd), toeDir: rotD(V(1, -0.6, 0).normalize()), headTilt: 0 });
+}
+
+const SHOTS = {
+  hook:   { from: { pos: [2.7, 1.0, 2.0], target: [0, 1.3, 0], fov: 50 }, to: { pos: [2.2, 1.15, 1.55], target: [0, 1.35, 0] } },
+  muscle: { from: { pos: [1.35, 1.8, 1.05], target: [0, 1.95, 0.05], fov: 46 }, to: { pos: [-1.35, 1.7, 1.05], target: [0, 1.8, 0] } },
+  use:    { from: { pos: [-1.7, 1.55, 1.0], target: [0, 1.55, 0], fov: 48 }, to: { pos: [-1.35, 1.7, 0.45], target: [0, 1.6, 0] } },
+  how1:   { from: { pos: [0.75, 2.12, 0.75], target: [0, 2.2, 0.25], fov: 44 }, to: { pos: [0.55, 2.18, 0.5], target: [0, 2.21, 0.27] } },
+  how2:   { from: { pos: [1.15, 1.3, 3.2], target: [0, 1.25, 0], fov: 50 }, to: { pos: [1.0, 1.3, 2.8], target: [0, 1.25, 0] } },
+  result: { from: { pos: [-2.1, 1.4, 1.9], target: [0, 1.3, 0], fov: 50 }, to: { pos: [2.1, 1.3, 1.9], target: [0, 1.3, 0] } },
+  outro:  { from: { pos: [1.9, 0.5, 0.9], target: [0, 1.5, 0], fov: 50 }, to: { pos: [1.7, 0.55, 1.3], target: [0, 1.5, 0] } },
+};
+
+function colorFor(w) {
+  const s = w.toLowerCase().replace(/[^a-z]/g, '');
+  if (['grip', 'forearms', 'lats', 'shoulders', 'thumbs'].includes(s)) return '#ff7a59';
+  if (['thirty', 'seconds', 'days', 'every', 'day'].includes(s)) return '#8fb4ff';
+  if (['stronger', 'easier', 'stiff', 'breathe', 'relax'].includes(s)) return '#34d399';
+  return '#ffffff';
+}
+
+window.drawFrame = (t) => {
+  const { id, u, s } = segAt(TL, t);
+  const br = 0.5 + 0.5 * Math.sin(t * (id === 'how2' ? 1.6 : 2.2));
+  const el = id === 'how2' || id === 'result' ? 0.0 : 0.025;
+  hang(t, el, br, 0.035 * Math.sin(t * 1.25));
+  const pulse = 0.75 + 0.25 * Math.sin(t * 5);
+  const G = {
+    hook:   { forearm: 0.6, lat: 0.4 },
+    muscle: { forearm: pulse, lat: 0.4 + 0.6 * fade(u, 0.3, 0.7), delt: 0.5 },
+    use:    { forearm: pulse, lat: 0.7 },
+    how1:   { forearm: pulse },
+    how2:   { forearm: 0.5, lat: 0.6, delt: 0.3 },
+    result: { forearm: 0.8, lat: 0.7, delt: 0.5 },
+    outro:  { forearm: 0.6, lat: 0.5, delt: 0.4 },
+  }[id];
+  A.glow(G);
+  applyShot(camera, SHOTS[id], u);
+  // soft cut: brief dip at each segment change
+  renderer.render(scene, camera);
+  out.drawImage(renderer.domElement, 0, 0);
+  const dip = 1 - Math.min(fade(t, s.start, s.start + 0.18), t < 0.2 ? 1 : 1);
+  if (dip > 0 && t > 0.3) { out.fillStyle = `rgba(7,9,14,${dip})`; out.fillRect(0, 0, W, H); }
+  // vignette
+  const vg = out.createRadialGradient(W / 2, H * 0.45, H * 0.25, W / 2, H * 0.5, H * 0.75);
+  vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,0.55)'); out.fillStyle = vg; out.fillRect(0, 0, W, H);
+  drawCaption(out, CH, t, colorFor);
+  return document.getElementById('out').toDataURL('image/png');
+};
+window.ready = true;
+</script>
+</body></html>
