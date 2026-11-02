@@ -1,0 +1,271 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Cartoon Curl Styles</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+@font-face { font-family: "Patrick Hand"; src: url(../lib/fonts/patrick-hand.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script>
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const W = 1080, H = 1920;
+const style = new URLSearchParams(location.search).get('style') || 'anime';
+function rng(seed) { let s = seed >>> 0 || 1; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
+const lerp = (a, b, u) => a + (b - a) * u;
+function path(pts, close = true) { ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); if (close) ctx.closePath(); }
+// smooth closed blob through points (Catmull-Rom -> bezier)
+function blob(pts) {
+  ctx.beginPath(); const n = pts.length;
+  for (let i = 0; i < n; i++) {
+    const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+    if (i === 0) ctx.moveTo(p1[0], p1[1]);
+    ctx.bezierCurveTo(p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6, p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6, p2[0], p2[1]);
+  }
+  ctx.closePath();
+}
+// tapered limb with round ends
+function limbPath(a, b, wa, wb) {
+  const dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1, nx = -dy / l, ny = dx / l;
+  const ang = Math.atan2(dy, dx);
+  ctx.beginPath();
+  ctx.moveTo(a[0] + nx * wa, a[1] + ny * wa); ctx.lineTo(b[0] + nx * wb, b[1] + ny * wb);
+  ctx.arc(b[0], b[1], wb, ang + Math.PI / 2, ang - Math.PI / 2, true);
+  ctx.lineTo(a[0] - nx * wa, a[1] - ny * wa);
+  ctx.arc(a[0], a[1], wa, ang - Math.PI / 2, ang + Math.PI / 2, true);
+  ctx.closePath();
+}
+function fillStroke(fill, stroke, lw) { if (fill) { ctx.fillStyle = fill; ctx.fill(); } if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw; ctx.lineJoin = 'round'; ctx.stroke(); } }
+function star4(x, y, r, color) {
+  ctx.fillStyle = color; ctx.beginPath();
+  for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4, rr = i % 2 ? r * 0.28 : r; ctx.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
+  ctx.closePath(); ctx.fill();
+}
+// curl arm geometry: shoulder S, upper arm down-forward, forearm rotates forward/up with contraction c
+function armPose(S, up, fore, c) {
+  const E = [S[0] + up * 0.12, S[1] + up * 0.99];
+  const phi = (12 + 138 * c) * Math.PI / 180;
+  const Hd = [E[0] + fore * Math.sin(phi), E[1] + fore * Math.cos(phi)];
+  return { S, E, H: Hd, phi };
+}
+
+// =====================================================================
+// 1) painterly anime (Ghibli-inspired): meadow, cumulus clouds, warm light
+// =====================================================================
+function cloud(cx, cy, s, r) {
+  const parts = []; for (let i = 0; i < 14; i++) parts.push([cx + (r() - 0.5) * 420 * s, cy + (r() - 0.6) * 120 * s - Math.abs(r() - 0.5) * 140 * s, (60 + r() * 90) * s]);
+  for (const [x, y, rr] of parts) { ctx.fillStyle = 'rgba(166,186,214,0.9)'; ctx.beginPath(); ctx.arc(x + 6, y + 18, rr, 0, 7); ctx.fill(); }
+  for (const [x, y, rr] of parts) { const g = ctx.createRadialGradient(x - rr * 0.3, y - rr * 0.5, rr * 0.1, x, y, rr); g.addColorStop(0, '#ffffff'); g.addColorStop(0.7, '#f3f6fb'); g.addColorStop(1, 'rgba(225,233,245,0.9)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y - 4, rr * 0.92, 0, 7); ctx.fill(); }
+  ctx.fillStyle = 'rgba(176,196,224,0.55)'; ctx.fillRect(cx - 260 * s, cy + 40 * s, 520 * s, 24 * s);
+}
+function animeBackground() {
+  const r = rng(5);
+  const sky = ctx.createLinearGradient(0, 0, 0, 1200); sky.addColorStop(0, '#3f8fd6'); sky.addColorStop(0.55, '#8cc5ec'); sky.addColorStop(1, '#e4f2f7');
+  ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+  cloud(260, 420, 1.1, r); cloud(860, 300, 0.8, r); cloud(780, 760, 0.6, r);
+  // distant hills with haze
+  ctx.fillStyle = '#8fb3b8'; blob([[-100, 1180], [150, 1060], [380, 1110], [620, 1020], [900, 1090], [1180, 1040], [1180, 1300], [-100, 1300]]); ctx.fill();
+  ctx.fillStyle = '#7aa58a'; blob([[-100, 1240], [200, 1150], [520, 1200], [800, 1140], [1180, 1190], [1180, 1400], [-100, 1400]]); ctx.fill();
+  // meadow
+  const gr = ctx.createLinearGradient(0, 1200, 0, H); gr.addColorStop(0, '#8cc65c'); gr.addColorStop(1, '#3f7f35'); ctx.fillStyle = gr; ctx.fillRect(0, 1230, W, H);
+  ctx.fillStyle = gr; blob([[-100, 1260], [300, 1215], [700, 1250], [1180, 1220], [1180, 1350], [-100, 1350]]); ctx.fill();
+  // grass strokes
+  for (let i = 0; i < 1600; i++) {
+    const x = r() * W, y = 1240 + Math.pow(r(), 0.7) * 700, h = 10 + (y - 1240) * 0.05 + r() * 14;
+    ctx.strokeStyle = `hsl(${95 + r() * 25},${45 + r() * 20}%,${28 + r() * 30}%)`; ctx.lineWidth = 1.5 + (y - 1240) / 300;
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.quadraticCurveTo(x + 4, y - h * 0.6, x + 8 + r() * 6, y - h); ctx.stroke();
+  }
+  for (let i = 0; i < 70; i++) { const x = r() * W, y = 1300 + r() * 600; ctx.fillStyle = r() > 0.5 ? '#fff8e8' : '#ffe27a'; ctx.beginPath(); ctx.arc(x, y, 3 + r() * 3, 0, 7); ctx.fill(); }
+  // sun bloom
+  const sun = ctx.createRadialGradient(80, 120, 10, 80, 120, 700); sun.addColorStop(0, 'rgba(255,240,200,0.25)'); sun.addColorStop(1, 'rgba(255,240,200,0)');
+  ctx.fillStyle = sun; ctx.fillRect(0, 0, W, H);
+}
+function animeCharacter(c) {
+  const LINE = '#4a3428', SKIN = '#f7dcc1', SKIN_SH = '#e2b08e', HAIR = '#3a2a22', TANK = '#f4f1e8', TANK_SH = '#d6dbe3', SHORTS = '#2f4166', SHOE = '#ffffff';
+  const lw = 4;
+  // shadow on grass
+  ctx.fillStyle = 'rgba(30,60,20,0.25)'; ctx.beginPath(); ctx.ellipse(520, 1585, 170, 26, 0, 0, 7); ctx.fill();
+  // far leg
+  limbPath([500, 1150], [470, 1350], 46, 36); fillStroke(SHORTS, LINE, lw);
+  limbPath([470, 1350], [455, 1545], 32, 24); fillStroke(SKIN_SH, LINE, lw);
+  ctx.beginPath(); ctx.ellipse(475, 1565, 52, 22, 0, 0, 7); fillStroke('#e8e2d8', LINE, lw);
+  // far arm (relaxed, behind)
+  limbPath([505, 870], [480, 1060], 30, 24); fillStroke(SKIN_SH, LINE, lw);
+  limbPath([480, 1060], [490, 1210], 24, 20); fillStroke(SKIN_SH, LINE, lw);
+  // torso (tank top) — broad chest, narrow waist
+  blob([[440, 870], [520, 800], [615, 815], [665, 900], [650, 1000], [600, 1090], [590, 1170], [470, 1175], [452, 1060], [425, 960]]); fillStroke(TANK, LINE, lw);
+  ctx.save(); blob([[440, 870], [520, 800], [615, 815], [665, 900], [650, 1000], [600, 1090], [590, 1170], [470, 1175], [452, 1060], [425, 960]]); ctx.clip();
+  ctx.fillStyle = TANK_SH; blob([[430, 860], [480, 900], [490, 1050], [500, 1180], [420, 1180]]); ctx.fill(); ctx.restore();
+  // shorts + near leg
+  blob([[462, 1140], [600, 1140], [615, 1290], [520, 1300], [465, 1290]]); fillStroke(SHORTS, LINE, lw);
+  ctx.strokeStyle = '#d9534f'; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(598, 1150); ctx.lineTo(612, 1288); ctx.stroke();
+  limbPath([560, 1290], [565, 1545], 36, 26); fillStroke(SKIN, LINE, lw);
+  ctx.fillStyle = SKIN_SH; limbPath([545, 1300], [550, 1540], 14, 10); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(588, 1568, 62, 24, 0, 0, 7); fillStroke(SHOE, LINE, lw);
+  ctx.fillStyle = '#d9534f'; ctx.fillRect(560, 1560, 60, 8);
+  // neck + head (profile, facing right)
+  limbPath([548, 815], [560, 760], 26, 24); fillStroke(SKIN_SH, LINE, lw);
+  blob([[520, 640], [560, 590], [625, 600], [655, 650], [668, 700], [660, 715], [664, 735], [640, 768], [596, 780], [552, 760], [520, 710]]); fillStroke(SKIN, LINE, lw);
+  // hair: chunky locks
+  blob([[505, 700], [492, 640], [520, 585], [575, 560], [640, 572], [672, 618], [650, 630], [662, 655], [628, 640], [606, 668], [590, 640], [560, 672], [540, 700]]); fillStroke(HAIR, LINE, lw);
+  ctx.strokeStyle = 'rgba(255,255,255,0.18)'; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(585, 640, 60, -2.6, -1.6); ctx.stroke();
+  // ear
+  ctx.beginPath(); ctx.ellipse(560, 705, 16, 22, 0.2, 0, 7); fillStroke(SKIN, LINE, 3);
+  // eye (big, determined but happy), brow, blush, smile
+  ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.ellipse(628, 690, 15, 20, 0.1, 0, 7); ctx.fill();
+  ctx.fillStyle = '#2b1d16'; ctx.beginPath(); ctx.ellipse(633, 692, 11, 16, 0.1, 0, 7); ctx.fill();
+  ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(637, 685, 4.5, 0, 7); ctx.fill();
+  ctx.strokeStyle = HAIR; ctx.lineWidth = 5; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(612, 662); ctx.quadraticCurveTo(630, 655, 648, 664); ctx.stroke();
+  ctx.fillStyle = 'rgba(240,120,110,0.35)'; ctx.beginPath(); ctx.ellipse(622, 728, 18, 9, 0, 0, 7); ctx.fill();
+  ctx.strokeStyle = LINE; ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(640, 748); ctx.quadraticCurveTo(652, 756, 660, 744); ctx.stroke();
+  // near arm doing the curl
+  const A = armPose([585, 850], 195, 165, c);
+  ctx.beginPath(); ctx.ellipse(588, 850, 52, 46, -0.3, 0, 7); fillStroke(SKIN, LINE, lw);   // deltoid
+  limbPath(A.S, A.E, 42, 32); fillStroke(SKIN, LINE, lw);
+  // biceps pop on the front of the upper arm
+  const mx = lerp(A.S[0], A.E[0], 0.5) + 24 + 26 * c, my = lerp(A.S[1], A.E[1], 0.5);
+  const glow = ctx.createRadialGradient(mx, my, 5, mx, my, 120 * c + 20); glow.addColorStop(0, `rgba(255,170,90,${0.85 * c})`); glow.addColorStop(1, 'rgba(255,170,90,0)');
+  ctx.fillStyle = glow; ctx.fillRect(mx - 160, my - 160, 320, 320);
+  ctx.beginPath(); ctx.ellipse(mx, my, 24 + 30 * c, 54 + 10 * c, -0.1, 0, 7); fillStroke(SKIN, LINE, lw);
+  ctx.fillStyle = `rgba(255,120,80,${0.45 * c})`; ctx.beginPath(); ctx.ellipse(mx + 4, my + 6, 16 + 24 * c, 40 + 8 * c, -0.1, 0, 7); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.beginPath(); ctx.ellipse(mx + 8, my - 18, 8 + 6 * c, 14, -0.4, 0, 7); ctx.fill();
+  limbPath(A.E, A.H, 32, 24); fillStroke(SKIN, LINE, lw);
+  // fist + dumbbell
+  ctx.beginPath(); ctx.arc(A.H[0], A.H[1], 26, 0, 7); fillStroke(SKIN, LINE, lw);
+  ctx.save(); ctx.translate(A.H[0], A.H[1]); ctx.rotate(-A.phi + Math.PI / 2 + Math.PI / 2);
+  ctx.fillStyle = '#6b7280'; ctx.fillRect(-60, -7, 120, 14); ctx.strokeStyle = LINE; ctx.lineWidth = 3; ctx.strokeRect(-60, -7, 120, 14);
+  for (const x of [-62, 62]) { ctx.beginPath(); ctx.roundRect(x - 16, -40, 32, 80, 10); fillStroke('#3d4452', LINE, lw); ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.fillRect(x - 10, -34, 6, 60); }
+  ctx.restore();
+  ctx.beginPath(); ctx.arc(A.H[0], A.H[1], 26, -1.2, 1.9); fillStroke(SKIN, LINE, lw);
+  // sparkles
+  if (c > 0.6) { const a = (c - 0.6) / 0.4; star4(mx + 70, my - 70, 26 * a, '#fff6c8'); star4(mx + 95, my - 5, 16 * a, '#fff6c8'); star4(mx + 40, my - 110, 14 * a, '#fff6c8'); }
+}
+function animeOverlay() {
+  // watercolour paper grain + soft vignette
+  const r = rng(9), img = ctx.getImageData(0, 0, W, H), d = img.data;
+  for (let i = 0; i < d.length; i += 4) { const n = (r() - 0.5) * 14; d[i] += n; d[i + 1] += n; d[i + 2] += n; }
+  ctx.putImageData(img, 0, 0);
+  const v = ctx.createRadialGradient(W / 2, H * 0.45, H * 0.35, W / 2, H / 2, H * 0.8); v.addColorStop(0, 'rgba(40,30,20,0)'); v.addColorStop(1, 'rgba(40,30,20,0.28)');
+  ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
+}
+
+// =====================================================================
+// 2) 1930s rubber-hose cartoon: noodle limbs, pie eyes, white gloves, film grain
+// =====================================================================
+const INK = '#16120e', PAPER = '#efe6d2';
+function hoseBackground(t) {
+  ctx.fillStyle = PAPER; ctx.fillRect(0, 0, W, H);
+  // simple stage: back wall with wainscot, floor boards
+  ctx.fillStyle = '#e3d8bf'; ctx.fillRect(0, 0, W, 1250);
+  ctx.strokeStyle = INK; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(0, 1250); ctx.lineTo(W, 1250); ctx.stroke();
+  ctx.lineWidth = 3; for (let x = -40; x < W; x += 90) { ctx.beginPath(); ctx.moveTo(x, 1250); ctx.lineTo(x - 140, H); ctx.stroke(); }
+  ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(0, 1060); ctx.lineTo(W, 1060); ctx.stroke();
+  // wall poster: dumbbell sign
+  ctx.save(); ctx.translate(820, 520); ctx.rotate(0.05);
+  ctx.fillStyle = PAPER; ctx.fillRect(-150, -110, 300, 220); ctx.strokeStyle = INK; ctx.lineWidth = 5; ctx.strokeRect(-150, -110, 300, 220);
+  ctx.fillStyle = INK; ctx.font = 'bold 40px "DejaVu Serif"'; ctx.textAlign = 'center'; ctx.fillText('GYM', 0, -40);
+  ctx.fillRect(-80, 10, 160, 14); ctx.beginPath(); ctx.arc(-85, 17, 34, 0, 7); ctx.arc(85, 17, 34, 0, 7); ctx.fill(); ctx.restore();
+}
+function glove(x, y, s, ang) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(ang); ctx.scale(s, s);
+  ctx.lineWidth = 6; ctx.strokeStyle = INK; ctx.fillStyle = '#ffffff';
+  blob([[-30, -10], [-10, -38], [24, -36], [40, -10], [36, 22], [10, 36], [-24, 30], [-40, 8]]); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(-44, 0, 14, 30, 0, 0, 7); ctx.fill(); ctx.stroke();   // cuff
+  ctx.lineWidth = 4; for (const yy of [-12, 0, 12]) { ctx.beginPath(); ctx.moveTo(-6, yy); ctx.lineTo(16, yy); ctx.stroke(); }
+  ctx.restore();
+}
+function hoseCharacter(c, t) {
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  // floor shadow
+  ctx.fillStyle = 'rgba(22,18,14,0.25)'; ctx.beginPath(); ctx.ellipse(520, 1585, 200, 26, 0, 0, 7); ctx.fill();
+  // noodle legs (bouncy curves) + big shoes
+  ctx.strokeStyle = INK; ctx.lineWidth = 30;
+  ctx.beginPath(); ctx.moveTo(470, 1200); ctx.bezierCurveTo(430, 1330, 500, 1430, 450, 1540); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(570, 1200); ctx.bezierCurveTo(610, 1330, 540, 1430, 600, 1540); ctx.stroke();
+  for (const [x, f] of [[430, -1], [630, 1]]) { ctx.fillStyle = INK; ctx.beginPath(); ctx.ellipse(x, 1560, 78, 34, f * 0.05, 0, 7); ctx.fill(); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(x + f * 20, 1548, 18, 8, 0, 0, 7); ctx.fill(); }
+  // far arm on hip (behind)
+  ctx.strokeStyle = INK; ctx.lineWidth = 26; ctx.beginPath(); ctx.moveTo(470, 920); ctx.bezierCurveTo(380, 980, 380, 1060, 440, 1090); ctx.stroke();
+  glove(448, 1092, 0.9, 0.4);
+  // pear-shaped body + striped strongman singlet
+  blob([[470, 860], [600, 860], [660, 1000], [650, 1150], [590, 1230], [450, 1230], [395, 1150], [400, 1000]]);
+  ctx.fillStyle = INK; ctx.fill();
+  ctx.save(); blob([[470, 860], [600, 860], [660, 1000], [650, 1150], [590, 1230], [450, 1230], [395, 1150], [400, 1000]]); ctx.clip();
+  ctx.fillStyle = '#ffffff'; for (let y = 1030; y < 1240; y += 60) ctx.fillRect(380, y, 300, 26);
+  ctx.restore();
+  ctx.strokeStyle = INK; ctx.lineWidth = 6; blob([[470, 860], [600, 860], [660, 1000], [650, 1150], [590, 1230], [450, 1230], [395, 1150], [400, 1000]]); ctx.stroke();
+  // white belly patch with buttons
+  ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(560, 980, 62, 70, 0, 0, 7); ctx.fill(); ctx.stroke();
+  // head: round black head, white face mask, pie eyes, big nose, wide grin
+  ctx.fillStyle = INK; ctx.beginPath(); ctx.arc(540, 690, 175, 0, 7); ctx.fill();
+  for (const [x, y, r] of [[470, 520, 22], [510, 505, 26], [552, 510, 20]]) { ctx.beginPath(); ctx.arc(x, y, r, Math.PI, 0); ctx.fill(); }   // hair tufts
+  ctx.fillStyle = PAPER; blob([[520, 640], [600, 600], [690, 640], [720, 720], [690, 800], [600, 830], [530, 790], [505, 720]]); ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 6; ctx.stroke();
+  const blink = 1;
+  for (const ex of [600, 668]) {
+    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(ex, 650, 28, 48 * blink, 0, 0, 7); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = INK; ctx.beginPath(); ctx.moveTo(ex + 6, 665); ctx.ellipse(ex + 6, 665, 16, 28, 0, -0.3, Math.PI * 2 - 0.9); ctx.closePath(); ctx.fill();   // pie-cut pupil
+  }
+  ctx.fillStyle = INK; ctx.beginPath(); ctx.ellipse(712, 718, 32, 24, 0, 0, 7); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(705, 710, 9, 6, -0.4, 0, 7); ctx.fill();
+  ctx.fillStyle = INK; ctx.beginPath(); ctx.moveTo(560, 745); ctx.quadraticCurveTo(640, 830, 715, 755); ctx.quadraticCurveTo(640, 790, 560, 745); ctx.fill();
+  ctx.fillStyle = '#c0392b'; ctx.beginPath(); ctx.ellipse(640, 792, 26, 12, 0, 0, Math.PI); ctx.fill();
+  // handlebar moustache
+  ctx.fillStyle = INK; ctx.beginPath(); ctx.moveTo(712, 742); ctx.bezierCurveTo(680, 770, 630, 760, 615, 728); ctx.bezierCurveTo(640, 752, 680, 748, 700, 732); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(712, 742); ctx.bezierCurveTo(745, 772, 780, 752, 772, 722); ctx.bezierCurveTo(760, 742, 740, 744, 722, 732); ctx.fill();
+  ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(552, 742, 12, Math.PI * 0.6, Math.PI * 1.6); ctx.stroke(); ctx.beginPath(); ctx.arc(722, 750, 12, -0.6, 0.6); ctx.stroke();
+  // curling noodle arm: one smooth curve from shoulder through elbow to glove
+  const S = [640, 900], E = [735, 1060], phi = (15 + 135 * c) * Math.PI / 180, Hh = [E[0] + 190 * Math.sin(phi), E[1] + 190 * Math.cos(phi)];
+  ctx.strokeStyle = INK; ctx.lineWidth = 28; ctx.beginPath(); ctx.moveTo(...S); ctx.quadraticCurveTo(E[0] + 30, E[1] + 30, Hh[0], Hh[1]); ctx.stroke();
+  // muscle POP: big round bump with shine, wobble lines and stars
+  const bx = lerp(S[0], E[0], 0.45) + 30 + 18 * c, by = lerp(S[1], E[1], 0.45), br = 24 + 46 * c;
+  ctx.fillStyle = INK; ctx.beginPath(); ctx.arc(bx, by, br, 0, 7); ctx.fill();
+  ctx.fillStyle = 'rgba(192,57,43,0.85)'; ctx.beginPath(); ctx.arc(bx, by, br - 7, 0, 7); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(bx + br * 0.3, by - br * 0.4, br * 0.22, br * 0.12, -0.6, 0, 7); ctx.fill();
+  if (c > 0.6) {
+    const a = (c - 0.6) / 0.4; ctx.strokeStyle = INK; ctx.lineWidth = 6;
+    for (const da of [-0.9, -0.3, 0.3, 0.9]) { const ang = da - 0.2; ctx.beginPath(); ctx.moveTo(bx + Math.cos(ang) * (br + 14), by + Math.sin(ang) * (br + 14)); ctx.lineTo(bx + Math.cos(ang) * (br + 14 + 40 * a), by + Math.sin(ang) * (br + 14 + 40 * a)); ctx.stroke(); }
+    ctx.save(); ctx.translate(bx + 150, by - 120); ctx.rotate(-0.15);
+    ctx.fillStyle = '#fff'; ctx.strokeStyle = INK; ctx.lineWidth = 6;
+    ctx.beginPath(); for (let i = 0; i < 18; i++) { const r = i % 2 ? 58 : 95; const an = i * Math.PI / 9; ctx.lineTo(Math.cos(an) * r * 1.3, Math.sin(an) * r * 0.75); } ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = INK; ctx.font = 'bold 52px "DejaVu Serif"'; ctx.textAlign = 'center'; ctx.fillText('POP!', 0, 18); ctx.restore();
+  }
+  // dumbbell in the glove
+  ctx.save(); ctx.translate(Hh[0], Hh[1]); ctx.rotate(-phi + Math.PI);
+  ctx.fillStyle = INK; ctx.fillRect(-70, -8, 140, 16);
+  for (const x of [-70, 70]) { ctx.beginPath(); ctx.arc(x, 0, 40, 0, 7); ctx.fill(); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x - 10, -12, 8, 0, 7); ctx.fill(); ctx.fillStyle = INK; }
+  ctx.restore();
+  glove(Hh[0], Hh[1], 1.1, -phi + Math.PI / 2 + Math.PI);
+}
+function hoseOverlay(t) {
+  // sepia film: grain, scratches, flicker, round vignette
+  const r = rng(3 + Math.floor(t * 24)), img = ctx.getImageData(0, 0, W, H), d = img.data;
+  const flick = 1 + (r() - 0.5) * 0.06;
+  for (let i = 0; i < d.length; i += 4) {
+    const n = (r() - 0.5) * 34;
+    const y = 0.3 * d[i] + 0.59 * d[i + 1] + 0.11 * d[i + 2];
+    const keepRed = d[i] > d[i + 1] + 60;                        // keep the red muscle tint
+    if (!keepRed) { d[i] = (y * 1.07 + n) * flick; d[i + 1] = (y * 0.98 + n) * flick; d[i + 2] = (y * 0.84 + n) * flick; }
+    else { d[i] += n; d[i + 1] += n; d[i + 2] += n; }
+  }
+  ctx.putImageData(img, 0, 0);
+  ctx.strokeStyle = 'rgba(30,25,20,0.35)'; ctx.lineWidth = 2;
+  for (let i = 0; i < 3; i++) { const x = r() * W; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + (r() - 0.5) * 30, H); ctx.stroke(); }
+  for (let i = 0; i < 8; i++) { ctx.fillStyle = 'rgba(20,15,10,0.5)'; ctx.beginPath(); ctx.arc(r() * W, r() * H, 1 + r() * 3, 0, 7); ctx.fill(); }
+  const v = ctx.createRadialGradient(W / 2, H / 2, H * 0.28, W / 2, H / 2, H * 0.62); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(10,8,5,0.85)');
+  ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
+}
+
+window.drawFrame = function (t, c = 1) {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  if (style === 'anime') {
+    animeBackground(); animeCharacter(c); animeOverlay();
+    ctx.font = '400 64px "Patrick Hand"'; ctx.textAlign = 'center'; ctx.fillStyle = '#fff';
+    ctx.shadowColor = 'rgba(0,0,0,0.45)'; ctx.shadowBlur = 12; ctx.fillText('Arm in front hits the short head', W / 2, 1790); ctx.shadowColor = 'transparent';
+  } else {
+    hoseBackground(t); hoseCharacter(c, t);
+    ctx.fillStyle = PAPER; ctx.fillRect(90, 1680, 900, 130); ctx.strokeStyle = INK; ctx.lineWidth = 8; ctx.strokeRect(90, 1680, 900, 130); ctx.lineWidth = 3; ctx.strokeRect(104, 1694, 872, 102);
+    ctx.font = 'bold italic 44px "DejaVu Serif"'; ctx.textAlign = 'center'; ctx.fillStyle = INK; ctx.fillText('Arm in front hits the short head', W / 2, 1764);
+    hoseOverlay(t);
+  }
+  return cv.toDataURL('image/png');
+};
+document.fonts.load('40px "Patrick Hand"').then(() => { window.ready = true; });
+</script></body></html>
