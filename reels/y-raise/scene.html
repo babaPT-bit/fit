@@ -1,0 +1,381 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Y Raise Reel</title>
+<style>html, body { margin: 0; background: #0b0f17; } canvas { display: block; }</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="model.js"></script>
+<script src="voice/lines.js"></script>
+<script>
+const M = window.YModel;
+const ctx = document.getElementById('c').getContext('2d');
+const W = 1080, H = 1920, FPS = 30;
+const SHOW_CAPTIONS = new URLSearchParams(location.search).get('captions') !== '0';
+
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const smooth = t => t * t * (3 - 2 * t);
+const fade = (t, a, b) => clamp((t - a) / (b - a));
+const lerp = (a, b, u) => a + (b - a) * u;
+
+const C = {
+  bg0: '#0b0f17', bg1: '#141b2b', panel: 'rgba(255,255,255,0.03)', line: 'rgba(148,163,184,0.18)',
+  text: '#e5e7eb', dim: '#94a3b8', faint: '#64748b', accent: '#8fb4ff', force: '#f2c14e',
+  skin: '#e9e4dc', shade: '#c9c2b7', shorts: '#1f2633', steel: '#3b4558', steelHi: '#5b677d',
+  trap: '#f5a524', delt: '#60a5fa', good: '#34d399',
+};
+const COLCOL = ['#60a5fa', '#f5a524', '#a78bfa'];
+
+// ---------- voice-driven timeline ----------
+const VO = window.VOICE || [];
+const GAP = 0.2;
+const SEG = {}; let tc = 0;
+for (const ln of VO) { SEG[ln.id] = { start: tc, vo: tc + GAP, end: tc + GAP + ln.dur + 0.25, line: ln }; tc = SEG[ln.id].end; }
+const DURATION = tc + 0.6;
+window.DURATION = DURATION; window.FPS = FPS;
+window.VO_TIMES = VO.map(ln => ({ file: ln.file, at: SEG[ln.id].vo }));
+function wordTime(id, needle) {
+  const s = SEG[id], i = s.line.text.indexOf(needle);
+  return s.vo + s.line.dur * (i < 0 ? 0 : i / s.line.text.length);
+}
+const T_B = SEG.d1.start, T_C = SEG.prog.start;
+const phaseA = t => 1 - fade(t, T_B - 0.2, T_B + 0.3);
+const phaseB = t => fade(t, T_B - 0.2, T_B + 0.3) * (1 - fade(t, T_C - 0.2, T_C + 0.3));
+const phaseC = t => fade(t, T_C - 0.2, T_C + 0.3);
+// day counter: tweens to each milestone at the start of its line
+const DAYS = [['d1', 1], ['d7', 7], ['d14', 14], ['d30', 30]];
+function dayAt(t) {
+  let d = 1;
+  for (let i = 0; i < DAYS.length; i++) {
+    const s = SEG[DAYS[i][0]], prev = i ? DAYS[i - 1][1] : 1;
+    if (t >= s.start) d = lerp(prev, DAYS[i][1], ease(fade(t, s.start, s.start + 0.9)));
+  }
+  return d;
+}
+// progression highlights, timed to the words
+const PROG_WORDS = ['Bench', 'Dumbbells', 'Cables'];
+const PROG_T = PROG_WORDS.map(w => wordTime('prog', w));
+function progFocus(i, t) {
+  if (t < PROG_T[0] - 0.2) return 1;
+  if (t > SEG.outro.start) return 1;
+  let cur = 0; PROG_T.forEach((tt, j) => { if (t >= tt - 0.2) cur = j; });
+  const since = PROG_T[cur] - 0.2;
+  return i === cur ? 1 : 1 - 0.7 * fade(t, since, since + 0.3);
+}
+// rep progress, 0 = arms down, 1 = top of the Y
+function rep(t, period, offset = 0) {
+  const r = ((t + offset) % period + period) % period / period;
+  if (r < 0.42) return ease(r / 0.42);
+  if (r < 0.55) return 1;
+  if (r < 0.92) return 1 - ease((r - 0.55) / 0.37);
+  return 0;
+}
+
+// ---------- helpers ----------
+function txt(s, x, y, font, color, align = 'center', alpha = 1) {
+  if (alpha <= 0) return;
+  ctx.save(); ctx.globalAlpha *= alpha; ctx.font = font; ctx.fillStyle = color; ctx.textAlign = align; ctx.fillText(s, x, y); ctx.restore();
+}
+function rrect(x, y, w, h, r) {
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+function hexA(hex, a) { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; }
+function limb(a, b, wa, wb, fill) {
+  const dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1, nx = -dy / l, ny = dx / l;
+  ctx.fillStyle = fill; ctx.beginPath();
+  ctx.moveTo(a[0] + nx * wa, a[1] + ny * wa); ctx.lineTo(b[0] + nx * wb, b[1] + ny * wb);
+  ctx.lineTo(b[0] - nx * wb, b[1] - ny * wb); ctx.lineTo(a[0] - nx * wa, a[1] - ny * wa); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.arc(a[0], a[1], wa, 0, 7); ctx.fill(); ctx.beginPath(); ctx.arc(b[0], b[1], wb, 0, 7); ctx.fill();
+}
+function pill(text, x, y, color, a, filled, size = 22) {
+  if (a <= 0) return;
+  ctx.save(); ctx.globalAlpha *= a; ctx.font = `700 ${size}px "JetBrains Mono"`;
+  const w = ctx.measureText(text).width + 28, h = size + 16;
+  rrect(x - w / 2, y - h / 2, w, h, h / 2);
+  ctx.fillStyle = filled ? color : 'rgba(11,15,23,0.85)'; ctx.fill(); ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
+  ctx.fillStyle = filled ? '#0b0f17' : color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, x, y + 1); ctx.restore();
+}
+
+// ---------- person (side view, facing right) ----------
+// o: {x, y (floor), k (px/m)}; opts: lean (deg), slouch 0..1, legs, bench, cable, arm (body-frame dir), load 0..1, weight label
+function person(o, opts) {
+  const th = (opts.lean || 0) * Math.PI / 180, sl = opts.slouch || 0;
+  const S = p => [o.x + p[0] * o.k, o.y - p[1] * o.k];
+  const add = (a, b, s = 1) => [a[0] + b[0] * s, a[1] + b[1] * s];
+  const dirT = [Math.sin(th), Math.cos(th)], n = [Math.cos(th), -Math.sin(th)];
+  const LEGS = {
+    stand: [[0, 0.07], [0.015, 0.5], [0, 0.93]],
+    hinge: [[0.1, 0.07], [0.2, 0.49], [-0.04, 0.86]],
+    incline: [[-0.62, 0.07], [-0.32, 0.46], [-0.02, 0.86]],
+  }[opts.legs || 'stand'];
+  const [ank, knee, hip] = LEGS;
+  const sh = add(add(hip, dirT, 0.52 - sl * 0.03), n, sl * 0.06);
+
+  // equipment behind the body
+  if (opts.cable) {
+    const P = add(sh, M.toWorld(M.PULLEY, th));
+    const tx = P[0];
+    ctx.fillStyle = hexA('#3b4558', 0.8); ctx.fillRect(S([tx, 0])[0] - 7, S([0, 2.25])[1], 14, 2.25 * o.k);
+    ctx.fillStyle = '#2a3242'; const pp = S([tx, Math.max(0.12, P[1])]); rrect(pp[0] - 13, pp[1] - 13, 26, 26, 6); ctx.fill();
+    ctx.beginPath(); ctx.arc(pp[0], pp[1], 7, 0, 7); ctx.fillStyle = '#9aa7bd'; ctx.fill();
+    opts._pulley = pp;
+  }
+  if (opts.bench) {
+    const a = add(add(hip, n, 0.13), dirT, -0.08), b = add(add(hip, n, 0.13), dirT, 0.5);
+    const a2 = add(a, n, 0.08), b2 = add(b, n, 0.08);
+    ctx.strokeStyle = C.steel; ctx.lineWidth = 0.035 * o.k;
+    const mid = add(a2, dirT, 0.18);
+    ctx.beginPath(); ctx.moveTo(...S(mid)); ctx.lineTo(...S([mid[0], 0.02])); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(...S(a2)); ctx.lineTo(...S([a2[0] - 0.05, 0.02])); ctx.stroke();
+    ctx.fillStyle = '#2a3242'; ctx.beginPath(); [a, b, b2, a2].forEach((q, i) => i ? ctx.lineTo(...S(q)) : ctx.moveTo(...S(q))); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = C.steel; ctx.fillRect(S([mid[0] - 0.3, 0])[0], S([0, 0.03])[1], 0.6 * o.k, 0.03 * o.k);
+  }
+  // legs
+  limb(S(hip), S(knee), 0.075 * o.k, 0.055 * o.k, C.shade);
+  limb(S(knee), S(ank), 0.055 * o.k, 0.04 * o.k, C.shade);
+  ctx.fillStyle = '#2b3140'; const ft = S(ank); ctx.beginPath(); ctx.ellipse(ft[0] + 0.06 * o.k, ft[1] + 0.03 * o.k, 0.11 * o.k, 0.035 * o.k, 0, 0, 7); ctx.fill();
+  limb(S(hip), S(add(hip, [knee[0] - hip[0], knee[1] - hip[1]], 0.55)), 0.09 * o.k, 0.075 * o.k, C.shorts);
+
+  // torso
+  const hipB = add(hip, n, -0.1), hipF = add(hip, n, 0.1);
+  const midB = add(add(hip, dirT, 0.3), n, -(0.12 + sl * 0.06));
+  const shB = add(add(sh, n, -0.09), dirT, -0.02), shTop = add(sh, dirT, 0.05);
+  const shF = add(add(sh, n, 0.1), dirT, -0.07), chestF = add(add(hip, dirT, 0.36), n, 0.14 - sl * 0.02), bellyF = add(add(hip, dirT, 0.12), n, 0.11 + sl * 0.01);
+  ctx.fillStyle = C.skin; ctx.beginPath(); ctx.moveTo(...S(hipB));
+  ctx.quadraticCurveTo(...S(midB), ...S(shB)); ctx.lineTo(...S(shTop)); ctx.lineTo(...S(shF));
+  ctx.quadraticCurveTo(...S(chestF), ...S(bellyF)); ctx.lineTo(...S(hipF)); ctx.closePath(); ctx.fill();
+  // lower-trap / mid-back glow along the back
+  const load = opts.load || 0;
+  if (load > 0.01) {
+    ctx.save(); ctx.lineCap = 'round';
+    ctx.strokeStyle = hexA(C.trap, 0.15 + 0.85 * load); ctx.lineWidth = 0.06 * o.k; ctx.shadowColor = C.trap; ctx.shadowBlur = 18 * load;
+    const m1 = add(add(hip, dirT, 0.26), n, -(0.085 + sl * 0.05)), m2 = add(add(sh, n, -0.06), dirT, -0.04);
+    ctx.beginPath(); ctx.moveTo(...S(m1)); ctx.quadraticCurveTo(...S(add(midB, n, 0.035)), ...S(m2)); ctx.stroke(); ctx.restore();
+  }
+  // shorts top
+  ctx.fillStyle = C.shorts; ctx.beginPath(); ctx.moveTo(...S(add(hipB, dirT, 0.06))); ctx.lineTo(...S(add(hipF, dirT, 0.06)));
+  ctx.lineTo(...S(add(hipF, dirT, -0.05))); ctx.lineTo(...S(add(hipB, dirT, -0.05))); ctx.closePath(); ctx.fill();
+
+  // neck + head (head drifts forward with slouch)
+  const a = (8 + sl * 24) * Math.PI / 180;
+  const nd = [dirT[0] * Math.cos(a) + n[0] * Math.sin(a), dirT[1] * Math.cos(a) + n[1] * Math.sin(a)];
+  const neck0 = add(sh, dirT, 0.02), headC = add(add(neck0, nd, 0.19), n, 0.015);
+  limb(S(neck0), S(add(neck0, nd, 0.1)), 0.045 * o.k, 0.042 * o.k, C.shade);
+  ctx.fillStyle = C.skin; ctx.beginPath(); ctx.ellipse(...S(headC), 0.095 * o.k, 0.11 * o.k, -Math.atan2(nd[0], nd[1]), 0, 7); ctx.fill();
+  const nose = add(add(headC, n, 0.1), nd, -0.01);
+  ctx.beginPath(); ctx.arc(...S(nose), 0.018 * o.k, 0, 7); ctx.fill();
+  ctx.fillStyle = '#262a33'; ctx.beginPath(); ctx.ellipse(...S(add(add(headC, n, -0.03), nd, 0.03)), 0.085 * o.k, 0.085 * o.k, 0, 0, 7); ctx.fill();
+  ctx.fillStyle = C.skin; ctx.beginPath(); ctx.ellipse(...S(add(headC, n, 0.025)), 0.075 * o.k, 0.1 * o.k, -Math.atan2(nd[0], nd[1]), 0, 7); ctx.fill();
+  opts._ear = S(headC); opts._shoulder = S(sh);
+
+  // arm
+  if (opts.arm) {
+    const hw = M.toWorld(opts.arm.map(v => v * M.ARM), th);
+    const hand = add(sh, hw);
+    const elb = add(sh, hw, 0.5);
+    if (opts.cable && opts._pulley) { ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(...opts._pulley); ctx.lineTo(...S(hand)); ctx.stroke(); }
+    limb(S(sh), S(elb), 0.055 * o.k, 0.045 * o.k, C.skin);
+    limb(S(elb), S(hand), 0.045 * o.k, 0.035 * o.k, C.skin);
+    // delt
+    ctx.beginPath(); ctx.arc(...S(sh), 0.065 * o.k, 0, 7); ctx.fillStyle = '#ddd6cb'; ctx.fill();
+    ctx.fillStyle = hexA(C.delt, 0.1 + 0.8 * load); ctx.fill();
+    if (opts.noWeight) { /* empty hand */ }
+    else if (opts.cable) { ctx.fillStyle = '#1b1f27'; ctx.beginPath(); ctx.arc(...S(hand), 0.04 * o.k, 0, 7); ctx.fill(); ctx.strokeStyle = '#7d8799'; ctx.lineWidth = 2; ctx.stroke(); }
+    else {
+      const hp = S(hand);
+      ctx.fillStyle = '#1b1f27'; ctx.beginPath(); ctx.arc(hp[0], hp[1], 0.065 * o.k, 0, 7); ctx.fill();
+      ctx.strokeStyle = '#7d8799'; ctx.lineWidth = 2; ctx.stroke();
+      if (opts.weight) txt(opts.weight, hp[0], hp[1] + 0.005 * o.k + 6, `700 ${Math.round(0.05 * o.k)}px "JetBrains Mono"`, C.text);
+    }
+    opts._hand = S(hand);
+  }
+  return opts;
+}
+
+// ---------- background + header ----------
+function background(t) {
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, C.bg1); g.addColorStop(0.55, C.bg0); g.addColorStop(1, '#090c13');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  ctx.save(); ctx.strokeStyle = 'rgba(143,180,255,0.05)'; ctx.lineWidth = 1;
+  const hy = 1680;
+  for (let i = -12; i <= 12; i++) { ctx.beginPath(); ctx.moveTo(W / 2 + i * 30, hy); ctx.lineTo(W / 2 + i * 260, H); ctx.stroke(); }
+  for (let j = 0; j < 8; j++) { const y = hy + Math.pow(j / 7, 1.8) * (H - hy); ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+  ctx.restore();
+}
+function header(t) {
+  const a = ease(fade(t, 0, 0.6)), b = phaseC(t);
+  txt('Y RAISES  ×  30 DAYS', W / 2, 96, '600 26px "JetBrains Mono"', C.accent, 'center', a);
+  txt('What actually changes?', W / 2, 176, 'italic 400 64px "DejaVu Serif"', C.text, 'center', a * (1 - b));
+  txt('Then: change the tool', W / 2, 176, 'italic 400 64px "DejaVu Serif"', C.text, 'center', a * b);
+  ctx.save(); ctx.globalAlpha = a; ctx.strokeStyle = C.accent; ctx.lineWidth = 3;
+  const w = 360 * ease(fade(t, 0.2, 1)); ctx.beginPath(); ctx.moveTo(W / 2 - w, 204); ctx.lineTo(W / 2 + w, 204); ctx.stroke(); ctx.restore();
+}
+
+// ---------- phase A: hook ----------
+function sceneA(t, a) {
+  if (a <= 0) return;
+  ctx.save(); ctx.globalAlpha = a;
+  const d = M.data[0], p = rep(t, 3.4, -0.4), s = M.sampleAt(d, p);
+  const o = person({ x: 540, y: 1250, k: 400 }, { lean: 45, legs: 'incline', bench: true, arm: s.dir, load: s.moment / M.maxMoment, weight: '2' });
+  ctx.fillStyle = C.steel; ctx.fillRect(180, 1252, 720, 4);
+  const la = fade(t, 1.2, 1.7);
+  pill('LOWER TRAPS', 260, 600, C.trap, la, false, 26);
+  pill('REAR + SIDE DELTS', 760, 470, C.delt, la, false, 26);
+  ctx.save(); ctx.globalAlpha *= la * 0.6; ctx.strokeStyle = C.trap; ctx.setLineDash([6, 6]); ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(260, 625); ctx.lineTo(o._shoulder[0] - 90, o._shoulder[1] + 60); ctx.stroke();
+  ctx.strokeStyle = C.delt; ctx.beginPath(); ctx.moveTo(760, 495); ctx.lineTo(o._shoulder[0] + 10, o._shoulder[1] - 30); ctx.stroke(); ctx.restore();
+  txt('arms up and out into a "Y"', W / 2, 1340, '500 30px Inter', C.dim, 'center', la);
+  ctx.restore();
+}
+
+// ---------- phase B: 30-day timeline ----------
+const STATS = [
+  { name: 'POSTURE', color: C.good, val: d => 0.25 + 0.55 * smooth(clamp((d - 3) / 20)), label: d => d < 10 ? 'rounded' : d < 20 ? 'shoulders back' : 'upright' },
+  { name: 'BREATHING', color: C.accent, val: d => 0.3 + 0.4 * smooth(clamp((d - 8) / 16)), label: d => d < 12 ? 'shallow' : 'deeper, easier' },
+  { name: 'OVERHEAD PRESS', color: C.force, val: d => 0.2 + 0.5 * smooth(clamp((d - 4) / 26)), label: d => '+' + Math.round(8 * smooth(clamp((d - 4) / 26))) + '%' },
+  { name: 'UPPER-BACK SIZE', color: C.trap, val: d => 0.2 + 0.35 * smooth(clamp((d - 10) / 20)), label: d => '+' + Math.round(3 * smooth(clamp((d - 10) / 20))) + '%' },
+];
+function sceneB(t, a) {
+  if (a <= 0) return;
+  ctx.save(); ctx.globalAlpha = a;
+  const d = dayAt(t);
+  // day counter
+  txt('DAY', W / 2 - 90, 330, '600 30px "JetBrains Mono"', C.dim, 'right');
+  txt(String(Math.round(d)), W / 2 - 70, 345, '800 92px Inter', C.text, 'left');
+  // 30-day track
+  const x0 = 110, x1 = 970, y = 400;
+  ctx.fillStyle = 'rgba(255,255,255,0.08)'; rrect(x0, y - 5, x1 - x0, 10, 5); ctx.fill();
+  ctx.fillStyle = C.accent; rrect(x0, y - 5, (x1 - x0) * (d - 1) / 29 + 10, 10, 5); ctx.fill();
+  for (const [, m] of DAYS) {
+    const mx = x0 + (x1 - x0) * (m - 1) / 29, on = d >= m - 0.01;
+    ctx.beginPath(); ctx.arc(mx, y, 11, 0, 7); ctx.fillStyle = on ? C.accent : '#1e2636'; ctx.fill();
+    ctx.strokeStyle = C.accent; ctx.lineWidth = 2; ctx.stroke();
+    txt(String(m), mx, y + 42, '600 22px "JetBrains Mono"', on ? C.text : C.faint);
+  }
+  // posture figure with plumb line
+  const sl = 1 - smooth(clamp((d - 3) / 20));
+  ctx.save();
+  ctx.setLineDash([8, 8]); ctx.strokeStyle = 'rgba(52,211,153,0.5)'; ctx.lineWidth = 2;
+  const px = 300 + 0.02 * 330; ctx.beginPath(); ctx.moveTo(px, 1150); ctx.lineTo(px, 480); ctx.stroke(); ctx.restore();
+  const f = person({ x: 300, y: 1150, k: 330 }, { lean: sl * 4, slouch: sl, legs: 'stand', arm: [0.05, 0, -1], noWeight: true, load: 0.15 + 0.5 * (1 - sl) });
+  for (const [pt, lab] of [[f._ear, 'ear'], [f._shoulder, 'shoulder']]) {
+    ctx.beginPath(); ctx.arc(pt[0], pt[1], 7, 0, 7); ctx.fillStyle = C.good; ctx.fill();
+    ctx.save(); ctx.strokeStyle = 'rgba(52,211,153,0.6)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(pt[0], pt[1]); ctx.lineTo(px, pt[1]); ctx.stroke(); ctx.restore();
+    txt(lab, px - 20, pt[1] + 7, '500 20px "JetBrains Mono"', C.good, 'right');
+  }
+  txt('POSTURE', 300, 1200, '600 22px "JetBrains Mono"', C.faint);
+  // daily Y-raise mini figure, weight goes up
+  const kg = d < 10 ? 2 : d < 22 ? 3 : 4;
+  const dd = M.data[0], p = rep(t, 2.8, 0.3), s = M.sampleAt(dd, p);
+  person({ x: 790, y: 1060, k: 250 }, { lean: 45, legs: 'incline', bench: true, arm: s.dir, load: s.moment / M.maxMoment, weight: String(kg) });
+  ctx.fillStyle = C.steel; ctx.fillRect(610, 1062, 380, 3);
+  txt('DAILY Y RAISE', 790, 1200, '600 22px "JetBrains Mono"', C.faint);
+  pill(kg + ' kg', 790, 640, C.trap, 1, false, 30);
+  // stat cards
+  STATS.forEach((st, i) => {
+    const yy = 1290 + i * 92, v = st.val(d);
+    txt(st.name, 110, yy, '600 24px "JetBrains Mono"', C.dim, 'left');
+    txt(st.label(d), 970, yy, '700 30px Inter', st.color, 'right');
+    ctx.fillStyle = 'rgba(255,255,255,0.07)'; rrect(110, yy + 16, 860, 14, 7); ctx.fill();
+    ctx.fillStyle = st.color; rrect(110, yy + 16, 860 * v, 14, 7); ctx.fill();
+  });
+  ctx.restore();
+}
+
+// ---------- phase C: progression ----------
+const COLS = [180, 540, 900];
+const GY0 = 1020, GY1 = 1280;
+function sceneC(t, a) {
+  if (a <= 0) return;
+  M.data.forEach((d, i) => {
+    const cx = COLS[i], fa = a * progFocus(i, t), col = COLCOL[i];
+    const foc = t >= PROG_T[i] - 0.2 && t < SEG.outro.start && progFocus(i, t) > 0.99 && t >= PROG_T[0] - 0.2;
+    ctx.save(); ctx.globalAlpha = fa;
+    ctx.fillStyle = C.panel; rrect(cx - 172, 250, 344, 1390, 22); ctx.fill();
+    if (foc) { ctx.strokeStyle = hexA(col, 0.8); ctx.lineWidth = 2.5; ctx.stroke(); }
+    pill('LEVEL ' + d.level, cx, 290, col, 1, true, 20);
+    txt(d.title, cx, 362, '700 38px Inter', C.text);
+    txt(d.sub, cx, 398, '500 20px "JetBrains Mono"', C.dim);
+    const p = rep(t - T_C, 3.0, 0), s = M.sampleAt(d, p);
+    const opts = d.key === 'bench' ? { lean: 45, legs: 'incline', bench: true }
+      : d.key === 'db' ? { lean: 70, legs: 'hinge' } : { lean: 8, legs: 'stand', cable: true };
+    const ox = d.key === 'bench' ? cx + 25 : d.key === 'db' ? cx - 20 : cx - 40;
+    ctx.fillStyle = C.steel; ctx.fillRect(cx - 160, 902, 320, 3);
+    person({ x: ox, y: 900, k: 210 }, { ...opts, arm: s.dir, load: s.moment / M.maxMoment });
+    // tension meter
+    txt('TENSION', cx - 145, 960, '600 19px "JetBrains Mono"', col, 'left');
+    txt(Math.round(100 * s.moment / M.maxMoment) + '%', cx + 145, 960, '600 22px "JetBrains Mono"', C.text, 'right');
+    ctx.fillStyle = 'rgba(255,255,255,0.07)'; rrect(cx - 145, 972, 290, 10, 5); ctx.fill();
+    ctx.fillStyle = col; rrect(cx - 145, 972, 290 * s.moment / M.maxMoment, 10, 5); ctx.fill();
+    // curve
+    const X = q => cx - 145 + 290 * q, Y = v => GY1 - (GY1 - GY0) * v / M.maxMoment * 0.92;
+    ctx.strokeStyle = C.line; ctx.lineWidth = 1;
+    for (let k = 0; k <= 4; k++) { const y = GY0 + (GY1 - GY0) * k / 4; ctx.beginPath(); ctx.moveTo(X(0), y); ctx.lineTo(X(1), y); ctx.stroke(); }
+    const g = ctx.createLinearGradient(0, GY0, 0, GY1); g.addColorStop(0, hexA(col, 0.35)); g.addColorStop(1, hexA(col, 0));
+    ctx.beginPath(); ctx.moveTo(X(0), GY1); d.samples.forEach(q => ctx.lineTo(X(q.p), Y(q.moment))); ctx.lineTo(X(1), GY1); ctx.closePath(); ctx.fillStyle = g; ctx.fill();
+    ctx.beginPath(); d.samples.forEach((q, j) => j ? ctx.lineTo(X(q.p), Y(q.moment)) : ctx.moveTo(X(q.p), Y(q.moment))); ctx.strokeStyle = col; ctx.lineWidth = 4; ctx.stroke();
+    ctx.setLineDash([3, 4]); ctx.strokeStyle = hexA(C.force, 0.6); ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(X(d.peak.p), GY0 - 6); ctx.lineTo(X(d.peak.p), GY1); ctx.stroke(); ctx.setLineDash([]);
+    txt('hardest', Math.min(X(d.peak.p), cx + 110), GY0 - 12, '600 18px "JetBrains Mono"', C.force);
+    ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(X(p), GY0); ctx.lineTo(X(p), GY1); ctx.stroke();
+    ctx.beginPath(); ctx.arc(X(p), Y(s.moment), 7, 0, 7); ctx.fillStyle = col; ctx.fill(); ctx.strokeStyle = C.bg0; ctx.lineWidth = 2; ctx.stroke();
+    txt('arms down', X(0), GY1 + 30, '500 17px "JetBrains Mono"', C.faint, 'left');
+    txt('top of Y', X(1), GY1 + 30, '500 17px "JetBrains Mono"', C.faint, 'right');
+    // takeaway
+    const parts = d.note.split(' → ');
+    txt(parts[0], cx, 1400, '700 28px Inter', col);
+    if (parts[1]) txt(parts[1], cx, 1440, '700 28px Inter', col);
+    ctx.restore();
+  });
+}
+
+// ---------- captions ----------
+function chunksFor(ln, start) {
+  const words = ln.text.split(' '), chunks = []; let cur = [];
+  words.forEach((w, i) => { cur.push(w); if (/[.,!?]$/.test(w) || cur.length >= 4 || i === words.length - 1) { chunks.push(cur.join(' ')); cur = []; } });
+  let acc = 0; const total = ln.text.length;
+  return chunks.map(c => { const t0 = start + ln.dur * acc / total; acc += c.length + 1; return { text: c, t0, t1: start + ln.dur * Math.min(1, acc / total) }; });
+}
+const CHUNKS = VO.flatMap(ln => chunksFor(ln, SEG[ln.id].vo));
+window.CHUNKS = CHUNKS;
+function wordColor(w) {
+  const s = w.toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (['day', 'one', 'seven', 'fourteen', 'thirty'].includes(s)) return C.accent;
+  if (['traps', 'upper', 'back'].includes(s)) return C.trap;
+  if (['eight', 'percent', 'press'].includes(s)) return C.force;
+  if (['shoulders', 'chest', 'breaths', 'opens'].includes(s)) return C.good;
+  if (s === 'bench') return COLCOL[0]; if (s === 'dumbbells') return COLCOL[1]; if (s === 'cables') return COLCOL[2];
+  if (s === 'y') return C.trap;
+  return '#ffffff';
+}
+function captions(t) {
+  if (!SHOW_CAPTIONS) return;
+  const c = CHUNKS.find((c, i) => t >= c.t0 && t < (CHUNKS[i + 1] && CHUNKS[i + 1].t0 - c.t1 < 0.6 ? CHUNKS[i + 1].t0 : c.t1 + 0.35));
+  if (!c) return;
+  const k = ease(fade(t, c.t0, c.t0 + 0.14)), words = c.text.split(' ');
+  ctx.save(); ctx.font = '800 58px Inter';
+  const sp = ctx.measureText(' ').width, w = words.reduce((s, x) => s + ctx.measureText(x).width, 0) + sp * (words.length - 1);
+  ctx.translate(W / 2, 1765); ctx.scale(0.9 + 0.1 * k, 0.9 + 0.1 * k); ctx.globalAlpha = k; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
+  let x = -w / 2;
+  for (const word of words) { ctx.lineWidth = 10; ctx.strokeStyle = 'rgba(0,0,0,0.85)'; ctx.strokeText(word, x, 0); ctx.fillStyle = wordColor(word); ctx.fillText(word, x, 0); x += ctx.measureText(word).width + sp; }
+  ctx.restore();
+}
+
+window.drawFrame = function (t) {
+  background(t);
+  header(t);
+  sceneA(t, phaseA(t));
+  sceneB(t, phaseB(t));
+  sceneC(t, phaseC(t));
+  captions(t);
+  txt('Typical beginner estimates · results vary', W / 2, 1890, '400 20px Inter', C.faint, 'center', fade(t, 0.5, 1.2));
+};
+window.drawFrame(2);
+</script>
+</body>
+</html>

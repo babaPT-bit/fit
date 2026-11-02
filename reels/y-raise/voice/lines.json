@@ -1,0 +1,44 @@
+[
+ {
+  "id": "hook",
+  "text": "What if you did Y raises every day for thirty days?",
+  "file": "hook.wav",
+  "dur": 3.179
+ },
+ {
+  "id": "d1",
+  "text": "Day one. Two kilos feels heavy. Your lower traps are barely awake.",
+  "file": "d1.wav",
+  "dur": 4.117
+ },
+ {
+  "id": "d7",
+  "text": "Day seven. You can finally feel them working.",
+  "file": "d7.wav",
+  "dur": 2.645
+ },
+ {
+  "id": "d14",
+  "text": "Day fourteen. Shoulders sit back, your chest opens, and deep breaths come easier.",
+  "file": "d14.wav",
+  "dur": 4.843
+ },
+ {
+  "id": "d30",
+  "text": "Day thirty. Overhead press up about eight percent, and a little more upper back.",
+  "file": "d30.wav",
+  "dur": 4.501
+ },
+ {
+  "id": "prog",
+  "text": "Then change the tool. Bench, to learn strict form. Dumbbells bent over, hardest at the top. Cables, loaded from the very first inch.",
+  "file": "prog.wav",
+  "dur": 8.597
+ },
+ {
+  "id": "outro",
+  "text": "Save this, and start tomorrow.",
+  "file": "outro.wav",
+  "dur": 1.899
+ }
+]
