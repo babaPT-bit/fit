@@ -1,0 +1,106 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Biceps Close-up</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+@font-face { font-family: "Patrick Hand"; src: url(../lib/fonts/patrick-hand.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script>
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const D = window.Doodle;
+const which = new URLSearchParams(location.search).get('head') || 'short';   // which head is working
+
+// Hand-drawn upper arm (front view, right arm, torso on the left) with the biceps split into
+// short head (inner side, toward the chest) and long head (outer side). Coordinates are relative
+// to the magnifier centre, in px.
+function armCloseup(K, cx, cy, s, focus, pulse) {
+  const P = (x, y) => [cx + x * s, cy + y * s];
+  const tp = K.tp, rc = K.rc;
+  const o = (e = {}) => Object.assign({ stroke: tp.ink, strokeWidth: 6, roughness: 1.3, bowing: 1, seed: K.seed }, e);
+  const curve = (pts, e) => rc.curve(pts.map(p => P(...p)), o(e));
+  // chest edge + armpit (tells you which side is "inside")
+  curve([[-390, -230], [-250, -250], [-150, -250]], { strokeWidth: 5 });
+  // shoulder cap (deltoid) and arm outline
+  curve([[-150, -250], [-120, -330], [-20, -390], [110, -380], [175, -320], [195, -200]], { strokeWidth: 7 });
+  curve([[195, -200], [185, -60], [160, 100], [140, 250], [150, 360]], { strokeWidth: 7 });       // outer edge
+  curve([[-150, -250], [-125, -90], [-105, 100], [-75, 250], [-60, 360]], { strokeWidth: 7 });    // inner edge
+  // humeral head (dashed) inside the shoulder
+  rc.circle(...P(60, -300), 120 * s, o({ strokeWidth: 3, strokeLineDash: [10, 10], stroke: tp.inkSoft }));
+  // biceps heads
+  const shortHead = [[-40, -230], [-95, -120], [-95, 40], [-45, 180], [30, 220], [22, 40], [18, -120], [-40, -230]];
+  const longHead  = [[60, -230], [125, -150], [150, 0], [120, 150], [30, 220], [22, 40], [18, -120], [60, -230]];
+  const red = tp.muscle, grey = 'rgba(26,26,26,0.28)';
+  const fillOn = { stroke: red, strokeWidth: 6, fill: red, fillStyle: 'hachure', hachureGap: 9, fillWeight: 3.2, hachureAngle: -50 };
+  const fillOff = { stroke: tp.ink, strokeWidth: 5, fill: grey, fillStyle: 'hachure', hachureGap: 16, fillWeight: 1.5, hachureAngle: 40 };
+  const on = focus === 'short' ? shortHead : longHead, off = focus === 'short' ? longHead : shortHead;
+  // glow behind the working head
+  const c = P(focus === 'short' ? -35 : 85, -10);
+  const g = ctx.createRadialGradient(...c, 10, ...c, 260 * s);
+  g.addColorStop(0, `rgba(215,38,30,${0.22 + 0.18 * pulse})`); g.addColorStop(1, 'rgba(215,38,30,0)');
+  ctx.fillStyle = g; ctx.fillRect(c[0] - 300, c[1] - 300, 600, 600);
+  rc.polygon(off.map(p => P(...p)), o(fillOff));
+  rc.polygon(on.map(p => P(...p)), o(fillOn));
+  // the dividing line between the two heads
+  curve([[50, -235], [18, -120], [22, 40], [30, 220]], { strokeWidth: 6 });
+  // tendons: long head goes over the top of the humeral head; short head hooks to the front (coracoid)
+  curve([[60, -230], [95, -300], [60, -365], [-5, -350]], { strokeWidth: focus === 'long' ? 6 : 4, stroke: focus === 'long' ? red : tp.ink });
+  curve([[-40, -230], [-70, -290], [-95, -325]], { strokeWidth: focus === 'short' ? 6 : 4, stroke: focus === 'short' ? red : tp.ink });
+  rc.circle(...P(-100, -330), 16 * s, o({ fill: tp.ink, fillStyle: 'solid', strokeWidth: 2 }));
+  curve([[30, 220], [35, 290], [45, 360]], { strokeWidth: 5 });                                     // tendon to forearm
+  // elbow crease + start of forearm
+  curve([[-60, 360], [40, 330], [150, 360]], { strokeWidth: 5, stroke: tp.inkSoft });
+  // fibre strokes on the working head
+  ctx.save(); ctx.globalAlpha = 0.9;
+  const fib = focus === 'short' ? [[-60, -150, -55, 120], [-25, -170, -10, 170]] : [[70, -170, 95, 130], [110, -110, 115, 90]];
+  for (const [x0, y0, x1, y1] of fib) curve([[x0, y0], [(x0 + x1) / 2 + 12, (y0 + y1) / 2], [x1, y1]], { stroke: '#7a0f0a', strokeWidth: 3 });
+  ctx.restore();
+  return { shortAt: P(-70, 0), longAt: P(135, -40) };
+}
+
+function magnifier(K, cx, cy, r, from) {
+  const rc = K.rc, tp = K.tp;
+  // connector lines from the small circle on the stickman to the big lens
+  const [fx, fy, fr] = from;
+  const ang = Math.atan2(cy - fy, cx - fx), perp = ang + Math.PI / 2;
+  for (const sgn of [-1, 1]) rc.line(fx + Math.cos(perp) * fr * sgn, fy + Math.sin(perp) * fr * sgn, cx + Math.cos(perp) * r * sgn, cy + Math.sin(perp) * r * sgn,
+    { stroke: tp.inkSoft, strokeWidth: 3, roughness: 1.2, seed: K.seed });
+  ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7); ctx.fillStyle = '#fbf9f3'; ctx.fill(); ctx.restore();
+  rc.circle(fx, fy, fr * 2, { stroke: tp.accent, strokeWidth: 5, roughness: 1.5, seed: K.seed });
+}
+
+window.drawFrame = function (t = 0.4, focusArg) {
+  const focus = typeof focusArg === 'string' ? focusArg : which;
+  const pulse = 0.5 + 0.5 * Math.sin(t * 6);
+  ctx.drawImage(D.background('paper'), 0, 0);
+  const K = D.kit(ctx, 'paper', 1 + Math.floor(t * 8)); K.seed = 1 + Math.floor(t * 8);
+  ctx.textAlign = 'center';
+  ctx.font = '700 92px Caveat'; ctx.fillStyle = K.tp.ink;
+  ctx.fillText(focus === 'short' ? 'Arm in front' : 'Arm behind', 540, 150);
+  ctx.font = '700 70px Caveat'; ctx.fillStyle = K.tp.accent;
+  ctx.fillText(focus === 'short' ? '= SHORT head works' : '= LONG head works', 540, 225);
+  // mini stickman doing the matching curl (bottom)
+  const mini = focus === 'short' ? D.preacher(K, 1, 300, 1720, 300) : D.cableCurl(K, 1, 420, 1730, 270);
+  const lens = [570, 840, 400];
+  magnifier(K, ...lens, [mini.muscle[0], mini.muscle[1], 46]);
+  ctx.save(); ctx.beginPath(); ctx.arc(lens[0], lens[1], lens[2] - 4, 0, 7); ctx.clip();
+  const pts = armCloseup(K, lens[0] + 20, lens[1] + 20, 0.95, focus, pulse);
+  ctx.restore();
+  K.rc.circle(lens[0], lens[1], lens[2] * 2, { stroke: K.tp.ink, strokeWidth: 9, roughness: 1.4, seed: K.seed });
+  // labels outside the lens
+  const on = K.tp.accent, off = 'rgba(26,26,26,0.55)';
+  const label = (text, x, y, to, col, big) => {
+    ctx.font = (big ? '700 64px' : '700 48px') + ' Caveat'; ctx.fillStyle = col; ctx.textAlign = 'center'; ctx.fillText(text, x, y);
+    const fx = x + (to[0] - x) * 0.18, fy = y + 18 + (to[1] - y) * 0.05;
+    K.rc.line(fx, fy, to[0], to[1], { stroke: col, strokeWidth: big ? 6 : 4, roughness: 1, seed: K.seed });
+    const a = Math.atan2(to[1] - fy, to[0] - fx);
+    for (const da of [2.6, -2.6]) K.rc.line(to[0], to[1], to[0] + 26 * Math.cos(a + da), to[1] + 26 * Math.sin(a + da), { stroke: col, strokeWidth: big ? 6 : 4, roughness: 0.6, seed: K.seed });
+  };
+  label(focus === 'short' ? 'SHORT HEAD' : 'short head', 190, 470, pts.shortAt, focus === 'short' ? on : off, focus === 'short');
+  label(focus === 'long' ? 'LONG HEAD' : 'long head', 900, 1310, pts.longAt, focus === 'long' ? on : off, focus === 'long');
+  return cv.toDataURL('image/png');
+};
+document.fonts.load('700 40px Caveat').then(() => document.fonts.load('40px "Patrick Hand"')).then(() => { window.ready = true; });
+</script></body></html>
