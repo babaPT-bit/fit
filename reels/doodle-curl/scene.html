@@ -18,8 +18,8 @@ const fade = (t, a, b) => clamp((t - a) / (b - a));
 
 // ---------- voice-driven timeline ----------
 const VO = window.VOICE; const SEG = {}; let tc = 0;
-for (const ln of VO) { SEG[ln.id] = { start: tc, vo: tc + 0.25, end: tc + 0.25 + ln.dur + 0.35, line: ln }; tc = SEG[ln.id].end; }
-window.DURATION = tc + 0.6; window.VO_TIMES = VO.map(ln => ({ file: ln.file, at: SEG[ln.id].vo }));
+for (const ln of VO) { SEG[ln.id] = { start: tc, vo: tc + 0.12, end: tc + 0.12 + ln.dur + 0.18, line: ln }; tc = SEG[ln.id].end; }
+window.DURATION = tc + 0.4; window.VO_TIMES = VO.map(ln => ({ file: ln.file, at: SEG[ln.id].vo }));
 function segAt(t) { let id = VO[0].id; for (const ln of VO) if (t >= SEG[ln.id].start) id = ln.id; const s = SEG[id]; return { id, s, u: clamp((t - s.start) / (s.end - s.start)) }; }
 // curl reps: 0 = arm down, 1 = full contraction
 const rep = (t, period = 2.2) => 0.5 - 0.5 * Math.cos(2 * Math.PI * t / period);
