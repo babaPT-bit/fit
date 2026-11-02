@@ -27,15 +27,21 @@ Every video follows the same 5 beats:
 - **Takeaway:** "Do one in front, one behind, and you've trained the whole biceps. Save this."
 - **Zoom bubble:** biceps split into short head (inner) and long head (outer); tendons up to the shoulder.
 
-## 2. Regular curl vs hammer curl
-**Title:** Palms up or thumbs up?
+## 2. Hypertrophy vs strength
+**Title:** Bigger muscles or stronger muscles?
 
-- **Hook:** "Regular curl or hammer curl? They don't hit the same muscle."
-- **A, palms up:** "Palms up, and the biceps works hardest, because it also turns your palm up."
-- **B, thumbs up (hammer):** "Thumbs up, and the work shifts to the brachialis under your biceps, and the brachioradialis in your forearm."
-- **Why:** "A thicker brachialis pushes your biceps up, so your arm looks bigger."
-- **Takeaway:** "Big arms need both grips. Save this for arm day."
-- **Zoom bubble:** upper arm with biceps on top, brachialis underneath, brachioradialis running into the forearm.
+- **Hook:** "Training for size and training for strength aren't the same thing."
+- **A, hypertrophy:** "Hypertrophy means your muscles get bigger. Most sets in about six to thirty reps, taken close to failure, ten to twenty hard sets per muscle a week."
+- **B, strength:** "Strength means lifting more weight. Heavy sets of one to six reps, long rests, and lots of practice on the same lifts."
+- **Why:** "Size comes from thicker muscle fibres. Strength also needs your brain to fire more of them at once."
+- **Takeaway:** "Most people should do both: one heavy lift first, then lighter sets for size. Save this."
+- **On screen:**
+  - **A:** the stickman's arm inflates like a balloon.
+  - **B:** the stickman lifts a huge barbell with lightning bolts from head to muscle.
+- **Zoom bubble:**
+  - **A:** muscle fibres drawn thin, then thicker.
+  - **B:** a nerve wire lighting up more and more fibres.
+- **Plan card (last 3 s):** "Heavy 3–5 reps → then 8–15 reps."
 
 ## 3. Overhead triceps extension vs pushdown
 **Title:** Where's the biggest part of your triceps?
@@ -47,28 +53,34 @@ Every video follows the same 5 beats:
 - **Takeaway:** "Keep the pushdowns, but add one overhead move. Save this."
 - **Zoom bubble:** back of the arm with three heads: long (inner, up to the shoulder blade), lateral (outer), medial (deep, near the elbow).
 
-## 4. Incline vs flat vs decline bench press
-**Title:** Which bench angle builds which chest?
+## 4. Cable fly vs dumbbell fly
+**Title:** Which fly builds more chest?
 
-- **Hook:** "Flat, incline or decline? Here's what each one really trains."
-- **A, flat bench:** "Flat bench hits the big middle part of your chest."
-- **B, incline at about thirty degrees:** "Tilt the bench to about thirty degrees and the upper chest, under your collarbone, works more."
-- **Short C, decline:** "Decline leans toward the lower fibres, which flat bench already hits well."
-- **Why:** "The angle changes which fibres line up with the push."
-- **Takeaway:** "Most people only need flat and incline. Save this."
-- **Zoom bubble:** chest fan with upper (clavicular), middle (sternal) and lower (costal) fibres; the matching band turns red for each angle.
-- Note: three setups, so the B and C beats run about 6 s each.
+- **Hook:** "Dumbbell fly or cable fly? The weight feels the same, but the tension isn't."
+- **A, dumbbell fly:** "With dumbbells, the hard part is the bottom stretch. At the top, the weights sit over your shoulders and your chest gets a break."
+- **B, cable fly:** "Cables pull from the side, so your chest stays loaded all the way, even at the squeeze."
+- **Why:** "Gravity pulls straight down. A cable pulls wherever the pulley is."
+- **Takeaway:** "Pick one? Go cables. Want a deep stretch? Dumbbells, controlled. Save this."
+- **Zoom bubble:** the chest fan with a hand-drawn tension arrow at three points of the rep:
+  - **Dumbbell:** big arrow at the bottom, tiny at the top.
+  - **Cable:** big arrows all the way through.
 
-## 5. Front raise vs lateral raise vs rear delt fly
-**Title:** Your shoulder has three parts.
+## 5. Dumbbell lateral raise vs cable lateral raise
+**Title:** Why cables win for side delts.
 
-- **Hook:** "Your shoulder isn't one muscle. It's three."
-- **A, front raise:** "Front raise: front delt. But presses already hammer this one."
-- **B, lateral raise:** "Lateral raise, arms out to the side: side delt, the one that makes shoulders look wide."
-- **C, rear delt fly:** "Bent over, arms out: rear delt, the one almost everyone skips."
-- **Why:** "Each part lifts your arm in a different direction."
-- **Takeaway:** "For round shoulders, prioritise side and rear. Save this."
-- **Zoom bubble:** shoulder cap split into front, side and rear delt; each turns red in turn.
+- **Hook:** "Lateral raises with dumbbells waste the first half of every rep."
+- **A, dumbbell:** "At the bottom, the dumbbell hangs straight down, so your side delt has almost nothing to do. It only gets hard near the top."
+- **B, cable:** "A low cable pulls across your body, so your side delt works from the very first inch."
+- **Setup (show this step by step):**
+  - "Set the pulley at about knee height."
+  - "Stand side-on, about an arm's length from the machine."
+  - "Hold the handle in your far hand, so the cable runs across your body."
+  - "Lean slightly away, and lift with your elbow until your arm is level with your shoulder."
+- **Takeaway:** "Same shoulder, more work per rep. Save this."
+- **Zoom bubble:** shoulder cap split into front, side and rear delt, with the side delt red. A tension arrow:
+  - **Dumbbell:** zero at the bottom.
+  - **Cable:** strong from the start.
+- **Note:** the setup needs its own ~6 s beat, so A and B run about 7 s each.
 
 ## 6. Squat vs Romanian deadlift
 **Title:** Knees or hips?
@@ -100,15 +112,15 @@ Every video follows the same 5 beats:
 - **Takeaway:** "Do both, and go slow at the bottom. Save this."
 - **Zoom bubble:** lower leg with the gastrocnemius (two bellies, top) over the soleus (underneath, wider at the bottom).
 
-## 9. Lat pulldown vs straight-arm pulldown
-**Title:** Can't feel your lats?
+## 9. Lat pulldown: wide grip vs close grip
+**Title:** Does grip width change your back?
 
-- **Hook:** "Doing pulldowns but only feeling your arms?"
-- **A, lat pulldown:** "Regular pulldowns bend your elbows, so your biceps help a lot, along with your lats."
-- **B, straight-arm pulldown:** "Keep your arms straight and sweep the bar to your hips. Now your biceps can't help, so your lats do all the work."
-- **Why:** "No elbow bend means no biceps."
-- **Takeaway:** "Use straight-arm first to wake up your lats, then pulldowns. Save this."
-- **Zoom bubble:** back view with lats (big wings) red and biceps grey. For the regular pulldown, both are lightly red.
+- **Hook:** "Wide grip for width, close grip for thickness? Not quite."
+- **A, wide grip:** "Wide grip feels more in your upper back, but your elbows can't travel as far."
+- **B, close or neutral grip:** "Close grip lets you pull deeper, through a longer range, with a bit more biceps."
+- **Why:** "Both hit your lats hard. Studies show only small differences between grips."
+- **Takeaway:** "Pick the grip you can pull to your chest with control, and vary it every few weeks. Save this."
+- **Zoom bubble:** back view with the lat wing split into upper and lower fibres, plus teres major. Wide grip lights the upper part a little more; close grip lights the whole wing with a longer range arrow.
 
 ## 10. Crunch vs hanging leg raise
 **Title:** Upper abs vs lower abs?
@@ -122,11 +134,15 @@ Every video follows the same 5 beats:
 
 ---
 
-### Backups (if you want 11–13)
+### Backups (if you want 11–14)
 11. **Shrug vs face pull:** upper traps vs mid/lower traps and rear delts.
 12. **Rows, elbows tucked vs flared:** lats vs upper back and rear delts.
 13. **Hip thrust vs squat for glutes:** glutes hardest at the top vs glutes stretched at the bottom.
+14. **Regular vs hammer curl:** biceps vs brachialis and forearm (moved out of the top 10).
+15. **Flat vs incline vs decline bench:** upper vs middle vs lower chest (moved out of the top 10).
 
 ### Accuracy notes
 - Every pair shifts **emphasis**; the other muscles still work. The voiceover says "more" or "takes over", never "only", except for the straight-arm pulldown (no elbow bend means the biceps can't help) and the crunch/leg-raise explanation.
 - #3 and #7 cite single studies (Maeo et al.: overhead vs pushdown triceps, seated vs lying leg curl). The voiceover says "one study" so it doesn't overclaim.
+- #2 uses the common evidence-based ranges: hypertrophy works across roughly 6–30 reps when sets are close to failure; strength is best built with heavy 1–6 rep work on the lifts you want to get strong at.
+- #9: research shows small differences between grip widths, so the script doesn't claim one is clearly better.
