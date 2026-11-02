@@ -60,9 +60,9 @@ const srtTime = s => { const ms = Math.round(s * 1000); const h = Math.floor(ms 
     const ms = Math.round(v.at * 1000);
     filters.push(`[${i}:a]adelay=${ms}|${ms},aresample=48000[a${i}]`);
   });
-  const mix = VO_TIMES.map((_, i) => `[a${i}]`).join('') + `amix=inputs=${VO_TIMES.length}:normalize=0,apad,atrim=0:${dur.toFixed(3)},loudnorm=I=-14:TP=-1.5[vo]`;
+  const mix = VO_TIMES.map((_, i) => `[a${i}]`).join('') + `amix=inputs=${VO_TIMES.length}:normalize=0,apad,atrim=0:${dur.toFixed(3)},loudnorm=I=-14:TP=-1.5,aresample=48000[vo]`;
   const voice = path.join(OUT, 'y-raise-voiceover.m4a');
-  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...inputs, '-filter_complex', filters.concat(mix).join(';'), '-map', '[vo]', '-c:a', 'aac', '-b:a', '192k', voice]);
+  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...inputs, '-filter_complex', filters.concat(mix).join(';'), '-map', '[vo]', '-ac', '2', '-c:a', 'aac', '-b:a', '192k', voice]);
   execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', silent, '-i', voice, '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'copy', '-shortest', '-movflags', '+faststart', path.join(OUT, 'y-raise-reel.mp4')]);
   fs.unlinkSync(silent);
 

@@ -40,9 +40,9 @@ const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'applic
     ff.stdin.end(); await new Promise(r => ff.on('close', r));
     const inputs = [], filters = [];
     times.forEach((v, i) => { inputs.push('-i', path.join(dir, 'voice', v.file)); const ms = Math.round(v.at * 1000); filters.push(`[${i}:a]adelay=${ms}|${ms},aresample=48000[a${i}]`); });
-    const mix = times.map((_, i) => `[a${i}]`).join('') + `amix=inputs=${times.length}:normalize=0,apad,atrim=0:${duration.toFixed(3)},loudnorm=I=-14:TP=-1.5[vo]`;
+    const mix = times.map((_, i) => `[a${i}]`).join('') + `amix=inputs=${times.length}:normalize=0,apad,atrim=0:${duration.toFixed(3)},loudnorm=I=-14:TP=-1.5,aresample=48000[vo]`;
     execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', silent, ...inputs, '-filter_complex', filters.map(f => f.replace(/\[(\d+):a\]/, (m, k) => `[${+k + 1}:a]`)).concat(mix).join(';'),
-      '-map', '0:v', '-map', '[vo]', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-shortest', '-movflags', '+faststart', path.join(out, `${name}.mp4`)]);
+      '-map', '0:v', '-map', '[vo]', '-c:v', 'copy', '-ac', '2', '-c:a', 'aac', '-b:a', '192k', '-shortest', '-movflags', '+faststart', path.join(out, `${name}.mp4`)]);
     fs.unlinkSync(silent);
     console.log(`wrote ${path.join(out, name + '.mp4')} (${duration.toFixed(1)}s)`);
   }
