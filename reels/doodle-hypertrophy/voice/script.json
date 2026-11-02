@@ -1,9 +1,8 @@
 [
-  {"id": "hookA", "voice": "am_onyx", "speed": 1.15, "text": "Lift heavy. Six reps!"},
-  {"id": "hookB", "voice": "am_puck", "speed": 1.2, "text": "No! Go light. Twelve reps!"},
-  {"id": "hookN", "text": "So who's right? It depends on your goal."},
-  {"id": "hyp",   "text": "If you want bigger muscles, that's hypertrophy. Six to thirty reps all work, as long as you go close to failure. Aim for ten to twenty hard sets per muscle a week."},
-  {"id": "str",   "text": "If you want to lift more, that's strength. Heavy sets of one to six reps, long rests, and lots of practice on the same lifts."},
-  {"id": "why",   "text": "Size comes from thicker muscle fibres. Strength also trains your brain to fire more of them at once."},
-  {"id": "plan",  "text": "So both of them were right. Go heavy on big compound lifts like squats, bench and deadlifts for strength. Use higher reps on smaller muscles like arms, shoulders and calves for size. Save this."}
+  {"id": "hookA", "voice": "am_onyx", "speed": 1.25, "text": "Heavy! Six reps!"},
+  {"id": "hookB", "voice": "am_puck", "speed": 1.25, "text": "No! Light! Twelve reps!"},
+  {"id": "hookN", "text": "Three months in and still confused? Both are right."},
+  {"id": "hyp",   "text": "Want bigger muscles? Six to thirty reps all work, if you go close to failure."},
+  {"id": "str",   "text": "Want to lift more? Go heavy, one to six reps, and rest longer."},
+  {"id": "plan",  "text": "Best of both: heavy on big lifts, higher reps on small muscles. Save this."}
 ]

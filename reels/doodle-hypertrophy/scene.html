@@ -20,8 +20,8 @@ const rad = d => d * Math.PI / 180;
 
 // ---------- voice-driven timeline (brisk: short gaps) ----------
 const VO = window.VOICE; const SEG = {}; let tc = 0;
-for (const ln of VO) { SEG[ln.id] = { start: tc, vo: tc + 0.12, end: tc + 0.12 + ln.dur + 0.18, line: ln }; tc = SEG[ln.id].end; }
-window.DURATION = tc + 0.4; window.VO_TIMES = VO.map(ln => ({ file: ln.file, at: SEG[ln.id].vo }));
+for (const ln of VO) { SEG[ln.id] = { start: tc, vo: tc + 0.08, end: tc + 0.08 + ln.dur + 0.12, line: ln }; tc = SEG[ln.id].end; }
+window.DURATION = tc + 0.35; window.VO_TIMES = VO.map(ln => ({ file: ln.file, at: SEG[ln.id].vo }));
 function segAt(t) { let id = VO[0].id; for (const ln of VO) if (t >= SEG[ln.id].start) id = ln.id; const s = SEG[id]; return { id, s, u: clamp((t - s.start) / (s.end - s.start)) }; }
 const speaking = (id, t) => t >= SEG[id].vo && t <= SEG[id].vo + SEG[id].line.dur;
 const rep = (t, period = 2.2) => 0.5 - 0.5 * Math.cos(2 * Math.PI * t / period);
@@ -139,15 +139,15 @@ function sceneArgue(t, id) {
   if (id === 'hookN') {
     const a = fade(t, SEG.hookN.start, SEG.hookN.start + 0.3);
     question(470, 790, t); question(610, 760, t + 1, 90);
-    ctx.globalAlpha = a; heading("What's your goal?", null); ctx.globalAlpha = 1;
-  } else if (t > SEG.hookB.start) question(540, 800, t, 90);
+    bigHook(rc, [['BOTH ARE', 150], ['RIGHT?!', 150]], SEG.hookN.start, t, 270);
+  } else { bigHook(rc, [['HEAVY', 150], ['OR LIGHT?', 150]], 0, t, 270); if (t > SEG.hookB.start) question(540, 800, t, 90); }
 }
 function sceneHyp(t, u) {
   heading('SIZE', '= hypertrophy');
   const c = rep(t, 2.0), s = 560;
   const o = man({ x: 470, y: 1560, s }, { arms: { L: [40, -110], R: [8, 10 + 140 * c] }, flex: (0.25 + 0.75 * ease(u)) * (0.6 + 0.4 * c) });
   dumbbell(o.R.H, s, 0);
-  sticky(640, 330, 400, 360, 0.04, [['6–30 reps', 66, RED], ['close to failure', 58], ['10–20 hard sets', 58], ['per muscle / week', 50]], fade(u, 0.15, 0.3));
+  sticky(640, 330, 400, 360, 0.04, [['6–30 reps', 70, RED], ['close to', 60], ['failure', 60]], fade(u, 0.15, 0.3));
 }
 function sceneStr(t, u) {
   heading('STRENGTH', '= lift more');
@@ -160,7 +160,7 @@ function sceneStr(t, u) {
     const px = sx * (0.78 + k * 0.08), py = barY - bend * 0.8;
     const pp = P([px, py]); rc.rectangle(pp[0] - 0.03 * s, pp[1] - 0.2 * s, 0.06 * s, 0.4 * s, ro({ strokeWidth: 4, fill: INK, fillStyle: 'solid' }));
   }
-  sticky(60, 330, 380, 300, -0.04, [['1–6 reps', 66, RED], ['heavy', 58], ['same lifts, lots', 52], ['of practice', 52]], fade(u, 0.1, 0.25));
+  sticky(60, 330, 380, 300, -0.04, [['1–6 reps', 70, RED], ['heavy', 60], ['rest longer', 60]], fade(u, 0.1, 0.25));
   clock(850, 470, 90, t);
 }
 function fibreBubble(cx, cy, r, grow) {
@@ -232,6 +232,21 @@ function caption(t) {
   let x = 540 - w / 2; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
   for (const word of words) { ctx.fillStyle = KEY.test(word) ? RED : INK; ctx.fillText(word, x, 1842); x += ctx.measureText(word).width + sp; }
   ctx.textBaseline = 'alphabetic';
+}
+
+
+// big hook: huge handwritten red text that pops in
+function bigHook(rc, lines, t0, t, y = 330) {
+  const e = x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+  const a = e(Math.max(0, Math.min(1, (t - t0) / 0.25))), k = 0.6 + 0.4 * a + 0.03 * Math.sin(t * 9);
+  ctx.save(); ctx.translate(540, y); ctx.rotate(-0.04); ctx.scale(k, k); ctx.globalAlpha = a;
+  let yy = 0;
+  for (const [txt, size] of lines) {
+    ctx.font = `700 ${size}px Caveat`; ctx.textAlign = 'center'; ctx.lineWidth = 14; ctx.strokeStyle = '#f4f1ea'; ctx.lineJoin = 'round';
+    ctx.strokeText(txt, 0, yy); ctx.fillStyle = '#d7261e'; ctx.fillText(txt, 0, yy); yy += size * 0.95;
+  }
+  rc.line(-420, yy - 50, 420, yy - 62, { stroke: '#d7261e', strokeWidth: 9, roughness: 2.5, seed: Math.floor(t * 8) + 1 });
+  ctx.restore();
 }
 
 window.drawFrame = function (t) {

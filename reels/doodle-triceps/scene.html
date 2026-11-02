@@ -1,0 +1,113 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Triceps Reel</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script src="../lib/doodlekit.js"></script>
+<script>
+const KEY = /^(skinny|two-thirds|triceps|biceps|long|stretch|overhead|forty|percent|pushdowns|add)/i;
+
+// side-view stickman facing right; arm angles are absolute: 0 = straight down, 90 = forward, 180 = up
+function sideMan(o, { upper = 5, fore = 5, face = 'smile' } = {}) {
+  const rc = S.rc, P = p => [o.x + p[0] * o.s, o.y - p[1] * o.s];
+  const hip = [0, 0.92], sh = [0.02, 1.42], head = [0.05, 1.62];
+  const ln = (pts, w = 7, c = INK) => rc.linearPath(pts.map(P), ro({ strokeWidth: w, stroke: c }));
+  ln([hip, [0.06, 0.48], [0.04, 0]]); ln([[0.04, 0], [0.14, 0]]);
+  ln([hip, [-0.05, 0.48], [-0.08, 0]], 7, SOFT);
+  ln([hip, sh]);
+  const u = [Math.sin(rad(upper)), -Math.cos(rad(upper))], f = [Math.sin(rad(fore)), -Math.cos(rad(fore))];
+  const E = [sh[0] + u[0] * 0.3, sh[1] + u[1] * 0.3], Hd = [E[0] + f[0] * 0.28, E[1] + f[1] * 0.28];
+  ln([sh, E, Hd]);
+  const hp = P(head), R = 0.11 * o.s;
+  rc.circle(hp[0], hp[1], R * 2, ro({ fill: '#f4f1ea', fillStyle: 'solid' }));
+  ctx.fillStyle = INK; ctx.beginPath(); ctx.ellipse(hp[0] + R * 0.45, hp[1] - R * 0.15, R * 0.09, R * 0.14, 0, 0, 7); ctx.fill();
+  rc.arc(hp[0] + R * 0.45, hp[1] + R * 0.25, R * 0.6, R * 0.45, 0.2, Math.PI - 0.8, false, ro({ strokeWidth: 5 }));
+  return { E: P(E), H: P(Hd), sh: P(sh), head: hp };
+}
+
+// back view of an upper arm (shoulder at top, elbow at bottom) with the three triceps heads
+function tricepsMap(cx, cy, k, mode, pulse) {
+  const P = (x, y) => [cx + x * k, cy + y * k], rc = S.rc;
+  const stretch = mode === 'stretch' ? 1.08 : 1, sy = (x, y) => P(x, y * stretch);
+  rc.curve([[-135, -320], [-125, -60], [-115, 250]].map(p => sy(...p)), ro({ strokeWidth: 7 }));
+  rc.curve([[135, -320], [128, -60], [112, 250]].map(p => sy(...p)), ro({ strokeWidth: 7 }));
+  const longH = [[-20, -330], [-112, -250], [-118, 0], [-80, 170], [-10, 200], [0, 0]];
+  const latH = [[20, -310], [112, -230], [118, -20], [80, 120], [10, 70], [5, -110]];
+  const medH = [[-70, 130], [75, 115], [62, 205], [-55, 215]];
+  const on = mode === 'stretch' ? { long: 1, lat: 0, med: 0 } : mode === 'push' ? { long: 0, lat: 1, med: 1 } : { long: 1, lat: 1, med: 1 };
+  for (const [poly, key] of [[latH, 'lat'], [medH, 'med'], [longH, 'long']]) rc.polygon(poly.map(p => sy(...p)), ro(on[key] ? hatch(RED, 8) : pencil()));
+  rc.line(...sy(-20, -330), ...sy(-45, -420), ro({ strokeWidth: 5, stroke: on.long ? RED : INK }));      // long head goes up to the shoulder blade
+  rc.line(...sy(0, 205), ...sy(0, 300), ro({ strokeWidth: 6 }));
+  if (mode === 'stretch') for (const yy of [-380, 300]) { const p = sy(-150, yy); rc.line(p[0], p[1], p[0], p[1] + (yy < 0 ? -50 : 50), ro({ stroke: RED, strokeWidth: 6 })); }
+  return { long: sy(-75, -40), lat: sy(80, -60) };
+}
+// side view of the upper arm: biceps (front) vs triceps (back), sized 1/3 vs 2/3
+function armSplit(cx, cy, k) {
+  const P = (x, y) => [cx + x * k, cy + y * k], rc = S.rc;
+  rc.ellipse(...P(-70, 0), 120 * k, 430 * k, ro(pencil()));
+  rc.ellipse(...P(70, 10), 190 * k, 500 * k, ro(hatch(RED, 9)));
+  ctx.font = '700 58px Caveat'; ctx.textAlign = 'center';
+  ctx.fillStyle = INK; ctx.fillText('biceps', ...P(-70, -280)); ctx.font = '700 80px Caveat'; ctx.fillText('1/3', ...P(-70, 30));
+  ctx.fillStyle = RED; ctx.font = '700 58px Caveat'; ctx.fillText('TRICEPS', ...P(90, -300)); ctx.font = '700 110px Caveat'; ctx.fillText('2/3', ...P(75, 40));
+}
+function mirror(x, y, w, h) {
+  S.rc.rectangle(x, y, w, h, ro({ strokeWidth: 9, stroke: '#4a4a4a' }));
+  for (const d of [0, 40]) S.rc.line(x + 30 + d, y + 40, x + 90 + d, y + 120, ro({ strokeWidth: 3, stroke: SOFT }));
+}
+
+window.drawFrame = function (t) {
+  begin(t);
+  const { id, s, u, lt } = segAt(t);
+  if (id === 'hook') {
+    mirror(600, 640, 400, 900);
+    const c = rep(t, 1.4) * 0.25;
+    const pose = { face: 'sad', arms: { L: [80, 95], R: [80, 95] }, flex: 0.1 + c, flexSide: 'LR' };
+    man({ x: 330, y: 1560, s: 430 }, pose);
+    ctx.save(); ctx.globalAlpha = 0.45; man({ x: 800, y: 1480, s: 380 }, pose); ctx.restore();
+    ctx.font = '700 52px Caveat'; ctx.fillStyle = INK; ctx.textAlign = 'center'; ctx.fillText('*squeak*', 330, 770);
+    bigHook([['STILL', 150], ['SKINNY ARMS?', 140]], s.start, t, 260);
+  } else if (id === 'twist') {
+    heading("It's not your biceps.", null);
+    lens(540, 950, 520); armSplit(540, 980, 1.25); lensRing(540, 950, 520);
+  } else if (id === 'a' || id === 'b') {
+    const ext = rep(t, 1.6);
+    if (id === 'a') {
+      heading('Pushdown', 'arms at your sides');
+      const o = { x: 330, y: 1680, s: 500 };
+      S.rc.line(o.x + 0.55 * o.s, o.y, o.x + 0.55 * o.s, o.y - 2.3 * o.s, ro({ strokeWidth: 12, stroke: '#4a4a4a' }));
+      const pul = [o.x + 0.5 * o.s, o.y - 2.15 * o.s]; S.rc.circle(...pul, 30, ro({ strokeWidth: 4 }));
+      const m = sideMan(o, { upper: 4, fore: 100 - 98 * ext });
+      S.rc.line(...pul, ...m.H, ro({ strokeWidth: 3, stroke: '#4a4a4a' }));
+      S.rc.circle(...m.H, 26, ro({ strokeWidth: 4, fill: '#4a4a4a', fillStyle: 'solid' }));
+      lens(800, 680, 250, [m.E[0] - 20, m.E[1] - 60, 50]);
+      ctx.save(); ctx.beginPath(); ctx.arc(800, 680, 246, 0, 7); ctx.clip(); tricepsMap(800, 690, 0.48, 'push', ext); ctx.restore(); lensRing(800, 680, 250);
+      ctx.font = '700 50px Caveat'; ctx.fillStyle = INK; ctx.textAlign = 'center'; ctx.fillText('long head: short & easy', 800, 990);
+    } else {
+      heading('Overhead extension', 'arms up');
+      const o = { x: 380, y: 1680, s: 500 };
+      const m = sideMan(o, { upper: 168, fore: -20 - 170 * ext });
+      dumbbell(m.H, 500, 0);
+      lens(800, 680, 250, [m.E[0] - 30, m.E[1] + 40, 50]);
+      ctx.save(); ctx.beginPath(); ctx.arc(800, 680, 246, 0, 7); ctx.clip(); tricepsMap(800, 690, 0.46, 'stretch', ext); ctx.restore(); lensRing(800, 680, 250);
+      ctx.font = '700 50px Caveat'; ctx.fillStyle = RED; ctx.textAlign = 'center'; ctx.fillText('LONG HEAD stretched', 800, 990);
+      if (t > SEG.b.vo + SEG.b.line.dur * 0.45) {
+        ctx.save(); ctx.translate(250, 520); ctx.rotate(-0.1); ctx.font = '700 150px Caveat'; ctx.fillStyle = RED; ctx.fillText('+40%', 0, 0); ctx.restore();
+      }
+    }
+  } else {
+    heading('Pushdown + overhead', '= bigger arms');
+    const c = 0.6 + 0.4 * rep(t, 1.2);
+    for (const [x, look] of [[300, 1], [780, -1]]) man({ x, y: 1600, s: 430 }, { look, arms: { L: [80, 95], R: [80, 95] }, flex: c, flexSide: 'LR' });
+    if (u > 0.4) saveStamp(540, 540);
+  }
+  if (id !== 'hook') flash(lt);
+  caption(t, KEY);
+  return cv.toDataURL('image/png');
+};
+fontsReady();
+</script></body></html>

@@ -18,8 +18,8 @@ const fade = (t, a, b) => clamp((t - a) / (b - a));
 
 // ---------- voice-driven timeline ----------
 const VO = window.VOICE; const SEG = {}; let tc = 0;
-for (const ln of VO) { SEG[ln.id] = { start: tc, vo: tc + 0.12, end: tc + 0.12 + ln.dur + 0.18, line: ln }; tc = SEG[ln.id].end; }
-window.DURATION = tc + 0.4; window.VO_TIMES = VO.map(ln => ({ file: ln.file, at: SEG[ln.id].vo }));
+for (const ln of VO) { SEG[ln.id] = { start: tc, vo: tc + 0.08, end: tc + 0.08 + ln.dur + 0.12, line: ln }; tc = SEG[ln.id].end; }
+window.DURATION = tc + 0.35; window.VO_TIMES = VO.map(ln => ({ file: ln.file, at: SEG[ln.id].vo }));
 function segAt(t) { let id = VO[0].id; for (const ln of VO) if (t >= SEG[ln.id].start) id = ln.id; const s = SEG[id]; return { id, s, u: clamp((t - s.start) / (s.end - s.start)) }; }
 // curl reps: 0 = arm down, 1 = full contraction
 const rep = (t, period = 2.2) => 0.5 - 0.5 * Math.cos(2 * Math.PI * t / period);
@@ -144,12 +144,27 @@ function caption(t) {
   ctx.textBaseline = 'alphabetic';
 }
 
+
+// big hook: huge handwritten red text that pops in
+function bigHook(rc, lines, t0, t, y = 330) {
+  const e = x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+  const a = e(Math.max(0, Math.min(1, (t - t0) / 0.25))), k = 0.6 + 0.4 * a + 0.03 * Math.sin(t * 9);
+  ctx.save(); ctx.translate(540, y); ctx.rotate(-0.04); ctx.scale(k, k); ctx.globalAlpha = a;
+  let yy = 0;
+  for (const [txt, size] of lines) {
+    ctx.font = `700 ${size}px Caveat`; ctx.textAlign = 'center'; ctx.lineWidth = 14; ctx.strokeStyle = '#f4f1ea'; ctx.lineJoin = 'round';
+    ctx.strokeText(txt, 0, yy); ctx.fillStyle = '#d7261e'; ctx.fillText(txt, 0, yy); yy += size * 0.95;
+  }
+  rc.line(-420, yy - 50, 420, yy - 62, { stroke: '#d7261e', strokeWidth: 9, roughness: 2.5, seed: Math.floor(t * 8) + 1 });
+  ctx.restore();
+}
+
 window.drawFrame = function (t) {
   ctx.drawImage(D.background('paper'), 0, 0);
   const seed = 1 + Math.floor(t * 8);
   const K = D.kit(ctx, 'paper', seed); K.seed = seed;
   const { id, s, u } = segAt(t), lt = t - s.start, L = s.end - s.start, split = 0.42;
-  if (id === 'hook') sceneBoth(K, t, 'Same curl.', 'Two heads?', () => { question(K, 720, 340, t); question(K, 860, 1120, t + 1); });
+  if (id === 'hook') { D.preacher(K, rep(t), 330, 1230, 360); D.cableCurl(K, rep(t + 0.6), 640, 1740, 330); bigHook(K.rc, [['ONLY HALF', 150], ['YOUR BICEPS?', 140]], s.start, t, 280); }
   else if (id === 'a' || id === 'b') {
     const focus = id === 'a' ? 'short' : 'long';
     if (u < split) sceneBig(K, t, focus);

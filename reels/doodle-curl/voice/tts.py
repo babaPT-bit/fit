@@ -11,7 +11,7 @@ k = Kokoro(model, voices)
 lines = json.load(open(os.path.join(here, "script.json")))
 out = []
 for ln in lines:
-    samples, sr = k.create(ln["text"], voice=voice, speed=speed, lang="en-us")
+    samples, sr = k.create(ln["text"], voice=ln.get("voice", voice), speed=ln.get("speed", speed), lang="en-us")
     path = os.path.join(here, f"{ln['id']}.wav")
     sf.write(path, samples, sr)
     out.append({**ln, "file": f"{ln['id']}.wav", "dur": round(len(samples) / sr, 3)})

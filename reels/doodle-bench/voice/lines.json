@@ -1,0 +1,32 @@
+[
+ {
+  "id": "hook",
+  "text": "Bench pressing for months, but you only feel it in your shoulders?",
+  "file": "hook.wav",
+  "dur": 2.581
+ },
+ {
+  "id": "flare",
+  "text": "Elbows flared out wide? Your shoulders take over, and they're at risk.",
+  "file": "flare.wav",
+  "dur": 3.157
+ },
+ {
+  "id": "tight",
+  "text": "Elbows glued to your sides? Now your triceps do most of the work.",
+  "file": "tight.wav",
+  "dur": 3.157
+ },
+ {
+  "id": "good",
+  "text": "Tuck them to about forty-five degrees and pinch your shoulder blades. Your chest does the pushing, and you lift more.",
+  "file": "good.wav",
+  "dur": 4.949
+ },
+ {
+  "id": "out",
+  "text": "Try it next chest day. Save this.",
+  "file": "out.wav",
+  "dur": 1.792
+ }
+]

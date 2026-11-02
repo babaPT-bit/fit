@@ -1,0 +1,94 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Bench Elbows Reel</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script src="../lib/doodlekit.js"></script>
+<script>
+const KEY = /^(shoulders|flared|risk|triceps|glued|forty-five|chest|blades|more)/i;
+
+// bench press seen from above: angle = elbow angle from the torso (90 flared, 45 good, 15 glued); p = press 0..1
+function benchTop(angle, p, hurt) {
+  const rc = S.rc, s = 520, cx = 420, shY = 880;
+  const P = (x, y) => [cx + x * s, shY + y * s];
+  rc.rectangle(cx - 0.2 * s, shY - 0.3 * s, 0.4 * s, 1.2 * s, ro({ strokeWidth: 5, stroke: '#4a4a4a', fill: 'rgba(74,74,74,0.12)', fillStyle: 'solid' }));
+  const hipY = 0.5;
+  rc.linearPath([P(0, 0), P(0, hipY)], ro());
+  for (const sd of [-1, 1]) rc.linearPath([P(0, hipY), P(sd * 0.2, hipY + 0.42), P(sd * 0.26, hipY + 0.82)], ro());
+  rc.line(...P(-0.2, 0), ...P(0.2, 0), ro());
+  // head (looking up at the bar)
+  const hp = P(0, -0.17), R = 0.11 * s;
+  rc.circle(...hp, R * 2, ro({ fill: '#f4f1ea', fillStyle: 'solid' }));
+  ctx.fillStyle = INK; for (const sd of [-1, 1]) { ctx.beginPath(); ctx.ellipse(hp[0] + sd * R * 0.35, hp[1] - R * 0.1, R * 0.09, R * 0.13, 0, 0, 7); ctx.fill(); }
+  rc.arc(hp[0], hp[1] + R * 0.25, R * 0.8, R * 0.5, hurt ? Math.PI + 0.5 : 0.35, hurt ? 2 * Math.PI - 0.5 : Math.PI - 0.35, false, ro({ strokeWidth: 5 }));
+  // arms: the upper arm foreshortens as the bar goes up toward the camera
+  const L = 0.3 * (1 - 0.55 * p), a = rad(angle), elbows = [];
+  for (const sd of [-1, 1]) {
+    const sh = [sd * 0.2, 0], E = [sh[0] + sd * Math.sin(a) * L, sh[1] + Math.cos(a) * L];
+    rc.line(...P(...sh), ...P(...E), ro({ strokeWidth: 8 })); elbows.push(E);
+    S.rc.circle(...P(...E), 22, ro({ strokeWidth: 5, fill: '#f4f1ea', fillStyle: 'solid' }));
+  }
+  // bar over the elbows (hands stack above the elbows)
+  const barY = elbows[0][1], k = 1 + 0.1 * p;
+  rc.line(...P(-0.62 * k, barY), ...P(0.62 * k, barY), ro({ strokeWidth: 10, stroke: '#4a4a4a' }));
+  for (const sd of [-1, 1]) rc.rectangle(...P(sd * 0.55 * k - 0.03, barY - 0.16 * k), 0.06 * s, 0.32 * k * s, ro({ strokeWidth: 4, fill: INK, fillStyle: 'solid' }));
+  // angle mark on the right arm
+  const sh = P(0.2, 0), r = 110;
+  ctx.strokeStyle = RED; ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(sh[0], sh[1], r, Math.PI / 2 - a, Math.PI / 2); ctx.stroke();
+  S.rc.line(sh[0], sh[1], sh[0], sh[1] + r + 30, ro({ strokeWidth: 3, stroke: SOFT }));
+  ctx.font = '700 64px Caveat'; ctx.fillStyle = RED; ctx.textAlign = 'left';
+  ctx.fillText(angle + '°', sh[0] + 40, sh[1] + r + 70);
+  return { delt: P(0.2, 0), tri: P(...elbows[1]), chest: P(0.08, 0.12) };
+}
+// small front-view muscle map: chest, shoulders, triceps
+function muscleMap(cx, cy, which, pulse) {
+  const rc = S.rc;
+  rc.curve([[cx - 150, cy - 120], [cx - 175, cy + 60], [cx - 120, cy + 170]], ro({ strokeWidth: 5 }));
+  rc.curve([[cx + 150, cy - 120], [cx + 175, cy + 60], [cx + 120, cy + 170]], ro({ strokeWidth: 5 }));
+  for (const sd of [-1, 1]) {
+    rc.ellipse(cx + sd * 62, cy - 30, 120, 95, ro(which === 'chest' ? hatch(RED, 8) : pencil()));
+    rc.circle(cx + sd * 150, cy - 125, 70, ro(which === 'shoulders' ? hatch(RED, 7) : pencil()));
+    rc.ellipse(cx + sd * 195, cy + 10, 44, 140, ro(which === 'triceps' ? hatch(RED, 7) : pencil()));
+  }
+}
+
+const STATES = {
+  hook: { angle: 90, which: 'shoulders', title: null },
+  flare: { angle: 90, which: 'shoulders', title: ['Elbows flared', 'shoulders take over'], ok: false },
+  tight: { angle: 15, which: 'triceps', title: ['Elbows glued', 'triceps take over'], ok: false },
+  good: { angle: 45, which: 'chest', title: ['Elbows at 45°', 'chest does the work'], ok: true },
+  out: { angle: 45, which: 'chest', title: ['Try it next chest day', null], ok: true },
+};
+window.drawFrame = function (t) {
+  begin(t);
+  const { id, s, u, lt } = segAt(t), st = STATES[id], p = rep(t, 1.6);
+  const pos = benchTop(st.angle, p, id === 'hook' || id === 'flare');
+  if (id === 'hook') {
+    const pr = pos.delt; ctx.globalAlpha = 0.5 + 0.5 * Math.sin(t * 10);
+    S.rc.circle(pr[0], pr[1], 120, ro(hatch(RED, 7))); ctx.globalAlpha = 1;
+    bigHook([['CHEST OR', 150], ['SHOULDERS?', 150]], s.start, t, 260);
+  } else {
+    heading(st.title[0], st.title[1]);
+    const target = st.which === 'shoulders' ? pos.delt : st.which === 'triceps' ? pos.tri : pos.chest;
+    lens(840, 560, 210, [target[0], target[1], 46]);
+    ctx.save(); ctx.beginPath(); ctx.arc(840, 560, 206, 0, 7); ctx.clip(); ctx.translate(840, 560); ctx.scale(0.72, 0.72); ctx.translate(-840, -560); muscleMap(840, 580, st.which, p); ctx.restore();
+    lensRing(840, 560, 210);
+    ctx.font = '700 54px Caveat'; ctx.textAlign = 'center'; ctx.fillStyle = RED; ctx.fillText(st.which.toUpperCase(), 840, 830);
+    if (id !== 'out') mark(st.ok, 900, 1150, 110);
+    if (id === 'good' && u > 0.45) {
+      ctx.save(); ctx.translate(820, 1350); ctx.rotate(-0.05); ctx.font = '700 60px Caveat'; ctx.fillStyle = INK; ctx.textAlign = 'center';
+      ctx.fillText('+ pinch your', 0, 0); ctx.fillText('shoulder blades', 0, 60); ctx.restore();
+    }
+    if (id === 'out') { mark(true, 900, 1150, 110); saveStamp(820, 1420); }
+    flash(lt);
+  }
+  caption(t, KEY);
+  return cv.toDataURL('image/png');
+};
+fontsReady();
+</script></body></html>
