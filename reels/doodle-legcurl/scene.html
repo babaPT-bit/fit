@@ -1,0 +1,107 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Leg Curl Reel</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script>
+const KEY = /^(hamstrings|lying|sitting|straight|bent|short|stretched|seated|study|grow)/i;
+const add = (a, b, k = 1) => [a[0] + b[0] * k, a[1] + b[1] * k];
+const pol = (deg, k = 1) => [Math.cos(rad(deg)) * k, Math.sin(rad(deg)) * k];   // 0 = right, 90 = up
+
+// lying leg curl, face down, head on the left. c 0..1 curl
+function lyingJ(c) {
+  const hip = [0.0, 0.62], knee = add(hip, pol(-2), 0.45);
+  const ankle = add(knee, pol(c * 115), 0.43);
+  const sh = add(hip, pol(178), 0.52);
+  const elb = add(sh, pol(-80), 0.2), hand = add(elb, pol(-170), 0.2);
+  return { hip, knee, ankle, sh, elb, hand, head: add(sh, pol(175), 0.2), toe: add(ankle, pol(c * 115 - 90), 0.12) };
+}
+// seated leg curl, torso upright, legs out in front. c 0..1 curl
+function seatedJ(c) {
+  const hip = [0.0, 0.62], knee = add(hip, pol(0), 0.45);
+  const ankle = add(knee, pol(-15 - 95 * c), 0.43);
+  const sh = add(hip, pol(95), 0.52);
+  const elb = add(sh, pol(-60), 0.22), hand = add(elb, pol(-10), 0.2);
+  return { hip, knee, ankle, sh, elb, hand, toe: add(ankle, pol(-15 - 95 * c + 90), 0.12) };
+}
+const toS = (o, p) => [o.x + p[0] * o.s, o.y - p[1] * o.s];
+// hamstring drawn as a band from the sit-bone to just below the knee
+function band(o, J, stretched) {
+  const a = toS(o, add(J.hip, [0.02, -0.06])), b = toS(o, add(J.knee, add(J.ankle, J.knee, -1), 0.12));
+  if (stretched) {
+    S.rc.line(...a, ...b, ro({ stroke: RED, strokeWidth: 16, roughness: 0.6 }));
+    return;
+  }
+  const pts = [], n = 9;
+  for (let i = 0; i <= n; i++) { const u = i / n, x = a[0] + (b[0] - a[0]) * u, y = a[1] + (b[1] - a[1]) * u + (i % 2 ? 14 : -14) * Math.sin(Math.PI * u); pts.push([x, y]); }
+  S.rc.linearPath(pts, ro({ stroke: RED, strokeWidth: 10, roughness: 0.6 }));
+}
+function benchLying(o) {
+  S.rc.rectangle(...toS(o, [-0.85, 0.56]), 1.3 * o.s, 0.06 * o.s, ro({ strokeWidth: 5, stroke: '#4a4a4a', fill: 'rgba(74,74,74,0.15)', fillStyle: 'solid' }));
+  for (const x of [-0.7, 0.3]) S.rc.line(...toS(o, [x, 0.5]), ...toS(o, [x, 0]), ro({ strokeWidth: 8, stroke: '#4a4a4a' }));
+}
+function seat(o) {
+  S.rc.rectangle(...toS(o, [-0.25, 0.56]), 0.55 * o.s, 0.06 * o.s, ro({ strokeWidth: 5, stroke: '#4a4a4a', fill: 'rgba(74,74,74,0.15)', fillStyle: 'solid' }));
+  S.rc.rectangle(...toS(o, [-0.2, 1.2]), 0.07 * o.s, 0.62 * o.s, ro({ strokeWidth: 5, stroke: '#4a4a4a', fill: 'rgba(74,74,74,0.15)', fillStyle: 'solid' }));
+  S.rc.line(...toS(o, [0, 0.5]), ...toS(o, [0, 0]), ro({ strokeWidth: 8, stroke: '#4a4a4a' }));
+  S.rc.circle(...toS(o, [0.42, 0.72]), 0.1 * o.s, ro({ strokeWidth: 5, stroke: '#4a4a4a' }));     // thigh pad
+}
+function bandLens(cx, cy, stretched) {
+  lens(cx, cy, 210);
+  if (stretched) {
+    S.rc.line(cx - 150, cy, cx + 150, cy, ro({ stroke: RED, strokeWidth: 22, roughness: 0.6 }));
+    for (const sd of [-1, 1]) S.rc.linearPath([[cx + sd * 130, cy - 40], [cx + sd * 185, cy], [cx + sd * 130, cy + 40]], ro({ stroke: RED, strokeWidth: 6 }));
+  } else {
+    const pts = []; for (let i = 0; i <= 8; i++) pts.push([cx - 90 + i * 22.5, cy + (i % 2 ? 22 : -22)]);
+    S.rc.linearPath(pts, ro({ stroke: INK, strokeWidth: 12, roughness: 0.6 }));
+  }
+  lensRing(cx, cy, 210);
+  ctx.font = '700 60px Caveat'; ctx.textAlign = 'center'; ctx.fillStyle = stretched ? RED : INK;
+  ctx.fillText(stretched ? 'STRETCHED' : 'already short', cx, cy + 290);
+}
+
+window.drawFrame = function (t) {
+  begin(t);
+  const { id, s, u, lt } = segAt(t), c = rep(t, 2.4);
+  if (id === 'hook') {
+    const o = { x: 600, y: 1560, s: 520 }; benchLying(o); sideFig(o, lyingJ(c * 0.8), { face: -1, mood: 'sad' });
+    question(560, 1080, t, 120);
+    bigHook([['STILL WEAK', 150], ['HAMSTRINGS?', 140]], s.start, t, 280);
+  } else if (id === 'a') {
+    heading('Lying leg curl', 'hips straight');
+    const o = { x: 520, y: 1560, s: 560 }, J = lyingJ(c); benchLying(o); band(o, J, false); sideFig(o, J, { face: -1 });
+    bandLens(800, 640, false);
+  } else if (id === 'b') {
+    heading('Seated leg curl', 'hips bent');
+    const o = { x: 420, y: 1560, s: 600 }, J = seatedJ(c); seat(o); band(o, J, true); sideFig(o, J);
+    bandLens(800, 640, true);
+  } else if (id === 'why') {
+    heading('One study:', 'seated grew more hamstring');
+    const o1 = { x: 330, y: 1500, s: 330 }, o2 = { x: 760, y: 1500, s: 380 };
+    benchLying(o1); const J1 = lyingJ(c); band(o1, J1, false); sideFig(o1, J1, { face: -1 });
+    seat(o2); const J2 = seatedJ(c); band(o2, J2, true); sideFig(o2, J2);
+    ctx.font = '700 70px Caveat'; ctx.textAlign = 'center';
+    ctx.fillStyle = INK; ctx.fillText('lying', 300, 1600); ctx.fillStyle = RED; ctx.fillText('seated', 780, 1600);
+    // simple growth bars
+    S.rc.rectangle(240, 760 - 140, 110, 140, ro(pencil())); S.rc.rectangle(720, 760 - 260, 110, 260, ro(hatch(RED, 8)));
+    ctx.font = '700 56px Caveat'; ctx.fillStyle = INK; ctx.fillText('growth', 540, 830);
+    S.rc.line(180, 760, 900, 760, ro({ strokeWidth: 5 }));
+  } else {
+    heading('Pick seated', 'if your gym has both');
+    const o = { x: 420, y: 1560, s: 600 }, J = seatedJ(c); seat(o); band(o, J, true); sideFig(o, J);
+    mark(true, 850, 760, 130);
+    if (u > 0.35) saveStamp(800, 480);
+  }
+  if (id !== 'hook') flash(lt);
+  caption(t, KEY);
+  return cv.toDataURL('image/png');
+};
+fontsReady();
+</script></body></html>

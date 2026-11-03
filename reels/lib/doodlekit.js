@@ -13,8 +13,9 @@
 
   // ---------- brisk voice timeline ----------
   const VO = root.VOICE, SEG = {}; let tc = 0;
-  const PRE = 0.08, POST = 0.12;
-  for (const ln of VO) { SEG[ln.id] = { start: tc, vo: tc + PRE, end: tc + PRE + ln.dur + POST, line: ln }; tc = SEG[ln.id].end; }
+  // pacing: a page can set window.TIMING = { pre, post }; a voice line can add its own "post" pause
+  const TM = root.TIMING || {}, PRE = TM.pre ?? 0.08, POST = TM.post ?? 0.12;
+  for (const ln of VO) { const post = ln.post ?? POST; SEG[ln.id] = { start: tc, vo: tc + PRE, end: tc + PRE + ln.dur + post, line: ln }; tc = SEG[ln.id].end; }
   root.DURATION = tc + 0.35; root.VO_TIMES = VO.map(ln => ({ file: ln.file, at: SEG[ln.id].vo }));
   function segAt(t) { let id = VO[0].id; for (const ln of VO) if (t >= SEG[ln.id].start) id = ln.id; const s = SEG[id]; return { id, s, u: clamp((t - s.start) / (s.end - s.start)), lt: t - s.start }; }
   const speaking = (id, t) => SEG[id] && t >= SEG[id].vo && t <= SEG[id].vo + SEG[id].line.dur;
@@ -157,8 +158,37 @@
     for (const x of [-0.085, 0.085]) S.rc.rectangle(x * s - 0.025 * s, -0.06 * s, 0.05 * s, 0.12 * s, ro({ strokeWidth: 4, fill: INK, fillStyle: 'solid' }));
     ctx.restore();
   }
+  // side-view stickman from explicit joint points (units, y up). J: ankle, knee, hip, sh, elb, hand,
+  // optional far limbs ankle2/knee2/elb2/hand2 (drawn soft). face: +1 looks right, -1 left.
+  function sideFig(o, J, opts = {}) {
+    const P = p => [o.x + p[0] * o.s, o.y - p[1] * o.s], rc = S.rc;
+    const ln = (pts, w = 7, c = INK) => rc.linearPath(pts.map(P), ro({ strokeWidth: w, stroke: c }));
+    const dir = opts.face ?? 1;
+    if (J.knee2) ln([J.hip, J.knee2, J.ankle2], 7, SOFT);
+    if (J.elb2) ln([J.sh, J.elb2, J.hand2], 7, SOFT);
+    ln([J.hip, J.knee, J.ankle]);
+    const toe = J.toe || [J.ankle[0] + dir * 0.13, J.ankle[1] - 0.04];
+    ln([J.ankle, toe]);
+    ln([J.hip, J.sh]);
+    const td = [J.sh[0] - J.hip[0], J.sh[1] - J.hip[1]], tl = Math.hypot(...td);
+    const hc = J.head || [J.sh[0] + td[0] / tl * 0.2, J.sh[1] + td[1] / tl * 0.2];
+    if (J.elb) ln([J.sh, J.elb, J.hand]);
+    const hp = P(hc), R = 0.11 * o.s;
+    rc.circle(hp[0], hp[1], R * 2, ro({ fill: '#f4f1ea', fillStyle: 'solid' }));
+    ctx.fillStyle = INK; ctx.beginPath(); ctx.ellipse(hp[0] + dir * R * 0.45, hp[1] - R * 0.15, R * 0.09, R * 0.14, 0, 0, 7); ctx.fill();
+    if (opts.mood === 'sad') rc.arc(hp[0] + dir * R * 0.45, hp[1] + R * 0.6, R * 0.6, R * 0.4, Math.PI + 0.5, 2 * Math.PI - 0.5, false, ro({ strokeWidth: 5 }));
+    else rc.arc(hp[0] + dir * R * 0.45, hp[1] + R * 0.25, R * 0.6, R * 0.45, 0.4, Math.PI - 0.4, false, ro({ strokeWidth: 5 }));
+    const out = {}; for (const k in J) out[k] = P(J[k]); out.head = hp; out.P = P; return out;
+  }
+  // vertical tension meter
+  function meter(x, y, h, v, label) {
+    S.rc.rectangle(x - 26, y - h, 52, h, ro({ strokeWidth: 5 }));
+    const f = Math.max(0.02, Math.min(1, v));
+    S.rc.rectangle(x - 22, y - h * f, 44, h * f, ro(hatch(RED, 7)));
+    ctx.font = '700 46px Caveat'; ctx.fillStyle = INK; ctx.textAlign = 'center'; ctx.fillText(label || 'tension', x, y + 50);
+  }
   function fontsReady() { return document.fonts.load('700 40px Caveat').then(() => { root.ready = true; }); }
 
   Object.assign(root, { W, H, INK, RED, SOFT, GREEN, cv, ctx, clamp, ease, fade, rad, S, ro, SEG, segAt, speaking, rep, caption, begin, flash,
-    bigHook, heading, saveStamp, mark, question, bubble, sticky, lens, lensRing, hatch, pencil, man, dumbbell, fontsReady });
+    bigHook, heading, saveStamp, mark, question, bubble, sticky, lens, lensRing, hatch, pencil, man, dumbbell, fontsReady, sideFig, meter });
 })(window);

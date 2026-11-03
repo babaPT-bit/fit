@@ -1,0 +1,102 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Squat vs RDL Reel</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script>
+const KEY = /^(flat|knees|quads|hips|hamstrings|glutes|stretches|hinge|bend)/i;
+const add = (a, b, k = 1) => [a[0] + b[0] * k, a[1] + b[1] * k];
+const dirDeg = d => [Math.sin(rad(d)), Math.cos(rad(d))];          // 0 = up, + = forward (right)
+
+// side-view squat, depth d 0..1 (bar on the upper back)
+function squatJ(d) {
+  const ankle = [0.0, 0.07];
+  const knee = add(ankle, dirDeg(8 + 32 * d), 0.45);
+  const hip = add(knee, dirDeg(-(12 + 78 * d)), 0.45);
+  const sh = add(hip, dirDeg(10 + 32 * d), 0.52);
+  const elb = add(sh, dirDeg(-150), 0.22), hand = add(elb, dirDeg(20), 0.18);
+  return { ankle, knee, hip, sh, elb, hand, bar: add(sh, dirDeg(-120), 0.06) };
+}
+// side-view Romanian deadlift, hinge h 0..1 (bar hangs in the hands)
+function rdlJ(h) {
+  const ankle = [0.0, 0.07];
+  const knee = add(ankle, dirDeg(10), 0.45);
+  const hip = add(knee, dirDeg(-(12 + 16 * h)), 0.45);
+  const sh = add(hip, dirDeg(8 + 72 * h), 0.52);
+  const elb = add(sh, [0, -1], 0.3), hand = add(elb, [0, -1], 0.28);
+  return { ankle, knee, hip, sh, elb, hand, bar: hand };
+}
+function barbellSide(p, s) { S.rc.circle(...p, 0.3 * s, ro({ strokeWidth: 5, stroke: '#4a4a4a', fill: 'rgba(26,26,26,0.35)', fillStyle: 'hachure', hachureGap: 12 })); S.rc.circle(...p, 0.06 * s, ro({ strokeWidth: 4 })); }
+const toS = (o, p) => [o.x + p[0] * o.s, o.y - p[1] * o.s];
+// thigh seen from the side: quads (front), hamstrings (back), glutes (top back)
+function thighMap(cx, cy, mode) {
+  const rc = S.rc, q = mode === 'squat', h = mode === 'rdl';
+  rc.ellipse(cx + 70, cy + 20, 150, 380, ro(q ? hatch(RED, 8) : pencil()));
+  rc.ellipse(cx - 70, cy + 40, 140, 360, ro(h ? hatch(RED, 8) : pencil()));
+  rc.ellipse(cx - 80, cy - 190, 170, 140, ro(h || q ? hatch(RED, 11) : pencil()));
+  ctx.font = '700 66px Caveat'; ctx.textAlign = 'center';
+  ctx.fillStyle = q ? RED : INK; ctx.fillText('quads', cx + 80, cy + 260);
+  ctx.fillStyle = h ? RED : INK; ctx.fillText('hams', cx - 80, cy + 260);
+  ctx.fillStyle = INK; ctx.fillText('glutes', cx - 90, cy - 270);
+  ctx.font = '700 50px Caveat'; ctx.fillText('back ←', cx - 140, cy - 330); ctx.fillText('→ front', cx + 140, cy - 330);
+}
+function scene(kind, t, o, withLens = true, lensAt = [820, 620]) {
+  const v = rep(t, 2.6);
+  const J = kind === 'squat' ? squatJ(v) : rdlJ(v);
+  barbellSide(toS(o, J.bar), o.s);
+  const f = sideFig(o, J);
+  if (withLens) {
+    const target = kind === 'squat' ? f.P(add(J.hip, add(J.knee, J.hip, -1), 0.5)) : f.P(add(J.hip, add(J.knee, J.hip, -1), 0.45));
+    lens(lensAt[0], lensAt[1], 220, [target[0], target[1], 46]);
+    ctx.save(); ctx.beginPath(); ctx.arc(lensAt[0], lensAt[1], 216, 0, 7); ctx.clip();
+    ctx.translate(lensAt[0], lensAt[1]); ctx.scale(0.55, 0.55); ctx.translate(-lensAt[0], -lensAt[1]);
+    thighMap(lensAt[0], lensAt[1] + 20, kind); ctx.restore(); lensRing(lensAt[0], lensAt[1], 220);
+  }
+  return f;
+}
+
+window.drawFrame = function (t) {
+  begin(t);
+  const { id, s, u, lt } = segAt(t);
+  if (id === 'hook') {
+    const HO = { x: 470, y: 1640, s: 560 }, HJ = squatJ(0.15 * rep(t, 2));
+    barbellSide(toS(HO, HJ.bar), 560);
+    const f = sideFig(HO, HJ, { mood: 'sad' });
+    const hp = f.P([-0.12, 0.7]); question(hp[0] - 60, hp[1], t, 120);
+    bigHook([['STILL FLAT', 150], ['HAMSTRINGS?', 140]], s.start, t, 280);
+  } else if (id === 'a') {
+    heading('Squat', 'knees bend → quads');
+    scene('squat', t, { x: 360, y: 1680, s: 560 });
+  } else if (id === 'b') {
+    heading('Romanian deadlift', 'hips back → hamstrings');
+    scene('rdl', t, { x: 330, y: 1680, s: 560 });
+  } else if (id === 'why') {
+    heading('The simple rule', null);
+    for (const [kind, cx] of [['squat', 280], ['rdl', 800]]) {
+      lens(cx, 640, 230); ctx.save(); ctx.beginPath(); ctx.arc(cx, 640, 226, 0, 7); ctx.clip();
+      ctx.translate(cx, 640); ctx.scale(0.55, 0.55); ctx.translate(-cx, -640); thighMap(cx, 660, kind); ctx.restore(); lensRing(cx, 640, 230);
+    }
+    ctx.font = '700 64px Caveat'; ctx.textAlign = 'center'; ctx.fillStyle = RED;
+    ctx.fillText('KNEES', 280, 960); ctx.fillText('HIPS', 800, 960);
+    ctx.fillStyle = INK; ctx.fillText('= quads', 280, 1030); ctx.fillText('= hamstrings', 800, 1030);
+    scene('squat', t, { x: 250, y: 1680, s: 380 }, false);
+    scene('rdl', t + 0.7, { x: 730, y: 1680, s: 380 }, false);
+  } else {
+    heading('One of each', 'every leg day');
+    scene('squat', t, { x: 250, y: 1640, s: 430 }, false);
+    scene('rdl', t + 0.7, { x: 720, y: 1640, s: 430 }, false);
+    if (u > 0.3) saveStamp(540, 470);
+  }
+  if (id !== 'hook') flash(lt);
+  caption(t, KEY);
+  return cv.toDataURL('image/png');
+};
+fontsReady();
+</script></body></html>

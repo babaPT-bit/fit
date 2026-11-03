@@ -1,0 +1,86 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Lateral Raise Reel</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script>
+const KEY = /^(narrow|nothing|bottom|cable|side|first|pulley|hand|ninety|elbow|wider|slowly)/i;
+const O = { x: 560, y: 1640, s: 560 };            // front-view figure
+const PUL = [-0.78, 0.86];                         // pulley at hand height, on his left
+
+function tower() {
+  const P = p => [O.x + p[0] * O.s, O.y - p[1] * O.s];
+  S.rc.line(...P([-0.85, 0]), ...P([-0.85, 2.2]), ro({ strokeWidth: 12, stroke: '#4a4a4a' }));
+  S.rc.line(...P([-1.0, 0]), ...P([-0.7, 0]), ro({ strokeWidth: 8, stroke: '#4a4a4a' }));
+  S.rc.circle(...P(PUL), 34, ro({ strokeWidth: 5 }));
+  return P(PUL);
+}
+// shoulder cap split into front / side / rear delt; side delt lights up by v
+function deltMap(cx, cy, v) {
+  const rc = S.rc;
+  rc.arc(cx, cy + 40, 300, 260, Math.PI, 2 * Math.PI, false, ro({ strokeWidth: 6 }));
+  rc.polygon([[cx - 150, cy + 40], [cx - 110, cy - 50], [cx - 50, cy - 85], [cx - 40, cy + 40]], ro(pencil()));
+  rc.polygon([[cx - 40, cy + 40], [cx - 50, cy - 85], [cx + 50, cy - 85], [cx + 40, cy + 40]], ro(v > 0.15 ? hatch(RED, 8) : pencil()));
+  rc.polygon([[cx + 40, cy + 40], [cx + 50, cy - 85], [cx + 110, cy - 50], [cx + 150, cy + 40]], ro(pencil()));
+  ctx.font = '700 40px Caveat'; ctx.textAlign = 'center'; ctx.fillStyle = INK;
+  ctx.fillText('front', cx - 95, cy + 95); ctx.fillText('rear', cx + 95, cy + 95);
+  ctx.fillStyle = RED; ctx.fillText('SIDE', cx, cy + 95);
+}
+function raise(t, period = 2.4) { return rep(t, period); }
+
+window.drawFrame = function (t) {
+  begin(t);
+  const { id, s, u, lt } = segAt(t);
+  if (id === 'hook') {
+    // narrow, sad guy; dashed "goal" outline of wide shoulders behind him
+    const P = p => [O.x + p[0] * O.s, O.y - p[1] * O.s];
+    ctx.save(); ctx.setLineDash([14, 12]); ctx.strokeStyle = 'rgba(215,38,30,0.55)'; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(...P([-0.5, 1.5])); ctx.lineTo(...P([0.5, 1.5])); ctx.lineTo(...P([0.18, 0.95])); ctx.lineTo(...P([-0.18, 0.95])); ctx.closePath(); ctx.stroke(); ctx.restore();
+    ctx.font = '700 52px Caveat'; ctx.fillStyle = RED; ctx.textAlign = 'center'; ctx.fillText('goal', ...P([0.68, 1.48]));
+    man(O, { face: 'sad', arms: { L: [6, 2], R: [6, 2] } });
+    bigHook([['STILL NARROW', 140], ['SHOULDERS?', 150]], s.start, t, 280);
+  } else if (id === 'a') {
+    heading('Dumbbell raise', 'bottom half = wasted');
+    const c = raise(t), a1 = 8 + 80 * c;
+    const m = man(O, { arms: { L: [a1, 6], R: [a1, 6] } });
+    dumbbell(m.L.H, O.s, 0); dumbbell(m.R.H, O.s, 0);
+    const v = Math.sin(rad(a1));
+    meter(940, 1500, 420, v, 'tension');
+    if (v < 0.4) { ctx.font = '700 64px Caveat'; ctx.fillStyle = RED; ctx.textAlign = 'center'; ctx.fillText('≈ 0', 940, 1040); }
+    lens(830, 590, 190); deltMap(830, 600, v); lensRing(830, 590, 190);
+  } else {
+    const isSetup = id === 'setup', c = isSetup ? 0.08 * rep(t, 2.4) : raise(t);
+    const a1 = 6 + 82 * c;
+    heading(id === 'b' ? 'Cable raise' : id === 'setup' ? 'The setup' : 'Cable lateral raise', id === 'b' ? 'works from the first inch' : id === 'setup' ? 'pulley at hand height' : null);
+    const pp = tower();
+    const m = man(O, { look: 1, arms: { L: [10, 4], R: [a1, 6] } });
+    S.rc.line(...pp, ...m.R.H, ro({ strokeWidth: 3, stroke: '#4a4a4a' }));
+    S.rc.circle(...m.R.H, 26, ro({ strokeWidth: 4, fill: '#4a4a4a', fillStyle: 'solid' }));
+    // tension = sine of the angle between arm and cable
+    const sh = m.sh, H = m.R.H, arm = [H[0] - sh[0], H[1] - sh[1]], cab = [pp[0] - H[0], pp[1] - H[1]];
+    const ang = Math.acos((arm[0] * cab[0] + arm[1] * cab[1]) / Math.hypot(...arm) / Math.hypot(...cab));
+    meter(940, 1500, 420, Math.sin(ang), 'tension');
+    if (isSetup) {
+      // right-angle mark where the cable meets the arm
+      const ua = [arm[0] / Math.hypot(...arm), arm[1] / Math.hypot(...arm)], uc = [cab[0] / Math.hypot(...cab), cab[1] / Math.hypot(...cab)], k = 46;
+      S.rc.linearPath([[H[0] - ua[0] * k, H[1] - ua[1] * k], [H[0] - ua[0] * k + uc[0] * k, H[1] - ua[1] * k + uc[1] * k], [H[0] + uc[0] * k, H[1] + uc[1] * k]], ro({ stroke: RED, strokeWidth: 5 }));
+      ctx.font = '700 70px Caveat'; ctx.fillStyle = RED; ctx.textAlign = 'center'; ctx.fillText('90°', H[0] + 95, H[1] + 20);
+      sticky(600, 330, 430, 380, 0.03, [['① pulley at', 52], ['hand height', 52], ['② side-on, arm\'s', 52], ['length away', 52], ['③ cable ⟂ arm', 52, RED]], fade(u, 0.05, 0.2));
+    } else {
+      lens(830, 590, 190); deltMap(830, 600, 0.9); lensRing(830, 590, 190);
+      if (id === 'out' && u > 0.55) saveStamp(300, 420);
+    }
+  }
+  if (id !== 'hook') flash(lt);
+  caption(t, KEY);
+  return cv.toDataURL('image/png');
+};
+fontsReady();
+</script></body></html>
