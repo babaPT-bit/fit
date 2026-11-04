@@ -1,0 +1,26 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Hamstrings Calves</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/splitkit.js"></script>
+<script src="../lib/movekit.js"></script>
+<script>
+MoveRun({ ep: 22, next: 'Core', key: /^(back|hamstrings|knee|hip|calves|foot|seated|lying|curls|romanian|calf|raises)/i,
+  hook: [['FORGOT THE BACK', 120], ['OF YOUR LEGS?', 130]],
+  hookScene: (t, st, c) => { bodyMap({ x: 540, y: 1700, s: 480 }, { legs: SOFT }); question(800, 1000, t, 120); },
+  motionTitle: ['The motion', 'bend knee · point foot'],
+  motionScene: (t, st, c) => { const o = { x: 380, y: 1450, s: 520 }; const hip = [0, 0.62], knee = [0.45, 0.62], ankle = add(knee, pol(-15 - 95 * c), 0.43); S.rc.rectangle(...toS(o, [-0.25, 0.56]), 0.55 * o.s, 0.06 * o.s, ro({ strokeWidth: 5, stroke: GREY })); sideFig(o, { hip, knee, ankle, sh: add(hip, pol(95), 0.52), elb: add(add(hip, pol(95), 0.52), pol(-60), 0.22), hand: add(add(add(hip, pol(95), 0.52), pol(-60), 0.22), pol(-10), 0.2) }); S.rc.line(...toS(o, add(hip, [0.02, -0.06])), ...toS(o, add(knee, [0, -0.05])), ro({ stroke: RED, strokeWidth: 14 })); label('seated leg curl', 380, 1560, RED, 54); label('calves → point the foot', 760, 900, INK, 52); },
+  cards: [{ icon: 'machine', name: 'Seated curl', kw: 'seated', tag: 'best stretch' }, { icon: 'machine', name: 'Lying curl', kw: 'lying', tag: 'still works' }, { icon: 'barbell', name: 'Romanian DL', kw: 'romanian', tag: 'hip side' }, { icon: 'body', name: 'Calf raises', kw: 'calf', tag: 'standing + seated' }],
+  take: [['1 curl + 1 hinge', 76, RED], ['slow full-range', 66], ['calf raises', 66]],
+});
+</script></body></html>

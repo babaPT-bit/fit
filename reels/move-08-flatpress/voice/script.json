@@ -1,0 +1,25 @@
+[
+ {
+  "id": "hook",
+  "text": "Bench press, dumbbell press, machine, push-ups... which one actually builds your chest?",
+  "speed": 1.0,
+  "post": 0.6
+ },
+ {
+  "id": "motion",
+  "text": "They're all the same movement: pushing away from your chest. So they all train your chest, front shoulders, and triceps."
+ },
+ {
+  "id": "options",
+  "text": "Barbell lets you lift the heaviest. Dumbbells give a deeper stretch, and each arm works alone. The machine is the most stable, so you can push close to failure safely. And push-ups need nothing but the floor."
+ },
+ {
+  "id": "take",
+  "text": "Pick one heavy option and one stable option, and your chest is covered."
+ },
+ {
+  "id": "out",
+  "text": "Next up: the incline press. Save this.",
+  "post": 1.0
+ }
+]

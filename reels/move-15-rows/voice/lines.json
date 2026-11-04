@@ -1,0 +1,35 @@
+[
+ {
+  "id": "hook",
+  "text": "Pulldowns make your back wide. So what makes it thick?",
+  "speed": 1.0,
+  "post": 0.6,
+  "file": "hook.wav",
+  "dur": 3.285
+ },
+ {
+  "id": "motion",
+  "text": "Rowing pulls the weight toward your torso, and trains your mid back, lats, and rear delts.",
+  "file": "motion.wav",
+  "dur": 5.333
+ },
+ {
+  "id": "options",
+  "text": "Barbell rows let you go heavy. Dumbbell rows give a big range, one arm at a time. Cable rows keep constant tension. And chest-supported rows take your lower back out of it.",
+  "file": "options.wav",
+  "dur": 11.093
+ },
+ {
+  "id": "take",
+  "text": "Tuck your elbows for more lats. Flare them for more upper back.",
+  "file": "take.wav",
+  "dur": 3.605
+ },
+ {
+  "id": "out",
+  "text": "Next up: biceps curls. Save this.",
+  "post": 1.0,
+  "file": "out.wav",
+  "dur": 2.389
+ }
+]

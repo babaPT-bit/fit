@@ -1,0 +1,31 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Flat Press</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/splitkit.js"></script>
+<script src="../lib/movekit.js"></script>
+<script>
+
+const sq = d => { const ankle = [0, 0.07], knee = add(ankle, pol(90 - 8 - 32 * d), 0.45), hip = add(knee, pol(90 + 12 + 78 * d), 0.45), sh = add(hip, pol(90 - 10 - 32 * d), 0.52); return { ankle, knee, hip, sh, elb: add(sh, pol(-150), 0.22), hand: add(add(sh, pol(-150), 0.22), pol(20), 0.18) }; };
+const plateAt = (o, p, k = 0.3) => S.rc.circle(...toS(o, p), k * o.s, ro({ strokeWidth: 5, stroke: GREY, fill: "rgba(26,26,26,0.3)", fillStyle: "hachure", hachureGap: 12 }));
+const arrowUp = (x, y1, y2) => arrow(x, y1, x, y2, RED, 8);
+
+MoveRun({ ep: 8, next: 'Incline press', key: /^(bench|press|dumbbell|machine|push-ups|chest|shoulders|triceps|heaviest|stretch|stable|heavy)/i,
+  hook: [['WHICH PRESS', 140], ['BUILDS CHEST?', 140]],
+  hookScene: (t, st, c) => { ['barbell', 'dumbbell', 'machine', 'body'].forEach((k, i) => icon(k, 290 + (i % 2) * 500, 820 + Math.floor(i / 2) * 480, 0.9)); question(540, 1080, t, 140); },
+  motionTitle: ['The motion', 'push away from your chest'],
+  motionScene: (t, st, c) => { benchTop({ x: 380, y: 900, s: 440 }, 45, c); arrowUp(820, 1150, 850); label('push', 900, 1000, RED, 60); bodyMap({ x: 820, y: 1700, s: 260 }, { chest: RED, shoulders: RED, arms: RED }); },
+  cards: [{ icon: 'barbell', name: 'Barbell', kw: 'barbell', tag: 'heaviest load' }, { icon: 'dumbbell', name: 'Dumbbells', kw: 'dumbbells', tag: ['deeper stretch', 'each arm alone'] }, { icon: 'machine', name: 'Machine', kw: 'machine', tag: ['most stable', 'safe near failure'] }, { icon: 'body', name: 'Push-ups', kw: 'push-ups', tag: 'just the floor' }],
+  take: [['1 heavy option', 76, RED], ['+ 1 stable option', 76, RED], ['= chest covered', 66]],
+});
+</script></body></html>

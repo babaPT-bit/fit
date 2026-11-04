@@ -1,0 +1,26 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Upper Back Traps</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/splitkit.js"></script>
+<script src="../lib/movekit.js"></script>
+<script>
+MoveRun({ ep: 17, next: 'The squat', key: /^(shrugs|traps|top|middle|lower|shoulder|blades|face|pulls|raises|rows)/i,
+  hook: [['FLAT', 160], ['UPPER BACK?', 150]],
+  hookScene: (t, st, c) => { const sh = 0.05 * c; const m = man({ x: 540, y: 1700, s: 500 }, { hands: { L: [-0.25, 0.92 + sh], R: [0.25, 0.92 + sh] } }); dumbbell(m.L.H, 420); dumbbell(m.R.H, 420); label('shrug… shrug…', 820, 1000, RED, 56); },
+  motionTitle: ['3 parts of the traps', null],
+  motionScene: (t, st, c) => { const cx = 540, cy = 1050; S.rc.linearPath([[cx - 300, cy - 300], [cx + 300, cy - 300], [cx + 220, cy + 350], [cx - 220, cy + 350], [cx - 300, cy - 300]], ro({ strokeWidth: 5 })); const on = Math.floor(st.u * 3.2); const parts = [[[cx - 260, cy - 280], [cx + 260, cy - 280], [cx, cy - 170]], [[cx - 230, cy - 170], [cx + 230, cy - 170], [cx + 80, cy + 20], [cx - 80, cy + 20]], [[cx - 80, cy + 20], [cx + 80, cy + 20], [cx, cy + 280]]]; const names = ['top: shrugs', 'middle: pull back', 'lower: pull down']; parts.forEach((p, i) => { S.rc.polygon(p, ro(i <= on ? hatch(RED, 9) : pencil())); }); names.forEach((n, i) => label(n, 540, 1500 + i * 70, i <= on ? RED : INK, 56)); },
+  cards: [{ icon: 'dumbbell', name: 'Shrugs', kw: 'shrugs', tag: 'top traps' }, { icon: 'cable', name: 'Face pulls', kw: 'face pulls', tag: 'middle + rear delts' }, { icon: 'dumbbell', name: 'Y raises', kw: 'y raises', tag: 'lower traps' }, { icon: 'cable', name: 'Wide rows', kw: 'wide-grip', tag: 'whole mid back' }],
+  take: [['Shrugs = top only', 70], ['+ 1 pulling-back move', 70, RED]],
+});
+</script></body></html>

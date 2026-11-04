@@ -1,0 +1,27 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Rows</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/splitkit.js"></script>
+<script src="../lib/movekit.js"></script>
+<script>
+const rowJ = c => { const hip = [0, 0.45], sh = [-0.02, 0.97]; return { hip, sh, knee: [0.4, 0.62], ankle: [0.75, 0.45], elb: [0.32 - 0.55 * c, 0.84 - 0.06 * c], hand: [0.6 - 0.48 * c, 0.78], toe: [0.78, 0.6] }; };
+MoveRun({ ep: 15, next: 'Biceps curls', key: /^(thick|rowing|rows|torso|mid|back|barbell|dumbbell|cable|chest-supported|tuck|flare|lats)/i,
+  hook: [['WIDE IS DONE.', 130], ['WHAT ABOUT THICK?', 120]],
+  hookScene: (t, st, c) => { bodyMap({ x: 540, y: 1700, s: 480 }, { back: '#2b6cb0' }); question(540, 820, t, 120); },
+  motionTitle: ['The motion', 'pull toward your torso'],
+  motionScene: (t, st, c) => { const o = { x: 420, y: 1500, s: 620 }, J = rowJ(c); S.rc.rectangle(...toS(o, [0.85, 1.2]), 0.12 * o.s, 1.2 * o.s, ro({ strokeWidth: 5, stroke: GREY })); S.rc.line(...toS(o, [0.85, 0.78]), ...toS(o, J.hand), ro({ strokeWidth: 3, stroke: GREY })); S.rc.ellipse(...toS(o, [-0.07, 0.75]), 60, 0.4 * o.s, ro(hatch(RED, 7))); sideFig(o, J); arrow(...toS(o, [0.5, 1.1]), ...toS(o, [0.0, 1.1]), RED); },
+  cards: [{ icon: 'barbell', name: 'Barbell row', kw: 'barbell', tag: 'go heavy' }, { icon: 'dumbbell', name: 'Dumbbell row', kw: 'dumbbell', tag: 'big range, one arm' }, { icon: 'cable', name: 'Cable row', kw: 'cable', tag: 'constant tension' }, { icon: 'machine', name: 'Chest-supported', kw: 'chest-supported', tag: 'no lower back' }],
+  take: [['Elbows tucked', 72, RED], ['= more lats', 60], ['Elbows flared', 72, RED], ['= more upper back', 60]],
+});
+</script></body></html>

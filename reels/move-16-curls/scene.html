@@ -1,0 +1,26 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Biceps Curls</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/splitkit.js"></script>
+<script src="../lib/movekit.js"></script>
+<script>
+MoveRun({ ep: 16, next: 'Upper back + traps', key: /^(curls|curl|elbow|incline|behind|long|preacher|front|short|hammer|forearms)/i,
+  hook: [['CURLS ARE', 150], ['JUST CURLS?', 150]],
+  hookScene: (t, st, c) => { const m = man({ x: 540, y: 1700, s: 500 }, { face: 'confused', arms: { L: [10, 5], R: [8, 10 + 130 * c] }, flex: c, flexSide: 'R' }); dumbbell(m.R.H, 400); },
+  motionTitle: ['The motion', 'bend the elbow'],
+  motionScene: (t, st, c) => { const m = man({ x: 420, y: 1700, s: 520 }, { arms: { L: [10, 5], R: [8, 10 + 130 * c] }, flex: c, flexSide: 'R' }); dumbbell(m.R.H, 420); label('arm BEHIND = long head', 760, 900, RED, 50); label('arm IN FRONT = short head', 760, 980, INK, 50); },
+  cards: [{ icon: 'dumbbell', name: 'Standard curl', kw: 'standard', tag: 'whole biceps' }, { icon: 'bench', name: 'Incline curl', kw: 'incline', tag: 'long head stretch' }, { icon: 'machine', name: 'Preacher curl', kw: 'preacher', tag: 'short head' }, { icon: 'dumbbell', name: 'Hammer curl', kw: 'hammer', tag: ['brachialis', '+ forearms'] }],
+  take: [['1 arm-behind curl', 70, RED], ['1 arm-in-front curl', 70, RED], ['+ hammer now and then', 58]],
+});
+</script></body></html>

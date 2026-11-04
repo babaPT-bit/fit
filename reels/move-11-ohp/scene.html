@@ -1,0 +1,26 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Overhead Press</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/splitkit.js"></script>
+<script src="../lib/movekit.js"></script>
+<script>
+MoveRun({ ep: 11, next: 'Delt raises', key: /^(overhead|press|shoulders|delts|triceps|standing|seated|machine|landmine|heavy|core)/i,
+  hook: [['BIGGER', 150], ['SHOULDERS?', 150]],
+  hookScene: (t, st, c) => { ohp({ x: 540, y: 1700, s: 500 }, c); },
+  motionTitle: ['The motion', 'press straight overhead'],
+  motionScene: (t, st, c) => { ohp({ x: 420, y: 1700, s: 500 }, c); arrow(850, 1200, 850, 800, RED, 8); bodyMap({ x: 850, y: 1700, s: 260 }, { shoulders: RED, arms: RED, chest: '#d9822b' }); },
+  cards: [{ icon: 'barbell', name: 'Standing barbell', kw: 'barbell', tag: ['go heavy', 'core works too'] }, { icon: 'dumbbell', name: 'Seated dumbbells', kw: 'dumbbells', tag: 'more range' }, { icon: 'machine', name: 'Machine', kw: 'machine', tag: 'most stable' }, { icon: 'landmine', name: 'Landmine press', kw: 'landmine', tag: ['easier on', 'cranky shoulders'] }],
+  take: [['Pick ONE press', 80, RED], ['get stronger on it', 70], ['over time', 60]],
+});
+</script></body></html>

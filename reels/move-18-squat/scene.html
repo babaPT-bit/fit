@@ -1,0 +1,31 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Squat Pattern</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/splitkit.js"></script>
+<script src="../lib/movekit.js"></script>
+<script>
+
+const sq = d => { const ankle = [0, 0.07], knee = add(ankle, pol(90 - 8 - 32 * d), 0.45), hip = add(knee, pol(90 + 12 + 78 * d), 0.45), sh = add(hip, pol(90 - 10 - 32 * d), 0.52); return { ankle, knee, hip, sh, elb: add(sh, pol(-150), 0.22), hand: add(add(sh, pol(-150), 0.22), pol(20), 0.18) }; };
+const plateAt = (o, p, k = 0.3) => S.rc.circle(...toS(o, p), k * o.s, ro({ strokeWidth: 5, stroke: GREY, fill: "rgba(26,26,26,0.3)", fillStyle: "hachure", hachureGap: 12 }));
+const arrowUp = (x, y1, y2) => arrow(x, y1, x, y2, RED, 8);
+
+MoveRun({ ep: 18, next: 'The hinge', key: /^(squat|quads|glutes|knees|hips|back|front|goblet|leg|press|hack|heaviest|safely|skill)/i,
+  hook: [['WHICH SQUAT', 140], ['IS BEST?', 150]],
+  hookScene: (t, st, c) => { ['barbell', 'kettlebell', 'machine', 'barbell'].forEach((k, i) => icon(k, 290 + (i % 2) * 500, 820 + Math.floor(i / 2) * 480, 0.85)); question(540, 1080, t, 140); },
+  motionTitle: ['The motion', 'knees + hips bend together'],
+  motionScene: (t, st, c) => { const o = { x: 420, y: 1700, s: 580 }, J = sq(c); plateAt(o, add(J.sh, pol(-120), 0.06), 0.34); sideFig(o, J); bodyMap({ x: 860, y: 1700, s: 260 }, { legs: '#1f8a3b', glutes: '#1f8a3b' }); },
+  cards: [{ icon: 'barbell', name: 'Back squat', kw: 'back squat', tag: ['heaviest', 'most skill'] }, { icon: 'barbell', name: 'Front squat', kw: 'front squat', tag: ['upright', 'more quads'] }, { icon: 'kettlebell', name: 'Goblet squat', kw: 'goblet', tag: 'best to learn' }, { icon: 'machine', name: 'Leg press / hack', kw: 'leg press', tag: 'push hard safely' }],
+  take: [['Learn: goblet', 76, RED], ['then the one you can', 60], ['progress safely', 66]],
+});
+</script></body></html>

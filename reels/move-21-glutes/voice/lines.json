@@ -1,0 +1,35 @@
+[
+ {
+  "id": "hook",
+  "text": "Squatting every week... but still no glutes?",
+  "speed": 1.0,
+  "post": 0.6,
+  "file": "hook.wav",
+  "dur": 2.859
+ },
+ {
+  "id": "motion",
+  "text": "Your glutes push your hips forward, and move your leg out to the side.",
+  "file": "motion.wav",
+  "dur": 3.712
+ },
+ {
+  "id": "options",
+  "text": "Hip thrusts are hardest at the top. Deep squats and Romanian deadlifts load them in the stretch. The abduction machine trains the side glutes. And cable kickbacks let you focus on one side.",
+  "file": "options.wav",
+  "dur": 11.989
+ },
+ {
+  "id": "take",
+  "text": "One hip thrust and one stretch-position move, and your glutes are covered.",
+  "file": "take.wav",
+  "dur": 4.075
+ },
+ {
+  "id": "out",
+  "text": "Next up: hamstrings and calves. Save this.",
+  "post": 1.0,
+  "file": "out.wav",
+  "dur": 2.475
+ }
+]

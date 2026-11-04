@@ -1,0 +1,25 @@
+[
+ {
+  "id": "hook",
+  "text": "Curls are just curls... right?",
+  "speed": 1.0,
+  "post": 0.6
+ },
+ {
+  "id": "motion",
+  "text": "Every curl bends your elbow. But where your arm is, and how you hold the weight, changes what works most."
+ },
+ {
+  "id": "options",
+  "text": "Standard curls hit the whole biceps. Incline curls put your arm behind you and stretch the long head. Preacher curls put it in front for the short head. And hammer curls build the muscle underneath, and your forearms."
+ },
+ {
+  "id": "take",
+  "text": "One curl with your arm behind, one in front, and a hammer curl now and then."
+ },
+ {
+  "id": "out",
+  "text": "Next up: upper back and traps. Save this.",
+  "post": 1.0
+ }
+]

@@ -1,0 +1,26 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Chest Flies</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/splitkit.js"></script>
+<script src="../lib/movekit.js"></script>
+<script>
+MoveRun({ ep: 10, next: 'Overhead press', key: /^(flies|fly|hugging|cable|pec|deck|dumbbell|tension|stretch|finisher)/i,
+  hook: [['DO YOU NEED', 140], ['FLIES?', 160]],
+  hookScene: (t, st, c) => { const w = 0.1 + 0.5 * (1 - c); man({ x: 540, y: 1700, s: 480 }, { face: 'confused', hands: { L: [-w, 1.42], R: [w, 1.42] } }); question(540, 820, t, 120); },
+  motionTitle: ['The motion', 'a hug: arms sweep, elbows fixed'],
+  motionScene: (t, st, c) => { const w = 0.08 + 0.55 * (1 - c); const m = man({ x: 540, y: 1700, s: 520 }, { hands: { L: [-w, 1.4], R: [w, 1.4] } }); for (const sd of [-1, 1]) S.rc.curve([[540 + sd * 400, 920], [540 + sd * 250, 860], [540 + sd * 80, 920]], ro({ stroke: RED, strokeWidth: 6 })); S.rc.ellipse(540, 1700 - 1.3 * 520, 0.3 * 520, 0.12 * 520, ro(hatch(RED, 7))); },
+  cards: [{ icon: 'cable', name: 'Cable fly', kw: 'cable', tag: 'tension all the way' }, { icon: 'machine', name: 'Pec deck', kw: 'pec deck', tag: 'most stable' }, { icon: 'dumbbell', name: 'Dumbbell fly', kw: 'dumbbell', tag: ['loads the stretch', 'easy at the top'] }, { icon: 'body', name: 'Required?', kw: 'flies', tag: ['no, but a', 'great finisher'] }],
+  take: [['Optional', 80, RED], ['great finisher', 70], ['after your presses', 60]],
+});
+</script></body></html>

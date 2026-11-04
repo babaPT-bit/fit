@@ -1,0 +1,25 @@
+[
+ {
+  "id": "hook",
+  "text": "Want bigger shoulders? It starts overhead.",
+  "speed": 1.0,
+  "post": 0.6
+ },
+ {
+  "id": "motion",
+  "text": "Pressing overhead trains your front delts and triceps, with your upper chest helping."
+ },
+ {
+  "id": "options",
+  "text": "A standing barbell press lets you go heavy, and your core works too. Seated dumbbells give more range. The machine is the most stable. And the landmine press is easier on cranky shoulders."
+ },
+ {
+  "id": "take",
+  "text": "Pick one press, and get stronger on it over time."
+ },
+ {
+  "id": "out",
+  "text": "Next up: the raises your presses miss. Save this.",
+  "post": 1.0
+ }
+]

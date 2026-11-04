@@ -1,0 +1,35 @@
+[
+ {
+  "id": "hook",
+  "text": "Do you even need flies if you're already pressing?",
+  "speed": 1.0,
+  "post": 0.6,
+  "file": "hook.wav",
+  "dur": 2.965
+ },
+ {
+  "id": "motion",
+  "text": "A fly is a hugging motion. Your arms sweep together, but your elbows stay fixed.",
+  "file": "motion.wav",
+  "dur": 4.992
+ },
+ {
+  "id": "options",
+  "text": "Cable flies keep tension the whole way. The pec deck is the most stable. Dumbbell flies load the stretch, but go easy at the top.",
+  "file": "options.wav",
+  "dur": 7.957
+ },
+ {
+  "id": "take",
+  "text": "Flies aren't required, but they're a great finisher after your presses.",
+  "file": "take.wav",
+  "dur": 4.096
+ },
+ {
+  "id": "out",
+  "text": "Next up: the overhead press. Save this.",
+  "post": 1.0,
+  "file": "out.wav",
+  "dur": 2.389
+ }
+]

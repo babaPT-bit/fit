@@ -1,0 +1,25 @@
+[
+ {
+  "id": "hook",
+  "text": "Back squat, front squat, hack squat, leg press... which one is best?",
+  "speed": 1.0,
+  "post": 0.6
+ },
+ {
+  "id": "motion",
+  "text": "A squat bends your knees and hips together. It trains your quads and glutes."
+ },
+ {
+  "id": "options",
+  "text": "The back squat lets you lift the heaviest, but takes the most skill. The front squat keeps you upright and hits more quads. The goblet squat is the best way to learn. And the leg press or hack squat let you push hard safely."
+ },
+ {
+  "id": "take",
+  "text": "Learn with the goblet squat, then pick the one you can progress safely."
+ },
+ {
+  "id": "out",
+  "text": "Next up: the hinge. Save this.",
+  "post": 1.0
+ }
+]

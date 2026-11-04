@@ -1,0 +1,25 @@
+[
+ {
+  "id": "hook",
+  "text": "Scared of deadlifts?",
+  "speed": 1.0,
+  "post": 0.6
+ },
+ {
+  "id": "motion",
+  "text": "A hinge pushes your hips back with soft knees. It trains your hamstrings, glutes, and back."
+ },
+ {
+  "id": "options",
+  "text": "The conventional deadlift lets you lift the most. The Romanian deadlift gives your hamstrings a big stretch. The trap bar deadlift is easier on your back. And back extensions are a great place to start."
+ },
+ {
+  "id": "take",
+  "text": "Learn the hinge with Romanian deadlifts before you go heavy."
+ },
+ {
+  "id": "out",
+  "text": "Next up: single-leg training. Save this.",
+  "post": 1.0
+ }
+]

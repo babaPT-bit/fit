@@ -1,0 +1,25 @@
+[
+ {
+  "id": "hook",
+  "text": "Flat bench every week... but your upper chest still looks flat?",
+  "speed": 1.0,
+  "post": 0.6
+ },
+ {
+  "id": "motion",
+  "text": "Pressing on an incline lines up with your upper chest fibres, the ones just under your collarbone."
+ },
+ {
+  "id": "options",
+  "text": "About thirty degrees is enough. Incline barbell for heavy weight, incline dumbbells for range, or an incline machine for stability."
+ },
+ {
+  "id": "take",
+  "text": "Go too steep, and your shoulders take over. Put one incline press in every chest day."
+ },
+ {
+  "id": "out",
+  "text": "Next up: chest flies. Save this.",
+  "post": 1.0
+ }
+]

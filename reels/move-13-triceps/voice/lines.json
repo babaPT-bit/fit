@@ -1,0 +1,35 @@
+[
+ {
+  "id": "hook",
+  "text": "Want bigger arms? Your triceps are two-thirds of them.",
+  "speed": 1.0,
+  "post": 0.6,
+  "file": "hook.wav",
+  "dur": 3.52
+ },
+ {
+  "id": "motion",
+  "text": "Every triceps exercise straightens your elbow. Where your arm is changes which part works most.",
+  "file": "motion.wav",
+  "dur": 5.909
+ },
+ {
+  "id": "options",
+  "text": "Pushdowns hit the outer heads. Overhead extensions stretch the long head. Skull crushers sit in between. And dips or close-grip bench let you go heavy.",
+  "file": "options.wav",
+  "dur": 9.557
+ },
+ {
+  "id": "take",
+  "text": "One overhead move and one pushdown, and your triceps are covered.",
+  "file": "take.wav",
+  "dur": 3.797
+ },
+ {
+  "id": "out",
+  "text": "Next up: the vertical pull. Save this.",
+  "post": 1.0,
+  "file": "out.wav",
+  "dur": 2.304
+ }
+]

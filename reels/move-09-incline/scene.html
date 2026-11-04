@@ -1,0 +1,33 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Incline Press</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/splitkit.js"></script>
+<script src="../lib/movekit.js"></script>
+<script>
+
+const sq = d => { const ankle = [0, 0.07], knee = add(ankle, pol(90 - 8 - 32 * d), 0.45), hip = add(knee, pol(90 + 12 + 78 * d), 0.45), sh = add(hip, pol(90 - 10 - 32 * d), 0.52); return { ankle, knee, hip, sh, elb: add(sh, pol(-150), 0.22), hand: add(add(sh, pol(-150), 0.22), pol(20), 0.18) }; };
+const plateAt = (o, p, k = 0.3) => S.rc.circle(...toS(o, p), k * o.s, ro({ strokeWidth: 5, stroke: GREY, fill: "rgba(26,26,26,0.3)", fillStyle: "hachure", hachureGap: 12 }));
+const arrowUp = (x, y1, y2) => arrow(x, y1, x, y2, RED, 8);
+
+const inclineJ = c => { const hip = [0, 0.55], sh = add(hip, pol(150), 0.52), hand = add(sh, pol(70), 0.2 + 0.36 * c), elb = add(sh, pol(70 - 70 * (1 - c)), 0.28); return { hip, sh, knee: [0.4, 0.55], ankle: [0.45, 0.07], elb, hand, head: add(sh, pol(150), 0.2) }; };
+const inclineBench = o => { S.rc.line(...toS(o, [0.15, 0.48]), ...toS(o, [-0.6, 0.92]), ro({ strokeWidth: 16, stroke: GREY })); S.rc.line(...toS(o, [0, 0.45]), ...toS(o, [0, 0]), ro({ strokeWidth: 8, stroke: GREY })); };
+MoveRun({ ep: 9, next: 'Chest flies', key: /^(incline|upper|chest|collarbone|thirty|degrees|steep|shoulders)/i,
+  hook: [['FLAT UPPER', 140], ['CHEST?', 160]],
+  hookScene: (t, st, c) => { benchTop({ x: 540, y: 1000, s: 400 }, 45, c); bodyMap({ x: 860, y: 1700, s: 220 }, { chest: SOFT }); },
+  motionTitle: ['The motion', 'press on a ~30° incline'],
+  motionScene: (t, st, c) => { const o = { x: 480, y: 1650, s: 520 }; inclineBench(o); const J = inclineJ(c); sideFig(o, J, { lookDeg: 60, upDeg: 150 }); plateAt(o, J.hand, 0.32); label('~30°', 760, 1500, RED, 80); S.rc.ellipse(...toS(o, add(J.sh, pol(-30), 0.08)), 70, 40, ro(hatch(RED, 6))); label('upper chest', 820, 1000, RED, 60); },
+  cards: [{ icon: 'barbell', name: 'Incline barbell', kw: 'barbell', tag: 'heavy weight' }, { icon: 'dumbbell', name: 'Incline dumbbells', kw: 'dumbbells', tag: 'more range' }, { icon: 'machine', name: 'Incline machine', kw: 'machine', tag: 'most stable' }, { icon: 'bench', name: 'Bench angle', kw: 'thirty', tag: ['~30° is enough', 'too steep = shoulders'] }],
+  take: [['1 incline press', 80, RED], ['every chest day', 70], ['~30°, not steeper', 60]],
+});
+</script></body></html>

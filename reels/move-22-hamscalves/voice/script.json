@@ -1,0 +1,25 @@
+[
+ {
+  "id": "hook",
+  "text": "Training your legs... but forgetting the back of them?",
+  "speed": 1.0,
+  "post": 0.6
+ },
+ {
+  "id": "motion",
+  "text": "Your hamstrings bend your knee and extend your hip. Your calves point your foot."
+ },
+ {
+  "id": "options",
+  "text": "Seated leg curls give the best stretch. Lying leg curls still work well. Romanian deadlifts train the hip side. And standing and seated calf raises cover both calf muscles."
+ },
+ {
+  "id": "take",
+  "text": "One curl, one hinge, and slow full-range calf raises."
+ },
+ {
+  "id": "out",
+  "text": "Next up: core. Save this.",
+  "post": 1.0
+ }
+]

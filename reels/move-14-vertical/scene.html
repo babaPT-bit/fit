@@ -1,0 +1,28 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Vertical Pull</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/splitkit.js"></script>
+<script src="../lib/movekit.js"></script>
+<script>
+function pull(o, c, grip = 0.32) { const by = 2.05 - 0.6 * c; S.rc.line(...toS(o, [-0.6, 2.25]), ...toS(o, [0.6, 2.25]), ro({ strokeWidth: 10, stroke: GREY })); man({ x: o.x, y: o.y + 0.6 * c * o.s * 0 , s: o.s }, { hands: { L: [-grip, 2.2 - 0.0], R: [grip, 2.2] } }); }
+function chinup(o, c) { S.rc.line(...toS(o, [-0.6, 2.25]), ...toS(o, [0.6, 2.25]), ro({ strokeWidth: 10, stroke: GREY })); const lift = 0.45 * c; man({ x: o.x, y: o.y - lift * o.s, s: o.s }, { hands: { L: [-0.32, 2.2 - lift], R: [0.32, 2.2 - lift] } }); }
+MoveRun({ ep: 14, next: 'Rows', key: /^(pull-up|pull-ups|lats|wide|assisted|band|pulldowns|single-arm|hardest)/i,
+  hook: [["CAN'T DO A", 140], ['PULL-UP YET?', 140]],
+  hookScene: (t, st, c) => { chinup({ x: 540, y: 1750, s: 460 }, 0.08 * Math.abs(Math.sin(t * 5))); label('0 reps…', 820, 1200, RED, 70); },
+  motionTitle: ['The motion', 'pull down from overhead'],
+  motionScene: (t, st, c) => { chinup({ x: 420, y: 1750, s: 460 }, c); arrow(850, 800, 850, 1150, RED, 8); bodyMap({ x: 850, y: 1750, s: 260 }, { back: '#2b6cb0', arms: '#2b6cb0' }); },
+  cards: [{ icon: 'body', name: 'Pull-up', kw: 'pull-ups are', tag: 'hardest' }, { icon: 'band', name: 'Assisted', kw: 'assisted', tag: 'band or machine' }, { icon: 'machine', name: 'Lat pulldown', kw: 'pulldowns', tag: 'pick the weight' }, { icon: 'cable', name: 'Single-arm', kw: 'single-arm', tag: 'one side at a time' }],
+  take: [['Pulldowns +', 76], ['assisted pull-ups', 76, RED], ['→ your first pull-up', 64]],
+});
+</script></body></html>

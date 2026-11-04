@@ -1,0 +1,35 @@
+[
+ {
+  "id": "hook",
+  "text": "Is a hundred crunches a day the best core workout?",
+  "speed": 1.0,
+  "post": 0.6,
+  "file": "hook.wav",
+  "dur": 2.987
+ },
+ {
+  "id": "motion",
+  "text": "Your core does more than crunch. It also stops your spine from arching, twisting, and bending sideways.",
+  "file": "motion.wav",
+  "dur": 6.272
+ },
+ {
+  "id": "options",
+  "text": "Crunches and cable crunches bend the spine. Dead bugs, planks, and ab wheels stop it arching. The Pallof press stops it twisting. And suitcase carries stop it bending sideways.",
+  "file": "options.wav",
+  "dur": 11.221
+ },
+ {
+  "id": "take",
+  "text": "Pick one from each type, a few sets a week.",
+  "file": "take.wav",
+  "dur": 2.603
+ },
+ {
+  "id": "out",
+  "text": "Next up: how to build your own program. Save this.",
+  "post": 1.0,
+  "file": "out.wav",
+  "dur": 2.923
+ }
+]

@@ -1,0 +1,26 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Core</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/splitkit.js"></script>
+<script src="../lib/movekit.js"></script>
+<script>
+MoveRun({ ep: 23, next: 'Build your own program', key: /^(crunches|core|crunch|arching|twisting|sideways|dead|planks|wheels|pallof|suitcase|carries|type)/i,
+  hook: [['100 CRUNCHES', 140], ['= BEST CORE?', 140]],
+  hookScene: (t, st, c) => { const o = { x: 600, y: 1600, s: 540 }; floorLine(o); const hip = [0, 0.12], sh = add(hip, pol(180 - 32 * c), 0.52); sideFig(o, { hip, knee: [0.32, 0.5], ankle: [0.62, 0.07], sh, elb: add(sh, pol(-20), 0.18), hand: add(add(sh, pol(-20), 0.18), pol(160), 0.14), head: add(sh, pol(180 - 45 * c), 0.2) }, { face: -1, lookDeg: 90 + 45 * c, upDeg: 180 - 45 * c }); },
+  motionTitle: ['Your core does 4 jobs', null],
+  motionScene: (t, st, c) => { const jobs = [['bend', '↷'], ['stop arching', '⟂'], ['stop twisting', '↺'], ['stop bending sideways', '↔']]; jobs.forEach(([j, s2], i) => { const on = st.u * 4.2 > i; const y = 620 + i * 260; S.rc.circle(220, y, 160, ro(on ? hatch(RED, 8) : pencil())); label(s2, 220, y + 25, on ? '#f4f1ea' : INK, 80); label(j, 620, y + 20, on ? RED : INK, 66); }); },
+  cards: [{ icon: 'cable', name: 'Crunch', kw: 'crunches and', tag: 'bend the spine' }, { icon: 'wheel', name: 'Dead bug / plank', kw: 'dead bugs', tag: 'stop arching' }, { icon: 'cable', name: 'Pallof press', kw: 'pallof', tag: 'stop twisting' }, { icon: 'kettlebell', name: 'Suitcase carry', kw: 'suitcase', tag: 'stop leaning' }],
+  take: [['1 from each type', 76, RED], ['a few sets a week', 66]],
+});
+</script></body></html>

@@ -1,0 +1,25 @@
+[
+ {
+  "id": "hook",
+  "text": "Is one of your legs stronger than the other?",
+  "speed": 1.0,
+  "post": 0.6
+ },
+ {
+  "id": "motion",
+  "text": "Single-leg moves train each leg on its own. They fix imbalances, and build balance."
+ },
+ {
+  "id": "options",
+  "text": "Lunges are simple and anywhere. Bulgarian split squats give a big stretch for quads and glutes. Step-ups are easy to learn. And single-leg Romanian deadlifts hit the hamstrings."
+ },
+ {
+  "id": "take",
+  "text": "Add one single-leg move to every leg day."
+ },
+ {
+  "id": "out",
+  "text": "Next up: glutes. Save this.",
+  "post": 1.0
+ }
+]

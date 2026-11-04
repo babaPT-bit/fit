@@ -1,0 +1,25 @@
+[
+ {
+  "id": "hook",
+  "text": "Doing shrugs for your traps... but your upper back still looks flat?",
+  "speed": 1.0,
+  "post": 0.6
+ },
+ {
+  "id": "motion",
+  "text": "Your traps have three parts. The top part shrugs. The middle and lower parts pull your shoulder blades back and down."
+ },
+ {
+  "id": "options",
+  "text": "Shrugs train the top. Face pulls hit the middle traps and rear delts. Y raises train the lower traps. And wide-grip rows build the whole mid back."
+ },
+ {
+  "id": "take",
+  "text": "Shrugs alone only train the top part. Add one pulling-back move."
+ },
+ {
+  "id": "out",
+  "text": "Next up: the squat. Save this.",
+  "post": 1.0
+ }
+]

@@ -1,0 +1,26 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Hinge Pattern</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/splitkit.js"></script>
+<script src="../lib/movekit.js"></script>
+<script>
+MoveRun({ ep: 19, next: 'Single-leg training', key: /^(deadlifts|deadlift|hinge|hips|hamstrings|glutes|back|romanian|trap|extensions|heavy)/i,
+  hook: [['SCARED OF', 150], ['DEADLIFTS?', 150]],
+  hookScene: (t, st, c) => { deadlift({ x: 460, y: 1700, s: 560 }, 0.1 * c, false); question(820, 1000, t, 130); },
+  motionTitle: ['The motion', 'hips back, soft knees'],
+  motionScene: (t, st, c) => { deadlift({ x: 400, y: 1700, s: 580 }, c, false); bodyMap({ x: 860, y: 1700, s: 260 }, { legs: '#1f8a3b', glutes: '#1f8a3b', back: '#2b6cb0' }); },
+  cards: [{ icon: 'barbell', name: 'Deadlift', kw: 'conventional', tag: 'lift the most' }, { icon: 'barbell', name: 'Romanian DL', kw: 'romanian', tag: 'big hamstring stretch' }, { icon: 'trapbar', name: 'Trap bar DL', kw: 'trap bar', tag: 'easier on the back' }, { icon: 'bench', name: 'Back extension', kw: 'back extensions', tag: 'great to start' }],
+  take: [['Learn the hinge', 76, RED], ['with Romanian', 66], ['deadlifts first', 66]],
+});
+</script></body></html>

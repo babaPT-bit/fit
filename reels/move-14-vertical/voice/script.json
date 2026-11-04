@@ -1,0 +1,25 @@
+[
+ {
+  "id": "hook",
+  "text": "Can't do a single pull-up yet?",
+  "speed": 1.0,
+  "post": 0.6
+ },
+ {
+  "id": "motion",
+  "text": "Pulling down from overhead builds your lats, the muscles that make your back look wide."
+ },
+ {
+  "id": "options",
+  "text": "Pull-ups are the hardest. Assisted pull-ups with a band or machine help you build up. Lat pulldowns let you pick the weight. And single-arm cable pulldowns let you focus on one side."
+ },
+ {
+  "id": "take",
+  "text": "Use pulldowns and assisted pull-ups to build up to your first real pull-up."
+ },
+ {
+  "id": "out",
+  "text": "Next up: rows. Save this.",
+  "post": 1.0
+ }
+]
