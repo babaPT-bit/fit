@@ -1,0 +1,24 @@
+[
+ {
+  "id": "hook",
+  "text": "Do your wrists hurt... when you bench or do push-ups?",
+  "speed": 1.0,
+  "post": 0.7
+ },
+ {
+  "id": "cause",
+  "text": "Your wrist is bending back, so the weight hangs on the joint."
+ },
+ {
+  "id": "step1",
+  "text": "First, set the bar in the heel of your palm, and stack your wrist right over your elbow."
+ },
+ {
+  "id": "step2",
+  "text": "Still sore? Add wrist curls and reverse wrist curls to strengthen your forearms."
+ },
+ {
+  "id": "out",
+  "text": "Still hurts? See a physio. Save this."
+ }
+]

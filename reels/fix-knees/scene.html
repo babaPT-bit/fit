@@ -1,0 +1,43 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Knees Cave Fix</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script>
+FixRun({
+  key: /^(knees|cave|caving|glutes|weak|spread|floor|toes|banded|side|walks|bridges)/i,
+  physio: false,
+  hook: [['KNEES', 160], ['CAVING IN?', 150]],
+  titles: { cause: ['The cause', 'weak side glutes'], step1: ['Step 1: check form', 'spread the floor'], step2: ['Step 2: still caving?', 'wake up your glutes'], out: ['Knees over toes', null] },
+  scenes: {
+    hook: (t, st, c) => {
+      const q = squatFront({ x: 540, y: 1700, s: 560 }, c, c);
+      if (c > 0.3) { arrow(q.kneeL[0] - 120, q.kneeL[1], q.kneeL[0] - 30, q.kneeL[1]); arrow(q.kneeR[0] + 120, q.kneeR[1], q.kneeR[0] + 30, q.kneeR[1]); }
+    },
+    cause: (t, st, c) => { zoom(540, 820, 380, 1.3, (cx, cy) => gluteMap(cx, cy, false)); squatFront({ x: 540, y: 1700, s: 330 }, c, c); mark(false, 880, 1400, 110); },
+    step1: (t, st, c) => {
+      const q = squatFront({ x: 500, y: 1640, s: 560 }, c, 0);
+      arrow(q.kneeL[0] - 20, q.kneeL[1], q.kneeL[0] - 110, q.kneeL[1], GREEN); arrow(q.kneeR[0] + 20, q.kneeR[1], q.kneeR[0] + 110, q.kneeR[1], GREEN);
+      arrow(400, 1700, 250, 1700, GREEN); arrow(600, 1700, 750, 1700, GREEN); label('spread the floor', 500, 1770, GREEN, 56);
+      zoom(860, 560, 170, 0.55, (cx, cy) => gluteMap(cx, cy, true)); mark(true, 880, 900, 110);
+    },
+    step2: (t, st, c) => {
+      const sx = 120 * Math.sin(t * 2.2), o = { x: 330 + sx, y: 1180, s: 390 };
+      const m = man(o, { squat: 0.25, arms: { L: [40, -100], R: [40, -100] } });
+      S.rc.ellipse(o.x, o.y - 0.43 * o.s, 0.38 * o.s, 0.06 * o.s, ro({ stroke: RED, strokeWidth: 6 })); label('banded side walk', 330, 1270, RED, 56);
+      const o2 = { x: 640, y: 1640, s: 430 }; floorLine(o2); const J = bridgeJ(c); sideFig(o2, J, LYING);
+      S.rc.circle(...toS(o2, add(J.hip, add(J.knee, J.hip, -1), 0.85)), 0.09 * o2.s, ro({ stroke: RED, strokeWidth: 6 })); label('banded glute bridge', 640, 1720, RED, 56);
+      zoom(830, 520, 170, 0.55, (cx, cy) => gluteMap(cx, cy, true));
+    },
+    out: (t, st, c) => { squatFront({ x: 540, y: 1620, s: 500 }, c, 0); mark(true, 860, 900, 120); },
+  },
+});
+</script></body></html>

@@ -1,0 +1,24 @@
+[
+ {
+  "id": "hook",
+  "text": "Sitting all day... and your shoulders are rounding forward?",
+  "speed": 1.0,
+  "post": 0.7
+ },
+ {
+  "id": "cause",
+  "text": "Your chest gets tight, and your upper back gets weak."
+ },
+ {
+  "id": "step1",
+  "text": "First, raise your screen to eye level, and do more pulling sets than pushing sets."
+ },
+ {
+  "id": "step2",
+  "text": "Still rounding? Add band pull-aparts and a doorway chest stretch, every day."
+ },
+ {
+  "id": "out",
+  "text": "Save this."
+ }
+]

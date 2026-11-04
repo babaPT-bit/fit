@@ -1,0 +1,51 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Lower Back Arch Fix</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script>
+// standing side view; tilt 0..1 tips the pelvis forward and arches the low back
+function standJ(tilt) { return { ankle: [0, 0.07], knee: [0.02, 0.5], hip: [-0.02 - 0.04 * tilt, 0.92], sh: [0.02, 1.42], elb: [0.03, 1.12], hand: [0.05, 0.86] }; }
+function pelvis(o, tilt, t) {
+  const c = toS(o, [-0.02 - 0.04 * tilt, 0.94]); ctx.save(); ctx.translate(...c); ctx.rotate(rad(28 * tilt));
+  S.rc.linearPath([[-70, -40], [-45, 45], [45, 45], [70, -40]], ro({ strokeWidth: 6, stroke: tilt > 0.5 ? RED : GREEN }));
+  S.rc.line(-70, -40, 70, -40, ro({ strokeWidth: 3, stroke: 'rgba(80,140,220,0.8)' }));
+  if (tilt > 0.5) for (let i = 0; i < 3; i++) { const y = ((t * 120 + i * 40) % 120); S.rc.circle(80 + i * 6, -40 + y, 14, ro({ stroke: 'rgba(80,140,220,0.9)', strokeWidth: 3 })); }
+  ctx.restore();
+}
+function archLine(o, tilt) { const pts = [[-0.06, 0.95], [-0.09 - 0.06 * tilt, 1.12], [-0.04, 1.32]].map(p => toS(o, p)); S.rc.curve(pts, ro({ stroke: tilt > 0.5 ? RED : INK, strokeWidth: 8 })); }
+function lungeJ() { return { ankle: [0.45, 0.07], knee: [0.45, 0.5], hip: [0, 0.55], sh: [0, 1.07], elb: [0.03, 0.8], hand: [0.05, 0.6], ankle2: [-0.5, 0.05], knee2: [-0.1, 0.05] }; }
+FixRun({
+  key: /^(arch|lower|back|hip|flexors|glutes|abs|pelvis|ribs|squeeze|dead|bugs|stretch)/i,
+  hook: [['LOWER BACK', 150], ['ARCHING?', 160]],
+  titles: { cause: ['The cause', 'pelvis tips forward'], step1: ['Step 1: fix your stance', 'ribs down, glutes on'], step2: ['Step 2: still aching?', 'a few minutes a day'], out: ['Level pelvis', null] },
+  scenes: {
+    hook: (t, st, c) => { const o = { x: 520, y: 1700, s: 600 }; sideFig(o, standJ(1), { mood: 'sad' }); archLine(o, 1); pelvis(o, 1, t); spark(...toS(o, [-0.15, 1.1]), t, 50); },
+    cause: (t, st, c) => {
+      const o = { x: 420, y: 1700, s: 600 }; sideFig(o, standJ(1)); archLine(o, 1); pelvis(o, 1, t);
+      label('hip flexors: tight', 760, 1130, RED, 56); arrow(700, 1150, 510, 1140); label('glutes + abs: weak', 760, 980, INK, 56);
+      label('like a bucket spilling forward', 540, 1760, INK, 52);
+    },
+    step1: (t, st, c) => {
+      const tl = 1 - ease(clamp(st.u * 2)), o = { x: 460, y: 1700, s: 600 }; sideFig(o, standJ(tl)); archLine(o, tl); pelvis(o, tl, t);
+      arrow(...toS(o, [0.3, 1.3]), ...toS(o, [0.3, 1.15]), GREEN); label('ribs down', ...toS(o, [0.55, 1.25]), GREEN, 56);
+      S.rc.ellipse(...toS(o, [-0.12, 0.88]), 70, 110, ro(hatch(RED, 6))); label('glutes on', ...toS(o, [-0.55, 0.85]), RED, 56);
+      if (st.u > 0.5) mark(true, 880, 760, 110);
+    },
+    step2: (t, st, c) => {
+      const o1 = { x: 360, y: 1150, s: 420 }; floorLine(o1); sideFig(o1, deadBugJ(c), LYING); label('dead bug', 360, 1240, RED, 58);
+      const o2 = { x: 600, y: 1650, s: 430 }; floorLine(o2); const J = lungeJ(); sideFig(o2, J);
+      S.rc.ellipse(...toS(o2, [0.0, 0.36]), 45, 100, ro(hatch(RED, 6))); label('hip flexor stretch', 600, 1730, RED, 58);
+    },
+    out: (t, st, c) => { const o = { x: 520, y: 1650, s: 560 }; sideFig(o, standJ(0)); archLine(o, 0); pelvis(o, 0, t); mark(true, 860, 900, 120); },
+  },
+});
+</script></body></html>

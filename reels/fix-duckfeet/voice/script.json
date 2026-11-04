@@ -1,0 +1,24 @@
+[
+ {
+  "id": "hook",
+  "text": "Look down at your feet right now. Do they point out like a duck?",
+  "speed": 1.0,
+  "post": 0.7
+ },
+ {
+  "id": "cause",
+  "text": "Often it's tight hips and weak glutes. A little turn-out is normal, but a lot is a habit."
+ },
+ {
+  "id": "step1",
+  "text": "First, stand with your feet pointing more forward, and give your glutes a light squeeze."
+ },
+ {
+  "id": "step2",
+  "text": "Still turning out? Add ninety-ninety hip switches and glute bridges, a few minutes a day."
+ },
+ {
+  "id": "out",
+  "text": "Save this."
+ }
+]

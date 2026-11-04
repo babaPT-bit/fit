@@ -1,0 +1,51 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Rows Biceps Fix</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script>
+// seated cable row, facing right (machine on the right). good = elbows drive back past the body
+function rowJ(c, good) {
+  const hip = [0, 0.45], sh = [-0.02, 0.97], knee = [0.4, 0.62], ankle = [0.75, 0.45];
+  let elb, hand;
+  if (good) { elb = [0.32 - 0.55 * c, 0.84 - 0.06 * c]; hand = [0.6 - 0.48 * c, 0.78]; }
+  else { elb = [0.32 - 0.12 * c, 0.82]; hand = [0.6 - 0.35 * c, 0.78 + 0.22 * c]; }
+  return { hip, sh, knee, ankle, elb, hand, toe: [0.78, 0.6] };
+}
+function rowMachine(o, J) {
+  S.rc.rectangle(...toS(o, [0.85, 1.2]), 0.12 * o.s, 1.2 * o.s, ro({ strokeWidth: 5, stroke: GREY }));
+  S.rc.rectangle(...toS(o, [-0.25, 0.42]), 0.5 * o.s, 0.06 * o.s, ro({ strokeWidth: 5, stroke: GREY }));
+  S.rc.line(...toS(o, [0.85, 0.78]), ...toS(o, J.hand), ro({ strokeWidth: 3, stroke: GREY }));
+}
+function bicepsBlob(o, J, on) { const a = toS(o, J.sh), b = toS(o, J.elb), m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2 - 8]; S.rc.ellipse(...m, 70, 40, ro(on ? hatch(RED, 6) : pencil())); }
+function latBlob(o, J, on) { S.rc.ellipse(...toS(o, [-0.07, 0.75]), 60, 0.4 * o.s, ro(on ? hatch(RED, 7) : pencil())); }
+function straightArmJ(c) { const ankle = [0, 0.07], knee = [0.04, 0.5], hip = [-0.05, 0.92], sh = add(hip, pol(75), 0.52); const a = 60 - 140 * c; const elb = add(sh, pol(a), 0.3); return { ankle, knee, hip, sh, elb, hand: add(elb, pol(a), 0.28) }; }
+FixRun({
+  key: /^(biceps|hands|arms|grip|loosen|elbows|hips|straight-arm|pulldowns|lats|bend)/i, physio: false, period: 2.4,
+  hook: [['ONLY FEEL', 150], ['YOUR BICEPS?', 150]],
+  titles: { cause: ['The cause', 'pulling with your hands'], step1: ['Step 1: check form', 'elbows to your hips'], step2: ['Step 2: still all biceps?', 'straight-arm pulldown first'], out: ['Pull with your elbows', null] },
+  scenes: {
+    hook: (t, st, c) => { const o = { x: 420, y: 1500, s: 620 }, J = rowJ(c, false); rowMachine(o, J); latBlob(o, J, false); const f = sideFig(o, J, { mood: 'sad' }); bicepsBlob(o, J, true); spark(...toS(o, J.elb), t, 45); },
+    cause: (t, st, c) => { const o = { x: 420, y: 1500, s: 620 }, J = rowJ(c, false); rowMachine(o, J); latBlob(o, J, false); sideFig(o, J); bicepsBlob(o, J, true); label('arms do the work', 540, 1620, RED, 60); label('back: off', 300, 900, INK, 56); mark(false, 880, 700, 110); },
+    step1: (t, st, c) => {
+      const o = { x: 420, y: 1500, s: 620 }, J = rowJ(c, true); rowMachine(o, J); latBlob(o, J, true); sideFig(o, J); bicepsBlob(o, J, false);
+      arrow(...toS(o, [0.3, 1.05]), ...toS(o, [-0.25, 1.05]), GREEN); label('elbows → hips', 540, 640, GREEN, 60); label('loose grip', 540, 1620, INK, 56); mark(true, 880, 760, 110);
+    },
+    step2: (t, st, c) => {
+      const o = { x: 420, y: 1700, s: 560 }, J = straightArmJ(c);
+      S.rc.line(...toS(o, [0.75, 2.3]), ...toS(o, [0.75, 0]), ro({ strokeWidth: 10, stroke: GREY })); S.rc.line(...toS(o, [0.73, 2.15]), ...toS(o, J.hand), ro({ strokeWidth: 3, stroke: GREY }));
+      sideFig(o, J); S.rc.ellipse(...toS(o, add(J.hip, pol(75), 0.33)), 60, 0.35 * o.s, ro(hatch(RED, 7)));
+      label('no elbow bend', 820, 1300, RED, 56); label('= no biceps help', 820, 1370, RED, 56);
+    },
+    out: (t, st, c) => { const o = { x: 420, y: 1450, s: 580 }, J = rowJ(c, true); rowMachine(o, J); latBlob(o, J, true); sideFig(o, J); mark(true, 860, 760, 120); },
+  },
+});
+</script></body></html>

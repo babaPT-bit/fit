@@ -1,0 +1,24 @@
+[
+ {
+  "id": "hook",
+  "text": "Does the front of your knee hurt... when you squat?",
+  "speed": 1.0,
+  "post": 0.7
+ },
+ {
+  "id": "cause",
+  "text": "Usually, you added weight too fast, and the tendon below your kneecap can't keep up."
+ },
+ {
+  "id": "step1",
+  "text": "First, drop the weight a little, and lower yourself slowly, under control."
+ },
+ {
+  "id": "step2",
+  "text": "Still sore? Add slow leg extensions and Spanish squats to strengthen that tendon."
+ },
+ {
+  "id": "out",
+  "text": "Still hurts? See a physio. Save this."
+ }
+]

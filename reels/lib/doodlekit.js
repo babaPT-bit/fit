@@ -114,7 +114,7 @@
     const hip = [0, 0.92 - 0.36 * sq], neck = [0, hip[1] + 0.56], sh = [0, hip[1] + 0.5], head = [0, hip[1] + 0.71];
     const line = (pts, w = 7, col = INK) => rc.linearPath(pts.map(P), ro({ strokeWidth: w, stroke: col }));
     if (!pose.noLegs) for (const s of [-1, 1]) {
-      const foot = [s * (0.15 + 0.07 * sq), 0], knee = [s * (0.1 + 0.2 * sq), 0.47 - 0.1 * sq];
+      const vg = pose.valgus || 0, foot = [s * (0.15 + 0.07 * sq), 0], knee = [s * ((0.1 + 0.2 * sq) * (1 - vg) + 0.03 * vg), 0.47 - 0.1 * sq];
       line([hip, knee, foot]); line([foot, [foot[0] + s * 0.07, 0]]);
     }
     line([hip, neck]);
@@ -175,9 +175,14 @@
     if (J.elb) ln([J.sh, J.elb, J.hand]);
     const hp = P(hc), R = 0.11 * o.s;
     rc.circle(hp[0], hp[1], R * 2, ro({ fill: '#f4f1ea', fillStyle: 'solid' }));
-    ctx.fillStyle = INK; ctx.beginPath(); ctx.ellipse(hp[0] + dir * R * 0.45, hp[1] - R * 0.15, R * 0.09, R * 0.14, 0, 0, 7); ctx.fill();
-    if (opts.mood === 'sad') rc.arc(hp[0] + dir * R * 0.45, hp[1] + R * 0.6, R * 0.6, R * 0.4, Math.PI + 0.5, 2 * Math.PI - 0.5, false, ro({ strokeWidth: 5 }));
-    else rc.arc(hp[0] + dir * R * 0.45, hp[1] + R * 0.25, R * 0.6, R * 0.45, 0.4, Math.PI - 0.4, false, ro({ strokeWidth: 5 }));
+    // face: lookDeg = where the face points, upDeg = where the top of the head points (0 right, 90 up)
+    const la = rad(opts.lookDeg ?? (dir > 0 ? 0 : 180)), ua = rad(opts.upDeg ?? 90);
+    const f = [Math.cos(la), -Math.sin(la)], up = [Math.cos(ua), -Math.sin(ua)];
+    ctx.save(); ctx.transform(f[0], f[1], -up[0], -up[1], hp[0], hp[1]);
+    ctx.fillStyle = INK; ctx.beginPath(); ctx.ellipse(R * 0.45, -R * 0.15, R * 0.09, R * 0.14, 0, 0, 7); ctx.fill();
+    if (opts.mood === 'sad') rc.arc(R * 0.45, R * 0.6, R * 0.6, R * 0.4, Math.PI + 0.5, 2 * Math.PI - 0.5, false, ro({ strokeWidth: 5 }));
+    else rc.arc(R * 0.45, R * 0.25, R * 0.6, R * 0.45, 0.4, Math.PI - 0.4, false, ro({ strokeWidth: 5 }));
+    ctx.restore();
     const out = {}; for (const k in J) out[k] = P(J[k]); out.head = hp; out.P = P; return out;
   }
   // vertical tension meter

@@ -1,0 +1,7 @@
+[
+  {"id": "hook",  "speed": 1.0, "post": 0.7, "text": "Watch your knees on your next squat. Do they cave in?"},
+  {"id": "cause", "text": "Usually, your glutes are too weak to push your knees out."},
+  {"id": "step1", "text": "First, point your toes slightly out, and spread the floor with your feet. Your knees should track over your toes."},
+  {"id": "step2", "text": "Still caving? Add banded side walks and banded glute bridges before you squat."},
+  {"id": "out",   "text": "Save this for leg day."}
+]

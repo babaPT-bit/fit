@@ -1,0 +1,38 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Shoulder Pinch Fix</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script>
+FixRun({
+  key: /^(pinch|shoulder|blades|forward|back|elbows|forty-five|squeeze|rear|delt|raises|physio)/i,
+  hook: [['SHOULDER', 150], ['PINCH?', 160]],
+  titles: { cause: ['The cause', 'shoulder blades drift forward'], step1: ['Step 1: check form', '45° elbows + blades back'], step2: ['Step 2: still pinching?', 'strengthen your upper back'], out: ['Fix it, then lift', null] },
+  scenes: {
+    hook: (t, st, c) => { const r = ohp({ x: 540, y: 1700, s: 520 }, c, { face: 'sad' }); spark(r.shoulderR[0] + 30, r.shoulderR[1], t); },
+    cause: (t, st, c) => { zoom(540, 900, 420, 1.3, (cx, cy) => scapMap(cx, cy, 0.3 + 0.7 * c, 'out')); mark(false, 880, 1420, 120); label('blades drift apart', 540, 1420, RED, 64); },
+    step1: (t, st, c) => {
+      benchTop({ x: 400, y: 900, s: 480 }, 45, c);
+      zoom(840, 540, 190, 0.6, (cx, cy) => scapMap(cx, cy, 0.05, 'in'));
+      label('blades squeezed', 840, 780, RED, 50); mark(true, 860, 1150, 110);
+    },
+    step2: (t, st, c) => {
+      const y = man({ x: 280, y: 1640, s: 380 }, { arms: { L: [12 + 138 * c, 4], R: [12 + 138 * c, 4] } });
+      dumbbell(y.L.H, 380); dumbbell(y.R.H, 380); label('Y raise', 280, 1700, RED, 60);
+      const r = man({ x: 790, y: 1640, s: 380 }, { arms: { L: [10 + 75 * c, 8], R: [10 + 75 * c, 8] } });
+      dumbbell(r.L.H, 380); dumbbell(r.R.H, 380); label('rear delt fly (bent over)', 790, 1700, RED, 50);
+      zoom(540, 560, 200, 0.6, (cx, cy) => upperBackMap(cx, cy));
+      sticky(780, 300, 260, 160, 0.05, [['2–3× / week', 52, RED]], fade(st.u, 0.2, 0.35));
+    },
+    out: (t, st, c) => { ohp({ x: 540, y: 1600, s: 470 }, c); mark(true, 860, 900, 120); },
+  },
+});
+</script></body></html>

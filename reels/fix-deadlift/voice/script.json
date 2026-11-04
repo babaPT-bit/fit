@@ -1,0 +1,7 @@
+[
+  {"id": "hook",  "speed": 1.0, "post": 0.7, "text": "Feel deadlifts... in your lower back, instead of your legs?"},
+  {"id": "cause", "text": "You're losing your brace, so your back rounds under the weight."},
+  {"id": "step1", "text": "First, take a big breath into your belly and brace hard. Keep the bar close to your shins, and push the floor away."},
+  {"id": "step2", "text": "Still feeling it? Add glute bridges and dead bugs to build your hips and core."},
+  {"id": "out",   "text": "Still hurts? See a physio. Save this."}
+]

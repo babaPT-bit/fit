@@ -1,0 +1,35 @@
+[
+ {
+  "id": "hook",
+  "text": "Lateral raises... but you feel them in your neck?",
+  "speed": 1.0,
+  "post": 0.7,
+  "file": "hook.wav",
+  "dur": 2.965
+ },
+ {
+  "id": "cause",
+  "text": "You're shrugging. The weight is too heavy, so your traps take over.",
+  "file": "cause.wav",
+  "dur": 3.392
+ },
+ {
+  "id": "step1",
+  "text": "First, drop the weight. Keep your shoulders down, and lead with your elbows, out to the walls.",
+  "file": "step1.wav",
+  "dur": 5.269
+ },
+ {
+  "id": "step2",
+  "text": "Still in your neck? Add Y raises to train the lower traps that pull your shoulders down.",
+  "file": "step2.wav",
+  "dur": 5.227
+ },
+ {
+  "id": "out",
+  "text": "Save this for shoulder day.",
+  "file": "out.wav",
+  "dur": 1.664,
+  "post": 1.0
+ }
+]

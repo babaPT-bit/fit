@@ -1,0 +1,24 @@
+[
+ {
+  "id": "hook",
+  "text": "Does your lower back arch... and ache when you stand?",
+  "speed": 1.0,
+  "post": 0.7
+ },
+ {
+  "id": "cause",
+  "text": "Sitting all day tightens your hip flexors, and weak glutes and abs let your pelvis tip forward."
+ },
+ {
+  "id": "step1",
+  "text": "First, when you stand or lift, bring your ribs down, and squeeze your glutes."
+ },
+ {
+  "id": "step2",
+  "text": "Still aching? Add dead bugs and a hip flexor stretch, a few minutes a day."
+ },
+ {
+  "id": "out",
+  "text": "Still hurts? See a physio. Save this."
+ }
+]

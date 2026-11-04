@@ -1,0 +1,46 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Duck Feet Fix</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script>
+// two feet seen from above, turned out by ang degrees
+function feetTop(cx, cy, k, ang) {
+  for (const sd of [-1, 1]) {
+    ctx.save(); ctx.translate(cx + sd * 110 * k, cy); ctx.rotate(sd * rad(ang));
+    S.rc.ellipse(0, 0, 120 * k, 300 * k, ro({ fill: '#f4f1ea', fillStyle: 'solid' }));
+    for (let i = 0; i < 5; i++) S.rc.circle(-40 * k + i * 20 * k + (sd > 0 ? 0 : 0), -160 * k + Math.abs(i - (sd > 0 ? 0 : 4)) * 6 * k, 26 * k, ro({ strokeWidth: 3 }));
+    S.rc.line(0, -120 * k, 0, -260 * k, ro({ stroke: ang > 15 ? RED : GREEN, strokeWidth: 5 }));
+    ctx.restore();
+  }
+}
+// 90/90 sit: both knees bent to one side, switching
+function ninety(o, c) {
+  const side = c > 0.5 ? 1 : -1, P = p => toS(o, p);
+  S.rc.line(...P([0, 0.35]), ...P([0, 0.85]), ro()); S.rc.circle(...P([0, 0.97]), 0.24 * o.s, ro({ fill: '#f4f1ea', fillStyle: 'solid' }));
+  S.rc.linearPath([P([0, 0.35]), P([side * 0.3, 0.12]), P([side * 0.05, 0.05])], ro());
+  S.rc.linearPath([P([0, 0.35]), P([-side * 0.3, 0.12]), P([-side * 0.55, 0.05])], ro());
+  S.rc.line(...P([-0.7, 0]), ...P([0.7, 0]), ro({ stroke: SOFT, strokeWidth: 5 }));
+  arrow(...P([-0.25, 0.75]), ...P([0.25, 0.75]), RED); arrow(...P([0.25, 0.68]), ...P([-0.25, 0.68]), RED);
+}
+FixRun({
+  key: /^(feet|duck|hips|glutes|forward|squeeze|ninety-ninety|switches|bridges|habit)/i, physio: false,
+  hook: [['DUCK', 170], ['FEET?', 170]],
+  titles: { cause: ['The cause', 'tight hips + weak glutes'], step1: ['Step 1: fix your stance', 'feet forward, light squeeze'], step2: ['Step 2: still turning out?', 'a few minutes a day'], out: ['Feet forward', null] },
+  scenes: {
+    hook: (t, st, c) => { feetTop(540, 1250, 1.1, 35); question(540, 900, t, 130); label('look down…', 540, 1700, INK, 64); },
+    cause: (t, st, c) => { zoom(540, 860, 380, 1.3, (cx, cy) => gluteMap(cx, cy, false)); feetTop(540, 1500, 0.55, 35); label('a little turn-out is normal', 540, 1740, INK, 52); },
+    step1: (t, st, c) => { man({ x: 330, y: 1650, s: 470 }); feetTop(790, 1200, 0.75, 8); mark(true, 800, 860, 110); zoom(790, 1580, 150, 0.5, (cx, cy) => gluteMap(cx, cy, true)); },
+    step2: (t, st, c) => { ninety({ x: 330, y: 1150, s: 420 }, rep(t, 2.4)); label('90/90 hip switch', 330, 1240, RED, 58); const o2 = { x: 650, y: 1640, s: 430 }; floorLine(o2); sideFig(o2, bridgeJ(c), LYING); label('glute bridge', 650, 1720, RED, 58); },
+    out: (t, st, c) => { feetTop(540, 1100, 1, 8); mark(true, 860, 760, 120); },
+  },
+});
+</script></body></html>

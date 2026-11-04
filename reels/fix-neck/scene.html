@@ -1,0 +1,55 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Lateral Raise Neck Fix</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script>
+// trap slopes (neck to shoulders) + delt caps, front view
+function traps(o, shrug, on) {
+  for (const sd of [-1, 1]) S.rc.polygon([toS(o, [0, 1.5 + 0.04 * shrug]), toS(o, [sd * 0.17, 1.42 + 0.05 * shrug]), toS(o, [0, 1.42])], ro(on ? hatch(RED, 6) : pencil()));
+}
+function trapDeltMap(cx, cy, trapOn, deltOn) {
+  S.rc.rectangle(cx - 50, cy - 260, 100, 160, ro({ strokeWidth: 5 }));
+  for (const sd of [-1, 1]) {
+    S.rc.polygon([[cx + sd * 50, cy - 160], [cx + sd * 230, cy - 20], [cx + sd * 50, cy - 20]], ro(trapOn ? hatch(RED, 8) : pencil()));
+    S.rc.circle(cx + sd * 270, cy + 30, 150, ro(deltOn ? hatch(RED, 8) : pencil()));
+  }
+  label('traps', cx - 230, cy - 120, trapOn ? RED : INK, 54); label('side delts', cx + 200, cy + 170, deltOn ? RED : INK, 54);
+}
+function lowerTrapMap(cx, cy) {
+  S.rc.linearPath([[cx - 220, cy - 200], [cx + 220, cy - 200], [cx + 160, cy + 230], [cx - 160, cy + 230], [cx - 220, cy - 200]], ro({ strokeWidth: 5 }));
+  S.rc.polygon([[cx - 150, cy - 150], [cx + 150, cy - 150], [cx + 30, cy + 170], [cx - 30, cy + 170]], ro(hatch(RED, 9)));
+  label('lower traps', cx, cy + 290, RED, 60);
+}
+function raise(o, c, heavy, shrug) {
+  const m = man(o, { face: shrug ? 'sad' : 'smile', arms: { L: [8 + 72 * c, 6], R: [8 + 72 * c, 6] } });
+  traps(o, shrug ? c : 0, shrug);
+  const k = heavy ? 1.6 : 0.8; dumbbell(m.L.H, o.s * k); dumbbell(m.R.H, o.s * k);
+  return m;
+}
+FixRun({
+  key: /^(neck|shrugging|heavy|traps|drop|shoulders|down|elbows|walls|raises|lower)/i, physio: false,
+  hook: [['FEEL IT IN', 150], ['YOUR NECK?', 150]],
+  titles: { cause: ['The cause', 'shrugging = traps take over'], step1: ['Step 1: check form', 'lighter + shoulders down'], step2: ['Step 2: still in your neck?', 'train your lower traps'], out: ['Shoulders down, elbows out', null] },
+  scenes: {
+    hook: (t, st, c) => { raise({ x: 540, y: 1700, s: 520 }, c, true, true); spark(540, 1700 - 1.52 * 520 + 30, t, 50); },
+    cause: (t, st, c) => { zoom(540, 820, 360, 1.05, (cx, cy) => trapDeltMap(cx, cy, true, false)); raise({ x: 540, y: 1720, s: 300 }, c, true, true); label('too heavy', 820, 1500, RED, 60); mark(false, 880, 1300, 100); },
+    step1: (t, st, c) => {
+      const o = { x: 540, y: 1700, s: 520 }, m = raise(o, c, false, false);
+      for (const sd of [-1, 1]) { S.rc.line(540 + sd * 480, 700, 540 + sd * 480, 1650, ro({ strokeWidth: 6, stroke: SOFT })); arrow(sd < 0 ? m.L.E[0] : m.R.E[0], sd < 0 ? m.L.E[1] : m.R.E[1], 540 + sd * 440, sd < 0 ? m.L.E[1] : m.R.E[1], GREEN); }
+      label('wall', 90, 690, SOFT, 48); label('wall', 990, 690, SOFT, 48);
+      zoom(820, 470, 160, 0.42, (cx, cy) => trapDeltMap(cx, cy, false, true)); mark(true, 260, 470, 100);
+    },
+    step2: (t, st, c) => { const m = man({ x: 330, y: 1640, s: 470 }, { arms: { L: [12 + 138 * c, 4], R: [12 + 138 * c, 4] } }); dumbbell(m.L.H, 380); dumbbell(m.R.H, 380); label('Y raise, light', 330, 1710, RED, 60); zoom(810, 640, 210, 0.6, (cx, cy) => lowerTrapMap(cx, cy)); },
+    out: (t, st, c) => { raise({ x: 540, y: 1650, s: 480 }, c, false, false); mark(true, 860, 900, 120); },
+  },
+});
+</script></body></html>

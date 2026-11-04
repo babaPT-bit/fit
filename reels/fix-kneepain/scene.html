@@ -1,0 +1,47 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Knee Pain Fix</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script>
+function squatSide(d) {
+  const ankle = [0, 0.07], knee = add(ankle, pol(90 - 8 - 32 * d), 0.45), hip = add(knee, pol(90 + 12 + 78 * d), 0.45), sh = add(hip, pol(90 - 10 - 32 * d), 0.52);
+  return { ankle, knee, hip, sh, elb: add(sh, pol(-150), 0.22), hand: add(add(sh, pol(-150), 0.22), pol(20), 0.18) };
+}
+function plate(o, J, size) { S.rc.circle(...toS(o, add(J.sh, pol(-120), 0.06)), size * o.s, ro({ strokeWidth: 5, stroke: GREY, fill: 'rgba(26,26,26,0.3)', fillStyle: 'hachure', hachureGap: 12 })); }
+function kneeMap(cx, cy, on) {
+  S.rc.line(cx - 200, cy - 220, cx - 10, cy - 10, ro({ strokeWidth: 26 })); S.rc.line(cx - 10, cy + 10, cx + 40, cy + 280, ro({ strokeWidth: 26 }));
+  S.rc.circle(cx + 50, cy - 40, 90, ro({ fill: '#f4f1ea', fillStyle: 'solid' })); label('kneecap', cx + 170, cy - 60, INK, 50);
+  S.rc.line(cx + 60, cy + 5, cx + 70, cy + 130, ro(on ? { stroke: RED, strokeWidth: 16 } : { stroke: GREEN, strokeWidth: 12 })); label('tendon', cx + 190, cy + 90, on ? RED : GREEN, 54);
+}
+function slowRep(t) { const r = ((t % 4) + 4) % 4; return r < 3 ? ease(r / 3) : 1 - ease((r - 3) / 1); }   // 3 s down, 1 s up
+function legExtJ(c) { const hip = [0, 0.62], knee = [0.45, 0.62]; return { hip, knee, ankle: add(knee, pol(-90 + 85 * c), 0.43), sh: add(hip, pol(95), 0.52), elb: add(add(hip, pol(95), 0.52), pol(-80), 0.25), hand: add(hip, pol(-10), 0.12) }; }
+function spanishJ(d) { const ankle = [0, 0.07], knee = add(ankle, pol(90), 0.45 - 0.05 * d), hip = add(knee, pol(90 + 15 + 70 * d), 0.45), sh = add(hip, pol(90 - 5), 0.52); return { ankle, knee, hip, sh, elb: add(sh, pol(-10), 0.28), hand: add(add(sh, pol(-10), 0.28), pol(0), 0.25) }; }
+FixRun({
+  key: /^(knee|tendon|kneecap|weight|fast|slowly|control|leg|extensions|spanish|squats)/i,
+  hook: [['KNEE PAIN', 160], ['ON SQUATS?', 150]],
+  titles: { cause: ['The cause', 'too much, too fast'], step1: ['Step 1: check your load', 'lighter + slow way down'], step2: ['Step 2: still sore?', 'make the tendon stronger'], out: ['Load it slowly', null] },
+  scenes: {
+    hook: (t, st, c) => { const o = { x: 460, y: 1680, s: 560 }, J = squatSide(c); plate(o, J, 0.36); const f = sideFig(o, J, { mood: 'sad' }); spark(f.knee[0] + 30, f.knee[1] + 30, t, 50); },
+    cause: (t, st, c) => { zoom(540, 860, 380, 1.05, (cx, cy) => kneeMap(cx, cy, true)); mark(false, 880, 1400, 110); label('tendon can\'t keep up', 540, 1420, RED, 60); },
+    step1: (t, st, c) => {
+      const d = slowRep(t), o = { x: 420, y: 1680, s: 560 }, J = squatSide(d); plate(o, J, 0.22); sideFig(o, J);
+      S.rc.circle(850, 700, 170, ro({ strokeWidth: 5 })); S.rc.line(850, 700, 850 + 60 * Math.cos(t * 2), 700 + 60 * Math.sin(t * 2), ro({ stroke: RED, strokeWidth: 5 }));
+      label('3 sec down', 850, 850, RED, 60); label('lighter', 850, 1000, INK, 60); mark(true, 860, 1180, 100);
+    },
+    step2: (t, st, c) => {
+      const o1 = { x: 330, y: 1150, s: 420 }; S.rc.rectangle(...toS(o1, [-0.2, 0.56]), 0.65 * o1.s, 0.06 * o1.s, ro({ strokeWidth: 5, stroke: GREY })); sideFig(o1, legExtJ(slowRep(t + 2) * 0.9 + 0.1)); label('slow leg extension', 330, 1240, RED, 56);
+      const o2 = { x: 640, y: 1650, s: 420 }, J = spanishJ(c); S.rc.line(...toS(o2, [0.6, 0]), ...toS(o2, [0.6, 0.9]), ro({ strokeWidth: 10, stroke: GREY })); S.rc.line(...toS(o2, J.knee), ...toS(o2, [0.6, J.knee[1]]), ro({ stroke: RED, strokeWidth: 6 })); sideFig(o2, J); label('Spanish squat (band behind knees)', 600, 1730, RED, 46);
+    },
+    out: (t, st, c) => { const o = { x: 460, y: 1650, s: 520 }, J = squatSide(slowRep(t)); plate(o, J, 0.22); sideFig(o, J); mark(true, 860, 900, 120); },
+  },
+});
+</script></body></html>

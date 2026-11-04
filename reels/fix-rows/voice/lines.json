@@ -1,0 +1,35 @@
+[
+ {
+  "id": "hook",
+  "text": "Doing rows and pulldowns... but you only feel your biceps?",
+  "speed": 1.0,
+  "post": 0.7,
+  "file": "hook.wav",
+  "dur": 3.989
+ },
+ {
+  "id": "cause",
+  "text": "You're pulling with your hands, so your arms do all the work.",
+  "file": "cause.wav",
+  "dur": 3.285
+ },
+ {
+  "id": "step1",
+  "text": "First, loosen your grip, and drive your elbows toward your hips.",
+  "file": "step1.wav",
+  "dur": 3.691
+ },
+ {
+  "id": "step2",
+  "text": "Still all biceps? Start with straight-arm pulldowns. No elbow bend, so your lats have to work.",
+  "file": "step2.wav",
+  "dur": 5.995
+ },
+ {
+  "id": "out",
+  "text": "Save this for back day.",
+  "file": "out.wav",
+  "dur": 1.557,
+  "post": 1.0
+ }
+]

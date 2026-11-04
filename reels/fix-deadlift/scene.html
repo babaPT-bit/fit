@@ -1,0 +1,40 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Deadlift Back Fix</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script>
+FixRun({
+  key: /^(lower|back|brace|rounds|belly|breath|shins|push|floor|glute|bridges|dead|bugs|core|physio)/i,
+  hook: [['LOWER BACK', 150], ['PAIN?', 160]],
+  titles: { cause: ['The cause', 'no brace = back rounds'], step1: ['Step 1: check form', 'brace + bar close'], step2: ['Step 2: still feel it?', 'build hips + core'], out: ['Brace, then pull', null] },
+  scenes: {
+    hook: (t, st, c) => { const d = deadlift({ x: 460, y: 1680, s: 560 }, c, true); spark(d.lowBack[0] - 20, d.lowBack[1], t); },
+    cause: (t, st, c) => {
+      zoom(300, 760, 230, 1, (cx, cy) => spineMap(cx, cy, true)); label('rounded', 300, 1060, RED, 64); mark(false, 300, 1180, 100);
+      zoom(790, 760, 230, 1, (cx, cy) => spineMap(cx, cy, false)); label('flat', 790, 1060, INK, 64); mark(true, 790, 1180, 100);
+      deadlift({ x: 470, y: 1690, s: 330 }, c, true);
+    },
+    step1: (t, st, c) => {
+      const d = deadlift({ x: 400, y: 1680, s: 560 }, c, false);
+      const r = 40 + 30 * (1 - c); S.rc.circle(d.belly[0], d.belly[1], r * 2, ro({ stroke: '#1f8a3b', strokeWidth: 6 }));
+      label('big breath in', d.belly[0] + 300, d.belly[1] + 80, GREEN, 58); arrow(d.belly[0] + 200, d.belly[1] + 60, d.belly[0] + 70, d.belly[1] + 10, GREEN);
+      label('bar close to shins', 820, 1500, INK, 52); mark(true, 860, 760, 110);
+    },
+    step2: (t, st, c) => {
+      const o1 = { x: 360, y: 1180, s: 430 }; floorLine(o1); sideFig(o1, bridgeJ(c), LYING); label('glute bridge', 360, 1270, RED, 60);
+      const o2 = { x: 620, y: 1640, s: 430 }; floorLine(o2); sideFig(o2, deadBugJ(c), LYING); label('dead bug', 620, 1720, RED, 60);
+      sticky(700, 330, 330, 170, 0.05, [['2–3× / week', 56, RED]], fade(st.u, 0.2, 0.35));
+    },
+    out: (t, st, c) => { deadlift({ x: 460, y: 1600, s: 500 }, c, false); mark(true, 860, 900, 120); },
+  },
+});
+</script></body></html>
