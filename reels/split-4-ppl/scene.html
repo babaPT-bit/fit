@@ -1,0 +1,30 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Push Pull Legs</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/splitkit.js"></script>
+<script>
+const PU = { chest: COL.PUSH, shoulders: COL.PUSH, arms: COL.PUSH }, PL = { back: COL.PULL, arms: COL.PULL }, LG = { legs: COL.LEGS, glutes: COL.LEGS };
+SplitRun({
+  ep: 4, key: /^(push|pull|legs|famous|chest|shoulders|triceps|back|biceps|once|twice|six|three|recover)/i,
+  hook: [['PUSH PULL', 150], ['LEGS?', 160]],
+  titles: { what: ['Push / Pull / Legs', null], week: ['3 days or 6?', null], who: ['Who is it for?', null], out: ['PPL', null] },
+  scenes: {
+    hook: (t, st, c) => { [['PUSH', COL.PUSH], ['PULL', COL.PULL], ['LEGS', COL.LEGS]].forEach(([w, col], i) => { if (t > i * 0.6) { ctx.save(); ctx.translate(540, 820 + i * 260); ctx.rotate((i - 1) * 0.06); S.rc.rectangle(-260, -90, 520, 170, ro({ stroke: col, strokeWidth: 8 })); label(w, 0, 30, col, 120); ctx.restore(); } }); },
+    what: (t, st, c) => { const a = st.u; bodyMap({ x: 200, y: 1450, s: 300 }, PU, 'PUSH', COL.PUSH); if (a > 0.3) bodyMap({ x: 540, y: 1450, s: 300 }, PL, 'PULL', COL.PULL); if (a > 0.6) bodyMap({ x: 880, y: 1450, s: 300 }, LG, 'LEGS', COL.LEGS); },
+    week: (t, st, c) => { label('3 days: each muscle 1×', 540, 420, INK, 60); calendar(540, 500, ['PUSH', 'PULL', 'LEGS', 'REST', 'REST', 'REST', 'REST'], 1, 128, 250); if (st.u > 0.45) { label('6 days: each muscle 2×', 540, 870, RED, 60); calendar(540, 950, ['PUSH', 'PULL', 'LEGS', 'PUSH', 'PULL', 'LEGS', 'REST'], (st.u - 0.45) * 3, 128, 250); } },
+    who: (t, st, c) => { sticky(100, 560, 400, 360, -0.04, [['6 days', 76, RED], ['great if you', 54], ['sleep + eat well', 54]], 1); sticky(580, 560, 400, 360, 0.04, [['3 days', 76], ['make every', 54], ['session count', 54]], fade(st.u, 0.3, 0.45)); bro({ x: 540, y: 1650, s: 360 }, t, false); },
+    out: (t, st, c) => nextCard('Ep 5: The bro split', st.u),
+  },
+});
+</script></body></html>

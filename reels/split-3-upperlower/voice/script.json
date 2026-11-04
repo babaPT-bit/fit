@@ -1,0 +1,25 @@
+[
+ {
+  "id": "hook1",
+  "text": "Four days a week, and you want more than the basics?",
+  "speed": 1.0,
+  "post": 0.6
+ },
+ {
+  "id": "what",
+  "text": "Upper lower splits your body in two. Upper day: chest, back, shoulders, and arms. Lower day: legs, glutes, and core."
+ },
+ {
+  "id": "week",
+  "text": "Upper, lower, rest, upper, lower. Then two days off."
+ },
+ {
+  "id": "pros",
+  "text": "Each muscle gets trained twice a week, with more time per muscle than full body."
+ },
+ {
+  "id": "out",
+  "text": "Next up: push, pull, legs. Save this.",
+  "post": 1.0
+ }
+]

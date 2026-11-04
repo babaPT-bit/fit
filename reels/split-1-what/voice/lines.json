@@ -1,0 +1,50 @@
+[
+ {
+  "id": "hook1",
+  "text": "Bro, what's your split?",
+  "voice": "am_onyx",
+  "speed": 1.08,
+  "file": "hook1.wav",
+  "dur": 1.621
+ },
+ {
+  "id": "hook2",
+  "text": "Split... of what?",
+  "voice": "am_puck",
+  "speed": 1.1,
+  "file": "hook2.wav",
+  "dur": 0.96
+ },
+ {
+  "id": "hook3",
+  "text": "Ever been confused by this question?",
+  "post": 0.6,
+  "file": "hook3.wav",
+  "dur": 2.325
+ },
+ {
+  "id": "what",
+  "text": "A split is just how you divide your muscles across the week.",
+  "file": "what.wav",
+  "dur": 3.435
+ },
+ {
+  "id": "types",
+  "text": "Full body. Upper and lower. Push, pull, legs. Or one muscle a day.",
+  "file": "types.wav",
+  "dur": 4.139
+ },
+ {
+  "id": "rule",
+  "text": "Whatever you pick, try to hit each muscle about twice a week.",
+  "file": "rule.wav",
+  "dur": 3.392
+ },
+ {
+  "id": "out",
+  "text": "This series breaks down every split. Follow, so you don't miss the next one.",
+  "post": 1.0,
+  "file": "out.wav",
+  "dur": 4.437
+ }
+]

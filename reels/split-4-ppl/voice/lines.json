@@ -1,0 +1,35 @@
+[
+ {
+  "id": "hook1",
+  "text": "Push, pull, legs. The most famous split on the internet. But should you do it?",
+  "speed": 1.0,
+  "post": 0.6,
+  "file": "hook1.wav",
+  "dur": 4.693
+ },
+ {
+  "id": "what",
+  "text": "Push day: chest, shoulders, triceps. Pull day: back and biceps. Leg day: legs and glutes.",
+  "file": "what.wav",
+  "dur": 5.696
+ },
+ {
+  "id": "week",
+  "text": "Run it three days a week, and each muscle gets hit once. Run it six days, and it's twice.",
+  "file": "week.wav",
+  "dur": 5.397
+ },
+ {
+  "id": "who",
+  "text": "Six days is great if you can recover. On three days, make each session count.",
+  "file": "who.wav",
+  "dur": 4.565
+ },
+ {
+  "id": "out",
+  "text": "Next up: the bro split. Save this.",
+  "post": 1.0,
+  "file": "out.wav",
+  "dur": 2.219
+ }
+]

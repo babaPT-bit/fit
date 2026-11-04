@@ -1,0 +1,30 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Hybrid Split</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/splitkit.js"></script>
+<script>
+const WEEK = ['UPPER', 'LOWER', 'REST', 'PUSH', 'PULL', 'LEGS', 'REST'];
+SplitRun({
+  ep: 6, key: /^(upper|lower|push|pull|legs|combine|five|twice|weekends|six|months)/i,
+  hook: [["CAN'T", 160], ['DECIDE?', 160]],
+  titles: { what: ['The hybrid', 'upper/lower + PPL'], pros: ['The good', null], who: ['Who is it for?', null], out: ['Hybrid split', null] },
+  scenes: {
+    hook: (t, st, c) => { label('UPPER / LOWER', 290, 720, COL.UPPER, 64); label('PUSH PULL LEGS', 790, 720, COL.PUSH, 64); label('?', 540, 730, RED, 110); man({ x: 540, y: 1680, s: 400 }, { face: 'confused', look: Math.sin(t * 2.5), arms: { L: [40, 100], R: [40, 100] } }); },
+    what: (t, st, c) => calendar(540, 620, WEEK, st.u * 1.8),
+    pros: (t, st, c) => { calendar(540, 420, WEEK, 1, 128, 240); sticky(150, 820, 780, 400, -0.02, [['5 days', 80, RED], ['every muscle 2× a week', 60], ['weekends off ✓', 60]], fade(st.u, 0.1, 0.25)); },
+    who: (t, st, c) => { man({ x: 540, y: 1650, s: 440 }, { arms: { L: [80, 100], R: [80, 100] }, flex: 0.7, flexSide: 'LR' }); ctx.save(); ctx.translate(820, 760); ctx.rotate(0.1); S.rc.circle(0, 0, 260, ro({ stroke: RED, strokeWidth: 7 })); label('6+', 0, 0, RED, 90); label('months', 0, 60, RED, 46); ctx.restore(); },
+    out: (t, st, c) => nextCard('Ep 7: Which split for you?', st.u),
+  },
+});
+</script></body></html>

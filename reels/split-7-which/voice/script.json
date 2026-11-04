@@ -1,0 +1,25 @@
+[
+ {
+  "id": "hook1",
+  "text": "So many splits. Which one is actually right for you?",
+  "speed": 1.0,
+  "post": 0.6
+ },
+ {
+  "id": "count",
+  "text": "First, count the days you can really train. Not the dream number."
+ },
+ {
+  "id": "map",
+  "text": "Three days: full body. Four days: upper lower. Five days: the hybrid. Six days: push, pull, legs."
+ },
+ {
+  "id": "warn",
+  "text": "And random workouts with no plan? That's the worst split of all. You can't progress what you don't repeat."
+ },
+ {
+  "id": "out",
+  "text": "Pick one, and stick with it for at least two months. Save this.",
+  "post": 1.0
+ }
+]

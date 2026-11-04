@@ -1,0 +1,29 @@
+[
+ {
+  "id": "hook1",
+  "text": "Only have three days a week to train?",
+  "speed": 1.0,
+  "post": 0.6
+ },
+ {
+  "id": "what",
+  "text": "Full body means you train your whole body every session, with a rest day in between."
+ },
+ {
+  "id": "week",
+  "text": "Monday, Wednesday, Friday. A squat, a press, and a pull, every time."
+ },
+ {
+  "id": "pros",
+  "text": "Each muscle gets hit three times a week. Perfect for beginners and busy people."
+ },
+ {
+  "id": "cons",
+  "text": "The catch: sessions get long, and you can't do much for each muscle."
+ },
+ {
+  "id": "out",
+  "text": "Next up: upper lower. Save this.",
+  "post": 1.0
+ }
+]

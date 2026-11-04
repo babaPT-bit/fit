@@ -1,0 +1,36 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>What Is A Split</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/splitkit.js"></script>
+<script>
+function bananaSplit(x, y) { S.rc.ellipse(x, y + 40, 260, 70, ro({ strokeWidth: 5 })); S.rc.curve([[x - 130, y + 40], [x, y + 80], [x + 130, y + 40]], ro({ strokeWidth: 5 })); for (const [dx, col] of [[-60, '#e0559b'], [0, '#7a4a1a'], [60, '#f4e3b0']]) S.rc.circle(x + dx, y + 5, 70, ro({ strokeWidth: 4, fill: col, fillStyle: 'solid' })); S.rc.ellipse(x, y + 30, 280, 40, ro({ strokeWidth: 4, stroke: '#d9b400' })); }
+const ROWS = [['FULL BODY', ['FULL', 'REST', 'FULL', 'REST', 'FULL', 'REST', 'REST']], ['UPPER / LOWER', ['UPPER', 'LOWER', 'REST', 'UPPER', 'LOWER', 'REST', 'REST']], ['PUSH PULL LEGS', ['PUSH', 'PULL', 'LEGS', 'PUSH', 'PULL', 'LEGS', 'REST']], ['ONE MUSCLE A DAY', ['CHEST', 'BACK', 'SHLD', 'ARMS', 'LEGS', 'REST', 'REST']]];
+SplitRun({
+  ep: 1, key: /^(split|divide|muscles|week|full|upper|lower|push|pull|legs|twice|follow)/i,
+  hook: [['SPLIT…', 150], ['OF WHAT?', 150]],
+  titles: { what: ['A split =', 'how you divide muscles across the week'], types: ['The main splits', null], rule: ['The one rule', null], out: ['This series', 'every split, explained'] },
+  scenes: {
+    hook: (t, st, c) => {
+      bro({ x: 260, y: 1650, s: 420 }, t, speaking('hook1', t), { arms: { L: [20, 10], R: [80, 0] } });
+      man({ x: 800, y: 1650, s: 420 }, { face: 'confused', look: -1, arms: { L: [40, 100], R: [40, 100] } });
+      if (t > SEG.hook1.vo - 0.1) say(330, 680, 380, "What's your split?", [290, 880], 56);
+      if (t > SEG.hook2.vo - 0.1) { say(800, 760, 360, 'Split… of what?', [800, 900], 54); bananaSplit(860, 560); }
+    },
+    what: (t, st, c) => { calendar(540, 500, ['FULL', 'REST', 'FULL', 'REST', 'FULL', 'REST', 'REST'], 0); bodyMap({ x: 540, y: 1600, s: 380 }, ALL(INK)); for (let i = 0; i < 3; i++) arrow(540, 1000, 140 + i * 256, 830, RED); },
+    types: (t, st, c) => { ROWS.forEach(([name, days], i) => { const a = fade(st.u, i * 0.2, i * 0.2 + 0.15); if (a <= 0) return; ctx.globalAlpha = a; label(name, 540, 465 + i * 330, RED, 56); calendar(540, 540 + i * 330, days, 1, 128, 180); ctx.globalAlpha = 1; }); },
+    rule: (t, st, c) => { calendar(540, 500, ['UPPER', 'LOWER', 'REST', 'UPPER', 'LOWER', 'REST', 'REST'], 1, 128, 300, [0, 3]); bodyMap({ x: 540, y: 1600, s: 380 }, { chest: RED, shoulders: RED, arms: RED, back: RED }); label('each muscle ~2× a week', 540, 900, RED, 70); },
+    out: (t, st, c) => { nextCard('Ep 2: Full body', st.u); label('FOLLOW', 540, 900, RED, 110); S.rc.rectangle(300, 810, 480, 130, ro({ stroke: RED, strokeWidth: 7 })); },
+  },
+});
+</script></body></html>

@@ -1,0 +1,30 @@
+[
+ {
+  "id": "hook1",
+  "text": "Monday is international chest day!",
+  "voice": "am_onyx",
+  "speed": 1.08
+ },
+ {
+  "id": "hook2",
+  "text": "Sound familiar?",
+  "post": 0.6
+ },
+ {
+  "id": "what",
+  "text": "The bro split trains one muscle group per day. Chest, back, shoulders, arms, legs."
+ },
+ {
+  "id": "pros",
+  "text": "Huge pump, lots of exercises per muscle, and honestly, it's fun."
+ },
+ {
+  "id": "cons",
+  "text": "The trade-off: each muscle gets trained only once a week. Many coaches recommend at least twice."
+ },
+ {
+  "id": "out",
+  "text": "It can still work if you train hard and love it. Next up: the hybrid split. Save this.",
+  "post": 1.0
+ }
+]

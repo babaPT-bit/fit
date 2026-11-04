@@ -1,0 +1,30 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Bro Split</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/splitkit.js"></script>
+<script>
+const WEEK = ['CHEST', 'BACK', 'SHLD', 'ARMS', 'LEGS', 'REST', 'REST'];
+SplitRun({
+  ep: 5, key: /^(chest|international|bro|one|muscle|pump|fun|once|twice|coaches)/i,
+  hook: [['INTERNATIONAL', 120], ['CHEST DAY?', 140]],
+  titles: { what: ['The bro split', 'one muscle per day'], pros: ['The good', null], cons: ['The trade-off', null], out: ['Bro split', null] },
+  scenes: {
+    hook: (t, st, c) => { bro({ x: 330, y: 1650, s: 440 }, t, speaking('hook1', t), { flex: 0.9 }); calendar(540, 600, WEEK, 0.15, 128, 220, [0]); if (t > SEG.hook1.vo - 0.1) say(720, 950, 420, 'MONDAY = CHEST DAY!', [600, 1080], 60); },
+    what: (t, st, c) => calendar(540, 620, WEEK, st.u * 1.7),
+    pros: (t, st, c) => { bro({ x: 330, y: 1650, s: 440 }, t, false, { flex: 0.7 + 0.3 * Math.sin(t * 4) }); sticky(580, 700, 420, 400, 0.04, [['huge pump ✓', 60, RED], ['lots of variety ✓', 54], ['fun ✓', 60]], fade(st.u, 0.1, 0.25)); },
+    cons: (t, st, c) => { calendar(540, 520, WEEK, 1, 128, 260, [0]); label('chest: once a week', 540, 960, RED, 70); label('many coaches: at least 2×', 540, 1060, INK, 60); bodyMap({ x: 540, y: 1700, s: 330 }, { chest: RED }); },
+    out: (t, st, c) => { label('still works if you train hard', 540, 760, INK, 60); nextCard('Ep 6: The hybrid split', st.u); },
+  },
+});
+</script></body></html>

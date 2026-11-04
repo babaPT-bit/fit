@@ -1,0 +1,25 @@
+[
+ {
+  "id": "hook1",
+  "text": "Can't decide between upper lower and push pull legs? Combine them.",
+  "speed": 1.0,
+  "post": 0.6
+ },
+ {
+  "id": "what",
+  "text": "Upper, lower, rest, then push, pull, legs."
+ },
+ {
+  "id": "pros",
+  "text": "Five days, every muscle twice a week, and your weekends off."
+ },
+ {
+  "id": "who",
+  "text": "It works best once you've been training for six months or more."
+ },
+ {
+  "id": "out",
+  "text": "Next up: which split is right for you. Save this.",
+  "post": 1.0
+ }
+]

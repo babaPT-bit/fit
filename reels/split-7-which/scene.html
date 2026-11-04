@@ -1,0 +1,31 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Which Split</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/splitkit.js"></script>
+<script>
+const OPT = [['3 days', 'FULL BODY', COL.FULL], ['4 days', 'UPPER / LOWER', COL.UPPER], ['5 days', 'HYBRID', COL.LOWER], ['6 days', 'PUSH PULL LEGS', COL.PUSH]];
+const RANDOM = ['CHEST', 'ARMS', 'LEGS', 'BACK', 'SHLD', 'PUSH', 'PULL', 'REST', 'FULL', 'UPPER'];
+SplitRun({
+  ep: 7, key: /^(split|count|days|really|dream|full|upper|lower|hybrid|push|pull|legs|random|plan|progress|repeat|two|months)/i,
+  hook: [['WHICH SPLIT', 140], ['IS FOR YOU?', 140]],
+  titles: { count: ['Step 1', 'count your REAL days'], map: ['Step 2', 'match your split'], warn: ['The worst split', null], out: ['Stick with it', null] },
+  scenes: {
+    hook: (t, st, c) => { ['FULL', 'UPPER', 'PUSH', 'CHEST'].forEach((d, i) => { ctx.save(); ctx.translate(200 + (i % 2) * 680, 780 + Math.floor(i / 2) * 400); ctx.rotate((i % 2 ? 1 : -1) * 0.1); S.rc.rectangle(-110, -150, 220, 300, ro({ stroke: COL[d], strokeWidth: 6, fill: COL[d], fillStyle: 'hachure', hachureGap: 14 })); label(d, 0, 10, '#f4f1ea', 56); ctx.restore(); }); man({ x: 540, y: 1680, s: 380 }, { face: 'confused', look: Math.sin(t * 3), arms: { L: [40, 100], R: [40, 100] } }); },
+    count: (t, st, c) => { label('dream: 6 days', 540, 700, INK, 80); cross(540, 680, 520, 90); label('real: 4 days', 540, 950, RED, 90); mark(true, 860, 930, 100); calendar(540, 1120, ['UPPER', 'LOWER', 'REST', 'UPPER', 'LOWER', 'REST', 'REST'], st.u * 2, 128, 260); },
+    map: (t, st, c) => { OPT.forEach(([d, s2, col], i) => { const a = fade(st.u, i * 0.18, i * 0.18 + 0.12); if (a <= 0) return; ctx.globalAlpha = a; const y = 560 + i * 280; S.rc.circle(220, y, 170, ro({ strokeWidth: 6 })); label(d, 220, y + 18, INK, 54); arrow(320, y, 470, y, RED); label(s2, 720, y + 20, col, 74); ctx.globalAlpha = 1; }); },
+    warn: (t, st, c) => { const k = Math.floor(t * 2); calendar(540, 560, [0, 1, 2, 3, 4, 5, 6].map(i => RANDOM[(i * 3 + k * 7) % RANDOM.length]), 1, 128, 300); mark(false, 540, 1080, 140); label('no plan = no progress', 540, 1280, RED, 76); label("you can't progress what you don't repeat", 540, 1380, INK, 50); },
+    out: (t, st, c) => { label('pick ONE', 540, 760, RED, 100); label('run it for 2+ months', 540, 880, INK, 70); nextCard('Exercises by movement', st.u); },
+  },
+});
+</script></body></html>

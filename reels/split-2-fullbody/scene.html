@@ -1,0 +1,31 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Full Body Split</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/splitkit.js"></script>
+<script>
+const WEEK = ['FULL', 'REST', 'FULL', 'REST', 'FULL', 'REST', 'REST'];
+SplitRun({
+  ep: 2, key: /^(three|full|body|whole|rest|squat|press|pull|beginners|busy|long|catch)/i,
+  hook: [['ONLY 3 DAYS', 140], ['A WEEK?', 150]],
+  titles: { what: ['Full body', 'whole body, every session'], week: ['The week', null], pros: ['The good', null], cons: ['The catch', null], out: ['Full body', null] },
+  scenes: {
+    hook: (t, st, c) => { calendar(540, 760, ['FULL', 'REST', 'FULL', 'REST', 'FULL', 'REST', 'REST'], 0, 128, 300, [0, 2, 4]); man({ x: 540, y: 1680, s: 380 }, { face: 'confused', arms: { L: [40, 100], R: [40, 100] } }); },
+    what: (t, st, c) => bodyMap({ x: 540, y: 1640, s: 560 }, ALL(INK), 'EVERYTHING', INK),
+    week: (t, st, c) => { calendar(540, 520, WEEK, st.u * 1.6); for (const [txt, i] of [['squat', 0], ['press', 1], ['pull', 2]]) label('· ' + txt, 540, 1050 + i * 90, RED, 70); },
+    pros: (t, st, c) => { bodyMap({ x: 330, y: 1600, s: 440 }, ALL(RED)); sticky(560, 760, 440, 420, 0.04, [['3× / week', 72, RED], ['per muscle', 56], ['beginners ✓', 56], ['busy people ✓', 56]], fade(st.u, 0.1, 0.25)); },
+    cons: (t, st, c) => { S.rc.circle(540, 900, 380, ro({ strokeWidth: 6 })); S.rc.line(540, 900, 540 + 140 * Math.cos(t * 2), 900 + 140 * Math.sin(t * 2), ro({ stroke: RED, strokeWidth: 6 })); label('long sessions', 540, 1190, RED, 70); label('less work per muscle', 540, 1290, INK, 64); mark(false, 860, 700, 100); },
+    out: (t, st, c) => nextCard('Ep 3: Upper / Lower', st.u),
+  },
+});
+</script></body></html>
