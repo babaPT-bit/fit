@@ -1,0 +1,29 @@
+[
+ {
+  "id": "hook",
+  "text": "Here's a full four-day program. Screenshot this.",
+  "speed": 1.0,
+  "post": 0.6
+ },
+ {
+  "id": "d1",
+  "text": "Upper one. Bench press, rows, overhead press, pulldowns, curls, and triceps pushdowns."
+ },
+ {
+  "id": "d2",
+  "text": "Lower one. Squats, Romanian deadlifts, leg extensions, leg curls, and calf raises."
+ },
+ {
+  "id": "d3",
+  "text": "Upper two. Incline dumbbell press, chest-supported rows, lateral raises, pull-ups, and overhead triceps extensions."
+ },
+ {
+  "id": "d4",
+  "text": "Lower two. Leg press, hip thrusts, Bulgarian split squats, seated leg curls, and core."
+ },
+ {
+  "id": "out",
+  "text": "Three sets each, eight to twelve reps, close to failure. Add a rep every week. Save this.",
+  "post": 1.0
+ }
+]

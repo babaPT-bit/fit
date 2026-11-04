@@ -1,0 +1,50 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Example Program</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/splitkit.js"></script>
+<script src="../lib/movekit.js"></script>
+<script>
+const DAYS = {
+  d1: ['UPPER 1', COL.UPPER, ['Bench press', 'Barbell row', 'Overhead press', 'Lat pulldown', 'Curls', 'Triceps pushdown']],
+  d2: ['LOWER 1', COL.LOWER, ['Squat', 'Romanian deadlift', 'Leg extension', 'Leg curl', 'Calf raise']],
+  d3: ['UPPER 2', COL.UPPER, ['Incline DB press', 'Chest-supported row', 'Lateral raise', 'Pull-ups', 'Overhead triceps ext.']],
+  d4: ['LOWER 2', COL.LOWER, ['Leg press', 'Hip thrust', 'Bulgarian split squat', 'Seated leg curl', 'Core']],
+};
+function card(name, col, ex, u) {
+  S.rc.rectangle(110, 470, 860, 1100, ro({ strokeWidth: 6, stroke: col, fill: '#fbf9f3', fillStyle: 'solid' }));
+  label(name, 540, 580, col, 100);
+  ex.forEach((e, i) => { if (u * ex.length * 1.25 > i) { label('□  ' + e, 180, 720 + i * 130, INK, 64, 'left'); label('3 × 8–12', 940, 720 + i * 130, SOFT, 48, 'right'); } });
+}
+window.drawFrame = function (t) {
+  begin(t);
+  const st = segAt(t), id = st.id;
+  if (id === 'hook') {
+    calendar(540, 800, ['UPPER', 'LOWER', 'REST', 'UPPER', 'LOWER', 'REST', 'REST'], Math.min(1, t / 2.5));
+    label('📸 screenshot this', 540, 1350, RED, 70);
+    bigHook([['FULL 4-DAY', 140], ['PROGRAM', 160]], 0, t, 260);
+  } else if (DAYS[id]) {
+    const [n, col, ex] = DAYS[id]; calendar(540, 220, ['UPPER', 'LOWER', 'REST', 'UPPER', 'LOWER', 'REST', 'REST'], 1, 128, 180, [{ d1: 0, d2: 1, d3: 3, d4: 4 }[id]]);
+    card(n, col, ex, st.u); flash(st.lt);
+  } else {
+    heading('The rules', null);
+    sticky(140, 520, 800, 640, -0.02, [['3 sets each', 80, RED], ['8–12 reps', 76], ['close to failure', 70], ['+1 rep every week', 70, RED]], fade(st.u, 0.05, 0.2));
+    if (st.u > 0.35) saveStamp(800, 1400);
+    flash(st.lt);
+  }
+  epTag(25);
+  caption(t, /^(program|upper|lower|bench|rows|squats|press|curls|three|sets|eight|twelve|failure|rep)/i);
+  return cv.toDataURL('image/png');
+};
+fontsReady();
+</script></body></html>

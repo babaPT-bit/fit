@@ -1,0 +1,47 @@
+[
+ {
+  "id": "hook",
+  "text": "You've watched the whole series. Now let's build your program.",
+  "speed": 1.0,
+  "post": 0.6,
+  "file": "hook.wav",
+  "dur": 3.541
+ },
+ {
+  "id": "s1",
+  "text": "Step one. Pick your split, from the days you can really train.",
+  "file": "s1.wav",
+  "dur": 3.605
+ },
+ {
+  "id": "s2",
+  "text": "Step two. Each day, pick one or two exercises for each movement. A press, a pull, a squat, and a hinge.",
+  "file": "s2.wav",
+  "dur": 6.869
+ },
+ {
+  "id": "s3",
+  "text": "Step three. Aim for ten to twenty hard sets per muscle, every week.",
+  "file": "s3.wav",
+  "dur": 4.16
+ },
+ {
+  "id": "s4",
+  "text": "Step four. Add a rep, or a little weight, every week. And write it down.",
+  "file": "s4.wav",
+  "dur": 4.075
+ },
+ {
+  "id": "s5",
+  "text": "Step five. Every six to eight weeks, take an easier week to recover.",
+  "file": "s5.wav",
+  "dur": 4.096
+ },
+ {
+  "id": "out",
+  "text": "That's it. You now know more than most people in your gym. Save this.",
+  "post": 1.0,
+  "file": "out.wav",
+  "dur": 3.563
+ }
+]

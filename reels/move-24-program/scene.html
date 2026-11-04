@@ -1,0 +1,54 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Build Your Program</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/splitkit.js"></script>
+<script src="../lib/movekit.js"></script>
+<script>
+const STEPS = { s1: ['1', 'Pick your split'], s2: ['2', 'Pick exercises'], s3: ['3', 'Set your volume'], s4: ['4', 'Progress'], s5: ['5', 'Deload'] };
+function stepBadge(n, title) { S.rc.circle(150, 330, 150, ro({ stroke: RED, strokeWidth: 8 })); label(n, 150, 360, RED, 100); label(title, 600, 360, INK, 86); }
+function notebook(x, y, w, h, rows, u) {
+  S.rc.rectangle(x, y, w, h, ro({ strokeWidth: 5, fill: '#fbf9f3', fillStyle: 'solid' }));
+  for (let i = 0; i < 6; i++) S.rc.circle(x, y + 60 + i * (h - 120) / 5, 26, ro({ strokeWidth: 4 }));
+  rows.forEach((r, i) => { if (u * rows.length * 1.3 > i) label(r[0], x + 60, y + 90 + i * 85, r[1] || INK, 56, 'left'); });
+}
+window.drawFrame = function (t) {
+  begin(t);
+  const st = segAt(t), c = rep(t, 2.4), id = st.id;
+  if (id === 'hook') {
+    const W = ['FULL', 'UPPER', 'PUSH', 'LEGS'];
+    W.forEach((d, i) => { ctx.save(); ctx.translate(200 + (i % 2) * 680, 780 + Math.floor(i / 2) * 400); ctx.rotate((i % 2 ? 1 : -1) * 0.1); S.rc.rectangle(-110, -150, 220, 300, ro({ stroke: COL[d], strokeWidth: 6, fill: COL[d], fillStyle: 'hachure', hachureGap: 14 })); ctx.restore(); });
+    man({ x: 540, y: 1700, s: 420 }, { arms: { L: [80, 100], R: [80, 100] }, flex: 0.8, flexSide: 'LR' });
+    bigHook([['BUILD YOUR', 140], ['PROGRAM', 160]], 0, t, 260);
+  } else if (STEPS[id]) {
+    stepBadge(...STEPS[id]);
+    if (id === 's1') { OPT_ROWS(st.u); }
+    if (id === 's2') { ['PRESS', 'PULL', 'SQUAT', 'HINGE'].forEach((m, i) => { const a = fade(st.u, i * 0.15, i * 0.15 + 0.12); if (a <= 0) return; ctx.globalAlpha = a; const x = 290 + (i % 2) * 500, y = 760 + Math.floor(i / 2) * 520; S.rc.rectangle(x - 210, y - 200, 420, 400, ro({ stroke: RED, strokeWidth: 6 })); icon(['barbell', 'cable', 'kettlebell', 'trapbar'][i], x, y - 50, 0.9); label(m, x, y + 140, RED, 76); ctx.globalAlpha = 1; }); }
+    if (id === 's3') { bars(540, 1350, [{ label: '< 10', v: 0.3 }, { label: '10–20', v: 0.7, on: true, value: '✓' }, { label: '30+', v: 0.95 }], 600, 200, 80); label('hard sets / muscle / week', 540, 1500, INK, 58); }
+    if (id === 's4') notebook(180, 560, 720, 760, [['Week 1:  60 kg × 8', INK], ['Week 2:  60 kg × 9', INK], ['Week 3:  60 kg × 10', INK], ['Week 4:  62.5 kg × 8', RED], ['Week 5:  62.5 kg × 9', RED], ['… keep going ↑', RED]], st.u);
+    if (id === 's5') { bars(540, 1300, [1, 1, 1, 1, 1, 1, 0.5].map((v, i) => ({ label: 'W' + (i + 1), v: v * (0.5 + i * 0.05), on: i === 6 })), 500, 100, 25); label('easier week = recover', 540, 1460, RED, 66); }
+    flash(st.lt);
+  } else {
+    heading('You did it', null);
+    man({ x: 540, y: 1650, s: 460 }, { arms: { L: [150, 10], R: [150, 10] } });
+    label('you know more than', 540, 700, INK, 70); label('most of your gym', 540, 790, RED, 80);
+    if (st.u > 0.35) saveStamp(800, 470);
+    flash(st.lt);
+  }
+  epTag(24);
+  caption(t, /^(program|split|days|press|pull|squat|hinge|ten|twenty|sets|rep|weight|write|easier|week|recover)/i);
+  return cv.toDataURL('image/png');
+};
+function OPT_ROWS(u) { [['3 days', 'FULL BODY', COL.FULL], ['4 days', 'UPPER / LOWER', COL.UPPER], ['5 days', 'HYBRID', COL.LOWER], ['6 days', 'PPL', COL.PUSH]].forEach(([d, s2, col], i) => { const a = fade(u, i * 0.15, i * 0.15 + 0.1); if (a <= 0) return; ctx.globalAlpha = a; const y = 640 + i * 260; S.rc.circle(220, y, 170, ro({ strokeWidth: 6 })); label(d, 220, y + 18, INK, 54); arrow(320, y, 470, y, RED); label(s2, 720, y + 20, col, 74); ctx.globalAlpha = 1; }); }
+fontsReady();
+</script></body></html>
