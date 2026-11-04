@@ -1,0 +1,31 @@
+[
+ {
+  "id": "hook1",
+  "text": "Whey is the only real protein. Everything else is a scam!",
+  "voice": "am_onyx",
+  "speed": 1.08
+ },
+ {
+  "id": "hook2",
+  "text": "Let's put all three side by side.",
+  "speed": 1.0,
+  "post": 0.5
+ },
+ {
+  "id": "what",
+  "text": "Whey has the most research, and it digests fast."
+ },
+ {
+  "id": "help",
+  "text": "Plant blends work almost as well, and suit vegans and lactose-intolerant people."
+ },
+ {
+  "id": "how",
+  "text": "Yeast protein is the newest, and dairy-free, but has the least research."
+ },
+ {
+  "id": "out",
+  "text": "Most important of all? Your daily total. About one point six grams per kilo of body weight. Save this.",
+  "post": 1.0
+ }
+]

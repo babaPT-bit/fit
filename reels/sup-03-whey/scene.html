@@ -1,0 +1,24 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Whey Protein</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/supkit.js"></script>
+<script>
+SupRun({ ep: '3/11', speaker: 'normie', verdict: 'yes', doctor: 'Kidney disease? Talk to your doctor.', key: /^(protein|kidneys|hospital|whey|milk|complete|fast|leucine|healthy|scoop|target|isolate|lactose)/i,
+  hook: [['PROTEIN DESTROYS', 120], ['YOUR KIDNEYS?', 140]], bubble: 'Protein shakes will DESTROY your kidneys!', hookProp: ['kidney', 'your kidneys', '#8a3b2b'],
+  what: { title: ['What is whey?', 'milk protein, filtered + dried'], extra: (t) => { S.rc.rectangle(170, 760, 160, 300, ro({ strokeWidth: 6, fill: '#fbf9f3', fillStyle: 'solid' })); label('MILK', 250, 920, INK, 50); arrow(380, 910, 560, 910, RED); tub(780, 980, 1.1, 'WHEY'); notes([['complete · fast · leucine-rich', 56, RED]], 1, 1300); } },
+  help: { title: ['Kidneys?', 'healthy people: no harm shown'], items: [['kidney', 'healthy kidneys ✓', GREEN]] },
+  how: { title: ['How to use it', null], notes: [['1 scoop when food', 64], ['falls short', 64], ['isolate = less lactose', 64, RED]], notesY: 600 },
+  out: { title: ['Verdict', 'for convenience'] },
+});
+</script></body></html>

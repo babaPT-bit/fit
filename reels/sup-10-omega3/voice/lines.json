@@ -1,0 +1,43 @@
+[
+ {
+  "id": "hook1",
+  "text": "Fish oil? That's for grandpas!",
+  "voice": "am_onyx",
+  "speed": 1.08,
+  "file": "hook1.wav",
+  "dur": 2.411
+ },
+ {
+  "id": "hook2",
+  "text": "Your heart would like a word.",
+  "speed": 1.0,
+  "post": 0.5,
+  "file": "hook2.wav",
+  "dur": 1.685
+ },
+ {
+  "id": "what",
+  "text": "Omega-3s are healthy fats found in fatty fish. They support your heart, and may help your joints.",
+  "file": "what.wav",
+  "dur": 6.187
+ },
+ {
+  "id": "help",
+  "text": "Eat fatty fish like salmon or sardines twice a week, and you may not need a supplement.",
+  "file": "help.wav",
+  "dur": 5.291
+ },
+ {
+  "id": "how",
+  "text": "If you don't, fish oil or algae oil fills the gap. Take it with a meal.",
+  "file": "how.wav",
+  "dur": 4.203
+ },
+ {
+  "id": "out",
+  "text": "You can start, but if you're on blood thinners or have a heart condition, check with your doctor first. Save this.",
+  "post": 1.0,
+  "file": "out.wav",
+  "dur": 6.229
+ }
+]

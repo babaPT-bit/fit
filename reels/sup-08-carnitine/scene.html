@@ -1,0 +1,24 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>L-Carnitine</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/supkit.js"></script>
+<script>
+SupRun({ ep: '8/11', speaker: 'bro', verdict: 'no', key: /^(l-carnitine|belly|fat|sleep|cells|burned|enough|healthy|little|deficit|protein|training)/i,
+  hook: [['MELTS BELLY', 140], ['FAT?', 160]], bubble: 'L-carnitine MELTS belly fat while you SLEEP, bro!', hookProp: ['bottle', 'L-CARN', '#d9822b'],
+  what: { title: ['What it does', 'carries fat into your cells'], extra: (t) => { label('your body already makes enough', 540, 1300, RED, 58); S.rc.circle(540, 950, 420, ro({ strokeWidth: 6 })); label('cell', 540, 970, INK, 64); for (let i = 0; i < 4; i++) { const a = t * 1.5 + i * 1.57; S.rc.circle(540 + Math.cos(a) * 300, 950 + Math.sin(a) * 300, 50, ro({ strokeWidth: 4, stroke: '#d9822b', fill: 'rgba(217,130,43,0.4)', fillStyle: 'solid' })); } } },
+  help: { title: ['Studies say', 'healthy people'], bars: [{ label: 'placebo', v: 0.4, value: 'fat loss' }, { label: 'L-carnitine', v: 0.43, on: true, value: '≈ same' }] },
+  how: { title: ['What actually works', null], notes: [['calorie deficit', 72, RED], ['+ protein', 68], ['+ training', 68]], notesY: 600 },
+  out: { title: ['Verdict', 'for fat loss'] },
+});
+</script></body></html>

@@ -1,0 +1,43 @@
+[
+ {
+  "id": "hook1",
+  "text": "Protein made from yeast? What's next, protein from bread?",
+  "voice": "am_onyx",
+  "speed": 1.08,
+  "file": "hook1.wav",
+  "dur": 3.605
+ },
+ {
+  "id": "hook2",
+  "text": "Actually... kind of. Here's how it works.",
+  "speed": 1.0,
+  "post": 0.5,
+  "file": "hook2.wav",
+  "dur": 2.603
+ },
+ {
+  "id": "what",
+  "text": "Yeast protein is made by fermentation. The yeast grows, and it's processed into a protein powder.",
+  "file": "what.wav",
+  "dur": 6.251
+ },
+ {
+  "id": "help",
+  "text": "It's a complete protein, dairy-free, and plant-based.",
+  "file": "help.wav",
+  "dur": 3.008
+ },
+ {
+  "id": "how",
+  "text": "But it's new. There's far less research on it than on whey or plant protein.",
+  "file": "how.wav",
+  "dur": 4.416
+ },
+ {
+  "id": "out",
+  "text": "Verdict: promising, but not proven yet. Save this.",
+  "post": 1.0,
+  "file": "out.wav",
+  "dur": 3.115
+ }
+]

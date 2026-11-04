@@ -1,0 +1,24 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Pre-workout</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/supkit.js"></script>
+<script>
+SupRun({ ep: '7/11', speaker: 'normie', verdict: 'maybe', key: /^(pre|tingling|dying|caffeine|energy|beta-alanine|harmless|citrulline|pump|double|scoop|six|bed|coffee)/i,
+  hook: [['FACE TINGLING', 130], ['= DYING?', 150]], bubble: 'Took 2 scoops of pre… my face is TINGLING, am I DYING?!', hookProp: ['tub', 'PRE', '#7b3fb8'],
+  what: { title: ['The main ingredient', 'caffeine'], items: [['cup', 'caffeine = energy + focus']] },
+  help: { title: ['The others', null], notes: [['tingle = beta-alanine', 64, RED], ['(harmless)', 54], ['pump = citrulline', 64, RED]], notesY: 600, extra: (t) => { const m = man({ x: 540, y: 1700, s: 330 }, {}); for (let i = 0; i < 6; i++) label('~', m.head[0] - 80 + i * 30, m.head[1] - 60 + Math.sin(t * 9 + i) * 10, RED, 44); } },
+  how: { title: ['How to use it', null], notes: [['check caffeine / scoop', 64, RED], ['never double scoop', 64], ['not within 6 h of bed', 64]], notesY: 600 },
+  out: { title: ['Verdict', 'a strong coffee does most of it'] },
+});
+</script></body></html>

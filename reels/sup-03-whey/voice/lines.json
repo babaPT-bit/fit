@@ -1,0 +1,43 @@
+[
+ {
+  "id": "hook1",
+  "text": "Protein shakes will destroy your kidneys!",
+  "voice": "am_puck",
+  "speed": 1.1,
+  "file": "hook1.wav",
+  "dur": 1.984
+ },
+ {
+  "id": "hook2",
+  "text": "If that were true, every gym would be a hospital. So what is whey, really?",
+  "speed": 1.0,
+  "post": 0.5,
+  "file": "hook2.wav",
+  "dur": 4.309
+ },
+ {
+  "id": "what",
+  "text": "Whey is just milk protein, filtered and dried. It's a complete protein, it digests fast, and it's rich in leucine.",
+  "file": "what.wav",
+  "dur": 7.147
+ },
+ {
+  "id": "help",
+  "text": "In healthy people, studies haven't shown higher-protein diets harming the kidneys.",
+  "file": "help.wav",
+  "dur": 4.693
+ },
+ {
+  "id": "how",
+  "text": "Use a scoop when food alone doesn't hit your protein target. Isolate has less lactose, if dairy bothers you.",
+  "file": "how.wav",
+  "dur": 6.955
+ },
+ {
+  "id": "out",
+  "text": "Verdict: worth it for convenience. Have kidney disease? Talk to your doctor. Save this.",
+  "post": 1.0,
+  "file": "out.wav",
+  "dur": 5.184
+ }
+]

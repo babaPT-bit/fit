@@ -1,0 +1,24 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Plant Protein</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/supkit.js"></script>
+<script>
+SupRun({ ep: '4/11', speaker: 'bro', verdict: 'yes', key: /^(plant|grass|pea|rice|soy|leucine|blends|whey|vegan|dairy|scoop)/i,
+  hook: [['PLANT PROTEIN', 130], ["CAN'T BUILD MUSCLE?", 110]], bubble: "Plant protein? You can't build muscle eating GRASS!", hookProp: ['tub', 'PLANT', GREEN],
+  what: { title: ['Plant proteins', 'pea · rice · soy'], items: [['tub', 'PEA', GREEN], ['tub', 'RICE', '#d9822b'], ['tub', 'SOY', '#7a4a1a']] },
+  help: { title: ['The trick: blend', null], bars: [{ label: 'pea only', v: 0.6 }, { label: 'pea + rice', v: 0.8, on: true }, { label: 'whey', v: 0.82 }], extra: () => label('similar results when protein is matched', 540, 1480, RED, 50) },
+  how: { title: ['How to use it', null], notes: [['pick a blend', 72, RED], ['or a slightly bigger scoop', 60], ['vegan / dairy issues ✓', 60]], notesY: 600 },
+  out: { title: ['Verdict', null] },
+});
+</script></body></html>

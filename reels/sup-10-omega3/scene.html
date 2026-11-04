@@ -1,0 +1,24 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Omega-3</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/supkit.js"></script>
+<script>
+SupRun({ ep: '10/11', speaker: 'bro', verdict: 'yes', doctor: ['On blood thinners or a heart', 'condition? Check with your doctor first.'], key: /^(fish|oil|grandpas|heart|omega-3s|fats|joints|salmon|sardines|twice|algae|meal)/i,
+  hook: [['FISH OIL =', 150], ['FOR GRANDPAS?', 140]], bubble: 'Fish oil? That\'s for GRANDPAS!', hookProp: ['bottle', 'FISH OIL', '#2b6cb0'],
+  what: { title: ['Omega-3', 'healthy fats in fatty fish'], items: [['fish', 'fatty fish'], ['man', 'heart + joints']] },
+  help: { title: ['Food first', 'fatty fish 2× a week'], items: [['fish', 'salmon'], ['fish', 'sardines']] },
+  how: { title: ['No fish?', null], items: [['bottle', 'FISH OIL', '#2b6cb0'], ['bottle', 'ALGAE', GREEN]], extra: () => label('take it with a meal', 540, 1400, RED, 62) },
+  out: { title: ['Verdict', 'if you don\'t eat fish'] },
+});
+</script></body></html>

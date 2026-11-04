@@ -1,0 +1,31 @@
+[
+ {
+  "id": "hook1",
+  "text": "Creatine? That's basically steroids! It'll wreck your kidneys and make you bald!",
+  "voice": "am_puck",
+  "speed": 1.1
+ },
+ {
+  "id": "hook2",
+  "text": "That's a lot of fear, for something your body already makes.",
+  "speed": 1.0,
+  "post": 0.5
+ },
+ {
+  "id": "what",
+  "text": "Creatine is stored in your muscles, and you get some from meat and fish. It's one of the most researched supplements in the world."
+ },
+ {
+  "id": "help",
+  "text": "Topping it up helps you squeeze out a rep or two more, so you build more strength and muscle over time."
+ },
+ {
+  "id": "how",
+  "text": "Take three to five grams of creatine monohydrate every day, any time. No loading needed. The early weight gain is water inside your muscle, not fat."
+ },
+ {
+  "id": "out",
+  "text": "Verdict: worth it. If you have kidney problems, ask your doctor first. Save this.",
+  "post": 1.0
+ }
+]

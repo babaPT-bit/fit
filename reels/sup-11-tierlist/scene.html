@@ -1,0 +1,25 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Supplement Tier List</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/supkit.js"></script>
+<script>
+function tier(y, name, col, items, on) { ctx.globalAlpha = on ? 1 : 0.3; S.rc.rectangle(80, y - 120, 200, 240, ro({ strokeWidth: 6, stroke: col, fill: col, fillStyle: 'solid' })); label(name, 180, y + 20, '#ffffff', name.length > 5 ? 46 : 56); S.rc.rectangle(280, y - 120, 720, 240, ro({ strokeWidth: 4, stroke: col })); items.forEach((it, i) => label(it, 310, y - 40 + i * 62, INK, 52, 'left')); ctx.globalAlpha = 1; }
+const T = [['WORTH IT', GREEN, ['creatine', 'protein powder', 'vitamin D (if low)']], ['MAYBE', '#d9822b', ['caffeine / pre-workout', 'omega-3 (no fish)']], ['SKIP', RED, ['fat burners', 'L-carnitine (fat loss)', 'BCAAs (enough protein)']]];
+const show = n => () => T.forEach((x, i) => tier(620 + i * 330, ...x, i < n));
+SupRun({ ep: '11/11', speaker: 'bro', verdict: 'info', key: /^(fat|burners|bcaas|boosters|pre-workouts|worth|creatine|protein|vitamin|maybe|caffeine|omega-3|skip|l-carnitine|food)/i,
+  hook: [['I NEED', 160], ['THEM ALL!', 150]], bubble: 'Fat burners, BCAAs, test boosters, 3 pre-workouts… I need them ALL!', hookProp: ['pills', '$$$', RED],
+  what: { title: ['The tier list', null], extra: show(1) }, help: { title: ['The tier list', null], extra: show(2) }, how: { title: ['The tier list', null], extra: show(3) },
+  out: { title: ['Food first', null], extra: () => label('spend on FOOD first', 540, 1150, RED, 80) },
+});
+</script></body></html>

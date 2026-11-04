@@ -1,0 +1,43 @@
+[
+ {
+  "id": "hook1",
+  "text": "Tired all the time, everything aches, and you barely see the sun?",
+  "voice": "am_puck",
+  "speed": 1.1,
+  "file": "hook1.wav",
+  "dur": 3.413
+ },
+ {
+  "id": "hook2",
+  "text": "It might not be your training. It could be your vitamin D.",
+  "speed": 1.0,
+  "post": 0.5,
+  "file": "hook2.wav",
+  "dur": 3.733
+ },
+ {
+  "id": "what",
+  "text": "Vitamin D supports your bones, muscles, and immune system. And many people are low, especially indoors or in winter.",
+  "file": "what.wav",
+  "dur": 7.573
+ },
+ {
+  "id": "help",
+  "text": "Vitamin K2 is often paired with it, to help put calcium into your bones.",
+  "file": "help.wav",
+  "dur": 4.843
+ },
+ {
+  "id": "how",
+  "text": "Take it with a meal that has some fat. On blood thinners? Check with your doctor first.",
+  "file": "how.wav",
+  "dur": 4.928
+ },
+ {
+  "id": "out",
+  "text": "You can start a basic dose, but get a blood test. If you're severely low, you may need a higher dose your doctor prescribes. Save this.",
+  "post": 1.0,
+  "file": "out.wav",
+  "dur": 7.851
+ }
+]

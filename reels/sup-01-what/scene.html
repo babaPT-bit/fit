@@ -1,0 +1,24 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>What Is A Supplement</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/supkit.js"></script>
+<script>
+SupRun({ ep: '1/11', speaker: 'bro', verdict: 'info', key: /^(supplements|twelve|grow|gaps|diet|food|sleep|training|creatine|protein|caffeine|vitamin|basics)/i,
+  hook: [['NO SUPPLEMENTS', 120], ['= NO GAINS?', 140]], bubble: 'No supplements? You\'ll NEVER grow! I take 12 a day!', hookProp: ['pills', '× 12', RED],
+  what: { title: ['A supplement…', 'fills gaps. Doesn\'t replace.'], extra: (t, st) => { const P = [['FOOD', 300, 760], ['SLEEP', 780, 760], ['TRAINING', 540, 1200]]; P.forEach(([n, x, y]) => { S.rc.circle(x, y, 300, ro({ strokeWidth: 7 })); label(n, x, y + 20, INK, 64); }); S.rc.circle(540, 900, 110, ro({ strokeWidth: 5, stroke: RED, fill: 'rgba(215,38,30,0.2)', fillStyle: 'solid' })); label('supps', 540, 915, RED, 46); } },
+  help: { title: ['Strong research', 'only a few'], extra: (t, st) => { [['tub', 'CREATINE'], ['shaker', 'protein'], ['cup', 'caffeine'], ['sun', 'vit D (if low)']].forEach((it, i) => { if (st.u * 4.5 > i) draw(it, 290 + (i % 2) * 500, 800 + Math.floor(i / 2) * 560, 0.85, t); }); } },
+  how: { title: ['The order', null], notes: [['1. Food', 72, RED], ['2. Sleep', 72, RED], ['3. Training', 72, RED], ['4. THEN supplements', 66]], notesY: 600 },
+  out: { title: ['This series', 'every supplement, explained'] },
+});
+</script></body></html>

@@ -1,0 +1,43 @@
+[
+ {
+  "id": "hook1",
+  "text": "No supplements? Bro, you'll never grow! I take twelve every morning!",
+  "voice": "am_onyx",
+  "speed": 1.08,
+  "file": "hook1.wav",
+  "dur": 4.011
+ },
+ {
+  "id": "hook2",
+  "text": "Twelve? Let's talk about that.",
+  "speed": 1.0,
+  "post": 0.5,
+  "file": "hook2.wav",
+  "dur": 1.92
+ },
+ {
+  "id": "what",
+  "text": "A supplement fills gaps in your diet. It doesn't replace food, sleep, or training.",
+  "file": "what.wav",
+  "dur": 4.843
+ },
+ {
+  "id": "help",
+  "text": "Only a few have strong research behind them. Creatine. Protein powder, for convenience. Caffeine. And vitamin D, if you're low.",
+  "file": "help.wav",
+  "dur": 8.725
+ },
+ {
+  "id": "how",
+  "text": "Get the basics right first. Then add supplements to fill real gaps.",
+  "file": "how.wav",
+  "dur": 4.139
+ },
+ {
+  "id": "out",
+  "text": "This series breaks down each one. Follow, so you don't miss it.",
+  "post": 1.0,
+  "file": "out.wav",
+  "dur": 3.477
+ }
+]

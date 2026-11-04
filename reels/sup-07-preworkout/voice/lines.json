@@ -1,0 +1,43 @@
+[
+ {
+  "id": "hook1",
+  "text": "Took two scoops of pre, my face is tingling, I think I'm dying!",
+  "voice": "am_puck",
+  "speed": 1.1,
+  "file": "hook1.wav",
+  "dur": 3.52
+ },
+ {
+  "id": "hook2",
+  "text": "You're probably fine. Here's what's inside that scoop.",
+  "speed": 1.0,
+  "post": 0.5,
+  "file": "hook2.wav",
+  "dur": 3.328
+ },
+ {
+  "id": "what",
+  "text": "Most of the effect comes from one ingredient: caffeine. It boosts energy, focus, and performance.",
+  "file": "what.wav",
+  "dur": 6.08
+ },
+ {
+  "id": "help",
+  "text": "The tingling is beta-alanine. It's harmless, and may help with higher-rep sets. Citrulline gives you the pump.",
+  "file": "help.wav",
+  "dur": 6.592
+ },
+ {
+  "id": "how",
+  "text": "Check the caffeine per scoop, never double scoop, and skip it within six hours of bed.",
+  "file": "how.wav",
+  "dur": 5.163
+ },
+ {
+  "id": "out",
+  "text": "Verdict: optional. A strong coffee does most of the job. Save this.",
+  "post": 1.0,
+  "file": "out.wav",
+  "dur": 4.245
+ }
+]

@@ -1,0 +1,31 @@
+[
+ {
+  "id": "hook1",
+  "text": "L-carnitine melts belly fat while you sleep, bro!",
+  "voice": "am_onyx",
+  "speed": 1.08
+ },
+ {
+  "id": "hook2",
+  "text": "If only. Here's what the studies found.",
+  "speed": 1.0,
+  "post": 0.5
+ },
+ {
+  "id": "what",
+  "text": "L-carnitine helps carry fat into your cells to be burned. But your body already makes enough."
+ },
+ {
+  "id": "help",
+  "text": "In healthy people, studies show little to no extra fat loss from taking more."
+ },
+ {
+  "id": "how",
+  "text": "A calorie deficit, protein, and training do the real work."
+ },
+ {
+  "id": "out",
+  "text": "Verdict: skip it for fat loss. Save this.",
+  "post": 1.0
+ }
+]

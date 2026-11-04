@@ -1,0 +1,24 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Yeast Protein</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script src="../lib/supkit.js"></script>
+<script>
+SupRun({ ep: '5/11', speaker: 'bro', verdict: 'maybe', key: /^(yeast|bread|fermentation|complete|dairy-free|plant-based|new|research|whey|plant)/i,
+  hook: [['PROTEIN FROM', 140], ['YEAST?!', 160]], bubble: 'Protein from YEAST? What\'s next, protein from BREAD?', hookProp: ['tub', 'YEAST', '#d9822b'],
+  what: { title: ['How it\'s made', 'fermentation'], extra: (t) => { for (let i = 0; i < 6; i++) S.rc.circle(220 + (i % 3) * 70, 900 + Math.floor(i / 3) * 70 + Math.sin(t * 3 + i) * 8, 60, ro({ strokeWidth: 4, stroke: '#d9822b', fill: 'rgba(217,130,43,0.3)', fillStyle: 'solid' })); label('yeast grows', 290, 1110, INK, 52); arrow(420, 930, 580, 930, RED); tub(780, 980, 1.1, 'YEAST', '#d9822b'); } },
+  help: { title: ['The good', null], notes: [['complete protein ✓', 70, GREEN], ['dairy-free ✓', 70, GREEN], ['plant-based ✓', 70, GREEN]], notesY: 600 },
+  how: { title: ['The catch', 'it\'s new'], bars: [{ label: 'whey', v: 0.9, value: 'lots' }, { label: 'plant', v: 0.6, value: 'some' }, { label: 'yeast', v: 0.15, on: true, value: 'little' }], extra: () => label('research so far', 540, 1480, INK, 54) },
+  out: { title: ['Verdict', 'promising, not proven yet'] },
+});
+</script></body></html>

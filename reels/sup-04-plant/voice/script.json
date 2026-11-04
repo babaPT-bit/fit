@@ -1,0 +1,31 @@
+[
+ {
+  "id": "hook1",
+  "text": "Plant protein? Bro, you can't build muscle eating grass!",
+  "voice": "am_onyx",
+  "speed": 1.08
+ },
+ {
+  "id": "hook2",
+  "text": "Let's check that.",
+  "speed": 1.0,
+  "post": 0.5
+ },
+ {
+  "id": "what",
+  "text": "Pea, rice, and soy protein can all build muscle. Single plant sources are just a bit lower in leucine."
+ },
+ {
+  "id": "help",
+  "text": "Blends like pea and rice fill that gap, and studies show results similar to whey when the protein is matched."
+ },
+ {
+  "id": "how",
+  "text": "Pick a blend, or use a slightly bigger scoop. Great if you're vegan, or dairy upsets your stomach."
+ },
+ {
+  "id": "out",
+  "text": "Verdict: worth it. Save this.",
+  "post": 1.0
+ }
+]
