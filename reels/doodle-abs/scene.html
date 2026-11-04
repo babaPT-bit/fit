@@ -1,0 +1,94 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Abs Reel</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script>
+const KEY = /^(lower|hips|crunch|ribs|six-pack|rectus|abdominis|hip|flexors|curl|pelvis|one|swing)/i;
+const add = (a, b, k = 1) => [a[0] + b[0] * k, a[1] + b[1] * k];
+const pol = (deg, k = 1) => [Math.cos(rad(deg)) * k, Math.sin(rad(deg)) * k];
+const toS = (o, p) => [o.x + p[0] * o.s, o.y - p[1] * o.s];
+
+// crunch on the floor, head on the left, knees bent. c 0..1 curl
+function crunchJ(c) {
+  const hip = [0.0, 0.12], knee = [0.32, 0.5], ankle = [0.62, 0.07];
+  const sh = add(hip, pol(180 - 32 * c), 0.52);
+  const elb = add(sh, pol(-20 - 32 * c), 0.18), hand = add(elb, pol(160 - 32 * c), 0.14);
+  return { hip, knee, ankle, sh, elb, hand, head: add(sh, pol(180 - 45 * c), 0.2), toe: add(ankle, pol(0), 0.12) };
+}
+// hanging leg raise, facing right. legs 0..1 raise, curl 0..1 pelvis curl at the top
+function hangJ(legs, curl) {
+  const hand = [0.0, 2.2], sh = [0.0, 1.62];
+  const hip = add(sh, pol(-90 + 14 * curl), 0.52);
+  const a = -90 + (95 + 15 * curl) * legs;
+  const knee = add(hip, pol(a), 0.45), ankle = add(knee, pol(a - 15 * legs), 0.43);
+  return { hip, knee, ankle, sh, elb: add(sh, pol(90), 0.3), hand, toe: add(ankle, pol(a - 15 * legs + 90), 0.12) };
+}
+// red band along the front of the torso (abs) or from the lower spine to the thigh (hip flexor)
+function absBand(o, J, on, side = 1) {
+  const n = add(J.sh, J.hip, -1), L = Math.hypot(...n), perp = [-n[1] / L * side, n[0] / L * side];
+  const a = toS(o, add(add(J.hip, n, 0.15), perp, 0.06)), b = toS(o, add(add(J.hip, n, 0.8), perp, 0.06));
+  S.rc.line(...a, ...b, ro(on ? { stroke: RED, strokeWidth: 16, roughness: 0.6 } : { stroke: SOFT, strokeWidth: 12, roughness: 0.6 }));
+}
+function flexorBand(o, J, on) {
+  const a = toS(o, add(J.hip, add(J.sh, J.hip, -1), 0.3)), b = toS(o, add(J.hip, add(J.knee, J.hip, -1), 0.4));
+  S.rc.line(...a, ...b, ro(on ? { stroke: RED, strokeWidth: 14, roughness: 0.6 } : { stroke: SOFT, strokeWidth: 10, roughness: 0.6 }));
+}
+// front view: one long six-pack muscle
+function absMap(cx, cy) {
+  S.rc.linearPath([[cx - 140, cy - 260], [cx - 120, cy + 230], [cx + 120, cy + 230], [cx + 140, cy - 260]], ro({ strokeWidth: 5 }));
+  S.rc.rectangle(cx - 80, cy - 230, 160, 440, ro(hatch(RED, 9)));
+  for (const yy of [-120, -10, 100]) S.rc.line(cx - 80, cy + yy, cx + 80, cy + yy, ro({ strokeWidth: 4 }));
+  S.rc.line(cx, cy - 230, cx, cy + 210, ro({ strokeWidth: 4 }));
+  S.rc.line(cx + 100, cy - 230, cx + 100, cy + 210, ro({ stroke: RED, strokeWidth: 6 }));
+  for (const yy of [-230, 210]) S.rc.line(cx + 85, cy + yy, cx + 115, cy + yy, ro({ stroke: RED, strokeWidth: 6 }));
+}
+function bar(o) { S.rc.line(...toS(o, [-0.5, 2.25]), ...toS(o, [0.5, 2.25]), ro({ strokeWidth: 12, stroke: '#4a4a4a' })); }
+function floor(o) { S.rc.line(...toS(o, [-0.9, 0]), ...toS(o, [0.9, 0]), ro({ strokeWidth: 5, stroke: SOFT })); }
+
+window.drawFrame = function (t) {
+  begin(t);
+  const { id, s, u, lt } = segAt(t), c = rep(t, 2.6);
+  if (id === 'hook') {
+    const o = { x: 520, y: 1720, s: 420 }, J = hangJ(c * 0.9, 0);
+    bar(o); flexorBand(o, J, true); sideFig(o, J, { mood: 'sad' });
+    const hp = toS(o, J.hip); ctx.globalAlpha = 0.5 + 0.5 * Math.sin(t * 9); S.rc.circle(...hp, 110, ro(hatch(RED, 7))); ctx.globalAlpha = 1;
+    bigHook([['ONLY FEEL IT', 140], ['IN YOUR HIPS?', 140]], s.start, t, 280);
+  } else if (id === 'a') {
+    heading('Crunch', 'ribs → hips');
+    const o = { x: 560, y: 1500, s: 600 }, J = crunchJ(c); floor(o); absBand(o, J, true, -1); sideFig(o, J, { face: -1 });
+    lens(820, 640, 210); absMap(820, 650); lensRing(820, 640, 210);
+    ctx.font = '700 56px Caveat'; ctx.fillStyle = RED; ctx.textAlign = 'center'; ctx.fillText('six-pack muscle', 820, 920);
+  } else if (id === 'b') {
+    heading('Hanging leg raise', 'legs up = hip flexors');
+    const legs = rep(t, 3.0), curl = Math.max(0, (legs - 0.75) / 0.25);
+    const o = { x: 440, y: 1720, s: 460 }, J = hangJ(legs, curl);
+    bar(o); flexorBand(o, J, true); absBand(o, J, curl > 0.3); sideFig(o, J);
+    ctx.font = '700 56px Caveat'; ctx.textAlign = 'center';
+    ctx.fillStyle = RED; ctx.fillText('hip flexor', 820, 700);
+    ctx.fillStyle = curl > 0.3 ? RED : SOFT; ctx.fillText(curl > 0.3 ? 'curl = ABS ON' : 'abs: barely', 820, 790);
+  } else if (id === 'why') {
+    heading("There's no 'lower ab'", null);
+    lens(540, 900, 400); absMap(540, 920); lensRing(540, 900, 400);
+    ctx.font = '700 90px Caveat'; ctx.fillStyle = RED; ctx.textAlign = 'center'; ctx.fillText('ONE muscle', 540, 1420);
+  } else {
+    heading('Curl, don\'t swing', null);
+    const legs = rep(t, 3.0), curl = Math.max(0, (legs - 0.6) / 0.4);
+    const o = { x: 440, y: 1720, s: 460 }, J = hangJ(legs, curl);
+    bar(o); flexorBand(o, J, false); absBand(o, J, curl > 0.2); sideFig(o, J);
+    mark(true, 850, 760, 130);
+    if (u > 0.35) saveStamp(820, 480);
+  }
+  if (id !== 'hook') flash(lt);
+  caption(t, KEY);
+  return cv.toDataURL('image/png');
+};
+fontsReady();
+</script></body></html>

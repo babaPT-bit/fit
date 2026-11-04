@@ -1,0 +1,89 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Lat Pulldown Reel</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script>
+const KEY = /^(wider|wide|close|upper|deeper|range|biceps|lats|small|control|switch)/i;
+const toS = (o, p) => [o.x + p[0] * o.s, o.y - p[1] * o.s];
+
+// seated pulldown, front view. grip: half-width of the hands; depth: how far down the bar can come
+function pulldown(o, grip, c, depth) {
+  const barY = 2.05 - (2.05 - depth) * c;
+  // machine: top pulley, seat, knee pad
+  S.rc.line(...toS(o, [0, 2.75]), ...toS(o, [0, barY]), ro({ strokeWidth: 3, stroke: '#4a4a4a' }));
+  S.rc.circle(...toS(o, [0, 2.78]), 34, ro({ strokeWidth: 5 }));
+  S.rc.rectangle(...toS(o, [-0.3, 0.98]), 0.6 * o.s, 0.08 * o.s, ro({ strokeWidth: 5, stroke: '#4a4a4a', fill: 'rgba(74,74,74,0.15)', fillStyle: 'solid' }));
+  S.rc.line(...toS(o, [0, 0.9]), ...toS(o, [0, 0.4]), ro({ strokeWidth: 8, stroke: '#4a4a4a' }));
+  const m = man({ x: o.x, y: o.y - 0.12 * o.s, s: o.s }, { noLegs: true, hands: { L: [-grip, barY + 0.12], R: [grip, barY + 0.12] }, look: 0 });
+  // bar (bends down at the ends for the wide grip)
+  const L = Math.max(grip + 0.12, 0.3);
+  S.rc.curve([[-L - 0.05, barY - 0.05], [-grip, barY], [0, barY], [grip, barY], [L + 0.05, barY - 0.05]].map(p => toS(o, p)), ro({ strokeWidth: 9, stroke: '#4a4a4a' }));
+  for (const sd of [-1, 1]) S.rc.rectangle(...toS(o, [sd * 0.2 - 0.12, 0.92]), 0.24 * o.s, 0.06 * o.s, ro({ strokeWidth: 4, stroke: '#4a4a4a', fill: '#4a4a4a', fillStyle: 'solid' }));   // knee pads
+  return m;
+}
+// range arrow next to the machine
+function rangeArrow(o, depth, x, label) {
+  const a = toS(o, [x, 2.05]), b = toS(o, [x, depth]);
+  S.rc.line(a[0], a[1], b[0], b[1], ro({ stroke: RED, strokeWidth: 6 }));
+  for (const p of [a, b]) S.rc.line(p[0] - 22, p[1], p[0] + 22, p[1], ro({ stroke: RED, strokeWidth: 6 }));
+  ctx.font = '700 56px Caveat'; ctx.fillStyle = RED; ctx.textAlign = 'left'; ctx.fillText(label, a[0] + 30, (a[1] + b[1]) / 2);
+}
+// back view: lat wings split into upper and lower fibres
+function latMap(cx, cy, upper, lower, biceps) {
+  const rc = S.rc;
+  rc.linearPath([[cx - 150, cy - 170], [cx + 150, cy - 170], [cx + 95, cy + 180], [cx - 95, cy + 180], [cx - 150, cy - 170]], ro({ strokeWidth: 5 }));
+  rc.line(cx, cy - 170, cx, cy + 180, ro({ strokeWidth: 3, stroke: SOFT }));
+  for (const sd of [-1, 1]) {
+    rc.polygon([[cx + sd * 10, cy - 60], [cx + sd * 150, cy - 150], [cx + sd * 125, cy - 20], [cx + sd * 10, cy + 20]], ro(upper ? hatch(RED, 8) : pencil()));
+    rc.polygon([[cx + sd * 10, cy + 20], [cx + sd * 125, cy - 20], [cx + sd * 95, cy + 170], [cx + sd * 10, cy + 150]], ro(lower ? hatch(RED, 8) : pencil()));
+    rc.ellipse(cx + sd * 200, cy - 80, 50, 150, ro(biceps ? hatch(RED, 7) : pencil()));
+  }
+  ctx.font = '700 46px Caveat'; ctx.fillStyle = RED; ctx.textAlign = 'center'; ctx.fillText('LATS', cx, cy + 240);
+}
+function latLens(cx, cy, r, u, l, b) {
+  lens(cx, cy, r); ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r - 4, 0, 7); ctx.clip();
+  ctx.translate(cx, cy); ctx.scale(0.62, 0.62); ctx.translate(-cx, -cy); latMap(cx, cy - 20, u, l, b); ctx.restore(); lensRing(cx, cy, r);
+}
+
+window.drawFrame = function (t) {
+  begin(t);
+  const { id, s, u, lt } = segAt(t), c = rep(t, 2.6);
+  if (id === 'hook') {
+    pulldown({ x: 540, y: 1700, s: 430 }, 0.45, c * 0.7, 1.55);
+    question(300, 1080, t, 120); question(780, 1050, t + 1, 100);
+    bigHook([['BACK STILL', 150], ['NOT WIDE?', 150]], s.start, t, 280);
+  } else if (id === 'a') {
+    heading('Wide grip', 'shorter pull');
+    const o = { x: 420, y: 1700, s: 470 }; pulldown(o, 0.5, c, 1.62); rangeArrow(o, 1.62, 0.72, 'short');
+    latLens(820, 640, 200, true, false, false);
+  } else if (id === 'b') {
+    heading('Close grip', 'longer pull');
+    const o = { x: 420, y: 1700, s: 470 }; pulldown(o, 0.13, c, 1.35); rangeArrow(o, 1.35, 0.72, 'long');
+    latLens(820, 640, 200, true, true, true);
+  } else if (id === 'why') {
+    heading('Both build lats', 'small differences');
+    pulldown({ x: 280, y: 1700, s: 330 }, 0.5, c, 1.62);
+    pulldown({ x: 800, y: 1700, s: 330 }, 0.13, c, 1.35);
+    latLens(280, 560, 170, true, true, false); latLens(800, 560, 170, true, true, false);
+    ctx.font = '700 120px Caveat'; ctx.fillStyle = RED; ctx.textAlign = 'center'; ctx.fillText('≈', 540, 600);
+  } else {
+    heading('Pull to your chest', 'switch grips every few weeks');
+    pulldown({ x: 280, y: 1700, s: 330 }, 0.5, c, 1.55);
+    pulldown({ x: 800, y: 1700, s: 330 }, 0.13, rep(t + 1.3, 2.6), 1.35);
+    mark(true, 540, 760, 120);
+    if (u > 0.35) saveStamp(540, 470);
+  }
+  if (id !== 'hook') flash(lt);
+  caption(t, KEY);
+  return cv.toDataURL('image/png');
+};
+fontsReady();
+</script></body></html>
