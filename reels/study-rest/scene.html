@@ -1,0 +1,33 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Rest Study</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script>
+function watch(x, y, r, label_, t, speed) { S.rc.circle(x, y, r * 2, ro({ strokeWidth: 6 })); S.rc.line(x - 20, y - r - 20, x + 20, y - r - 20, ro({ strokeWidth: 6 })); const a = t * speed - Math.PI / 2; S.rc.line(x, y, x + Math.cos(a) * r * 0.8, y + Math.sin(a) * r * 0.8, ro({ stroke: RED, strokeWidth: 6 })); label(label_, x, y + r + 70, RED, 60); }
+StudyRun({
+  key: /^(rest|resting|lazy|cold|seconds|intense|one|three|minute|strength|muscle|thighs)/i,
+  hook: [['RESTING =', 140], ['LAZY?', 160]], cite: 'Schoenfeld et al., 2016',
+  scenes: {
+    hook: (t, st, c) => {
+      S.rc.rectangle(560, 1420, 360, 50, ro({ strokeWidth: 6, stroke: GREY })); for (const x of [600, 880]) S.rc.line(x, 1470, x, 1650, ro({ strokeWidth: 7, stroke: GREY }));
+      const g = man({ x: 740, y: 1720, s: 330 }, { noLegs: true, face: 'confused', arms: { L: [20, 10], R: [20, 10] } }); label('❄ cold?', 880, 1250, '#3b82c4', 60);
+      bro({ x: 280, y: 1650, s: 420 }, t, speaking('hook1', t), { arms: { L: [20, 10], R: [80, 0] } }); watch(470, 1000, 70, '10 sec!', t, 6);
+      if (t > SEG.hook1.vo - 0.1) say(400, 600, 640, 'Back under the bar in 10 seconds or your muscles get COLD!', [330, 830], 50);
+    },
+    myth: (t, st, c) => { bigText([['SHORT REST =', 120, INK], ['MORE GAINS?', 130, RED]], 700, t, st.s.start); watch(540, 1250, 170, '1 min', t, 4); },
+    study: (t, st, c) => { label('8 weeks', 540, 680, INK, 64); watch(290, 1000, 140, '1 min rest', t, 5); watch(790, 1000, 140, '3 min rest', t, 1.7); group(290, 1650, 230, 3, {}, t); group(790, 1650, 230, 3, {}, t); },
+    result: (t, st, c) => { const g = ease(clamp(st.u * 1.6)); bars(330, 1350, [{ label: '1 min', v: 0.5 * g }, { label: '3 min', v: 0.8 * g, on: true }], 560, 140, 50); bars(780, 1350, [{ label: '1 min', v: 0.45 * g }, { label: '3 min', v: 0.7 * g, on: true }], 560, 140, 50); label('STRENGTH', 330, 1500, RED, 58); label('THIGH MUSCLE', 780, 1500, RED, 58); },
+    out: (t, st, c) => { watch(540, 900, 200, 'big lifts: 2–3 min', t, 1.5); mark(true, 540, 1400, 120); },
+  },
+});
+</script></body></html>

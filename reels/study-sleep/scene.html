@@ -1,0 +1,38 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Sleep Study</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script>
+function door(x, y, txt, on) { S.rc.rectangle(x - 110, y - 330, 220, 330, ro({ strokeWidth: 6, fill: on ? 'rgba(215,38,30,0.12)' : undefined, fillStyle: 'solid' })); S.rc.circle(x + 70, y - 160, 18, ro({ strokeWidth: 4 })); label(txt, x, y - 360, on ? RED : INK, 64); }
+function bed(x, y, t) { S.rc.rectangle(x - 300, y - 40, 600, 60, ro({ strokeWidth: 6 })); S.rc.line(x - 300, y - 140, x - 300, y + 80, ro({ strokeWidth: 8 })); S.rc.line(x + 300, y - 70, x + 300, y + 80, ro({ strokeWidth: 8 })); }
+StudyRun({
+  key: /^(training|diet|sleep|optional|awake|night|eighteen|percent|lower|starts|fuels|finishes)/i,
+  hook: [['WHAT MATTERS', 130], ['MOST?', 140]], cite: 'Lamon et al., 2021 (small study)',
+  scenes: {
+    hook: (t, st, c) => { door(220, 1350, 'TRAIN', false); door(540, 1350, 'EAT', false); door(860, 1350, 'SLEEP', t > SEG.hook1.vo + 2.8); man({ x: 540, y: 1700, s: 260 }, { face: 'confused', look: Math.sin(t * 2), arms: { L: [40, 100], R: [40, 100] } }); question(540, 1180, t, 90); },
+    myth: (t, st, c) => {
+      bed(540, 1250, t); const o = { x: 420, y: 1210, s: 330 }; sideFig(o, { sh: [-0.5, 0.12], hip: [0, 0.12], knee: [0.45, 0.12], ankle: [0.9, 0.12], elb: [-0.35, 0.3], hand: [-0.2, 0.45], head: [-0.7, 0.18] }, LYING);
+      S.rc.rectangle(...toS(o, [-0.25, 0.55]), 40, 60, ro({ strokeWidth: 4, fill: INK, fillStyle: 'solid' }));
+      S.rc.circle(860, 700, 170, ro({ strokeWidth: 6 })); label('2:00', 860, 720, RED, 60); label('just one more video…', 540, 1500, INK, 58);
+    },
+    study: (t, st, c) => { scientist({ x: 540, y: 1000, s: 330 }, t); S.rc.circle(850, 600, 140, ro({ strokeWidth: 5, fill: 'rgba(26,26,26,0.15)', fillStyle: 'solid' })); group(540, 1650, 260, 4, { face: 'sad' }, t); label('awake ALL night', 540, 1180, RED, 66); },
+    result: (t, st, c) => { const g = ease(clamp(st.u * 1.6)); bars(540, 1450, [{ label: 'normal sleep', v: g, value: '100%' }, { label: 'no sleep', v: 0.82 * g, on: true, value: '-18%' }], 600, 220, 120); label('muscle building (next day)', 540, 700, INK, 56); },
+    out: (t, st, c) => {
+      const P = [[540, 700], [260, 1250], [820, 1250]], L = ['TRAIN', 'EAT', 'SLEEP'], sub = ['starts it', 'fuels it', 'finishes it'];
+      S.rc.polygon(P, ro({ strokeWidth: 5, stroke: SOFT }));
+      P.forEach((p, i) => { S.rc.circle(...p, 230, ro({ strokeWidth: 6, fill: '#fbf9f3', fillStyle: 'solid' })); label(L[i], p[0], p[1] + 10, RED, 56); label(sub[i], p[0], p[1] + 170, INK, 50); });
+      mark(true, 540, 1050, 110);
+    },
+  },
+});
+</script></body></html>

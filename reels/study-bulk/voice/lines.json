@@ -1,0 +1,36 @@
+[
+ {
+  "id": "hook1",
+  "text": "Skinny guy, you want muscle? Eat everything, gain a ton of weight, then cut. It's the only way!",
+  "voice": "am_onyx",
+  "speed": 1.08,
+  "post": 0.6,
+  "file": "hook1.wav",
+  "dur": 5.312
+ },
+ {
+  "id": "myth",
+  "text": "Bulk, then cut. Is it really the only way?",
+  "file": "myth.wav",
+  "dur": 2.581
+ },
+ {
+  "id": "study",
+  "text": "A review looked at people who lifted weights while eating enough protein.",
+  "file": "study.wav",
+  "dur": 3.925
+ },
+ {
+  "id": "result",
+  "text": "Beginners, people returning to the gym, and people with more body fat could build muscle and lose fat at the same time.",
+  "file": "result.wav",
+  "dur": 6.891
+ },
+ {
+  "id": "out",
+  "text": "New to the gym? Lift hard, eat your protein, and skip the dirty bulk. Save this.",
+  "post": 1.0,
+  "file": "out.wav",
+  "dur": 4.928
+ }
+]

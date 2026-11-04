@@ -1,0 +1,30 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Half Reps Study</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script>
+function legExtJ(c) { const hip = [0, 0.62], knee = [0.45, 0.62]; return { hip, knee, ankle: add(knee, pol(-90 + 85 * c), 0.43), sh: add(hip, pol(95), 0.52), elb: add(add(hip, pol(95), 0.52), pol(-80), 0.25), hand: add(hip, pol(-10), 0.12) }; }
+function legExt(o, c) { S.rc.rectangle(...toS(o, [-0.2, 0.56]), 0.65 * o.s, 0.06 * o.s, ro({ strokeWidth: 5, stroke: GREY })); S.rc.rectangle(...toS(o, [-0.25, 1.2]), 0.07 * o.s, 0.62 * o.s, ro({ strokeWidth: 5, stroke: GREY })); return sideFig(o, legExtJ(c)); }
+function arc(o, from, to, on) { const k = toS(o, [0.45, 0.62]); ctx.strokeStyle = on ? RED : SOFT; ctx.lineWidth = on ? 14 : 6; ctx.beginPath(); ctx.arc(k[0], k[1], 0.43 * o.s, rad(90 - 85 * to), rad(90 - 85 * from), false); ctx.stroke(); }
+StudyRun({
+  key: /^(half|cheating|full|range|useless|bottom|stretched|quads|more|skip)/i,
+  hook: [['HALF REPS =', 140], ['CHEATING?', 150]], cite: 'Pedrosa et al., 2022',
+  scenes: {
+    hook: (t, st, c) => { legExt({ x: 620, y: 1650, s: 520 }, 0.45 * c); bro({ x: 220, y: 1650, s: 380 }, t, speaking('hook1', t), { arms: { L: [20, 10], R: [80, 0] } }); if (t > SEG.hook1.vo - 0.1) say(560, 640, 640, 'Half reps? CHEATING! Not a single muscle!', [480, 880], 54); },
+    myth: (t, st, c) => { bigText([['"FULL RANGE', 120, INK], ['OR NOTHING"', 120, INK]], 700, t, st.s.start); legExt({ x: 480, y: 1650, s: 480 }, c); },
+    study: (t, st, c) => { const o1 = { x: 230, y: 1350, s: 400 }; legExt(o1, c); arc(o1, 0, 1, true); label('full reps', 330, 1450, RED, 56); const o2 = { x: 700, y: 1350, s: 400 }; legExt(o2, 0.5 * c); arc(o2, 0, 0.5, true); arc(o2, 0.5, 1, false); label('bottom half only', 800, 1450, RED, 56); label('(the stretched part)', 800, 1510, INK, 46); },
+    result: (t, st, c) => { const g = ease(clamp(st.u * 1.6)); bars(540, 1350, [{ label: 'full reps', v: 0.66 * g, value: 'quads' }, { label: 'bottom half', v: 0.74 * g, on: true, value: 'quads' }], 560, 200, 140); label('as much, or more in some spots', 540, 1500, RED, 54); },
+    out: (t, st, c) => { const o = { x: 420, y: 1600, s: 500 }; legExt(o, c); arc(o, 0, 0.5, true); label('never skip the bottom', 540, 800, RED, 66); mark(true, 860, 1000, 110); },
+  },
+});
+</script></body></html>

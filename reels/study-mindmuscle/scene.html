@@ -1,0 +1,41 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Mind Muscle Study</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script>
+function mirror(x, y, w, h) { S.rc.rectangle(x, y, w, h, ro({ strokeWidth: 9, stroke: GREY })); for (const d of [0, 40]) S.rc.line(x + 30 + d, y + 40, x + 90 + d, y + 120, ro({ strokeWidth: 3, stroke: SOFT })); }
+function bulb(x, y, on) { S.rc.circle(x, y, 60, ro({ strokeWidth: 4, stroke: on ? '#e0a800' : INK, fill: on ? 'rgba(255,214,0,0.6)' : undefined, fillStyle: 'solid' })); S.rc.line(x - 12, y + 34, x + 12, y + 34, ro({ strokeWidth: 4 })); }
+StudyRun({
+  key: /^(grow|whisper|biceps|magic|focused|squeezing|twelve|seven|quads|small|curls)/i,
+  hook: [['MIND-MUSCLE', 130], ['CONNECTION?', 130]], cite: 'Schoenfeld et al., 2018',
+  scenes: {
+    hook: (t, st, c) => {
+      mirror(560, 700, 420, 950); bro({ x: 330, y: 1650, s: 430 }, t, false, { flex: 0.7 + 0.3 * Math.sin(t * 3) });
+      ctx.save(); ctx.globalAlpha = 0.45; bro({ x: 770, y: 1580, s: 380 }, t, false); ctx.restore();
+      if (speaking('hook1', t) || t < SEG.hook2.start) for (let i = 0; i < 3; i++) label('grow…', 180 + i * 50, 820 - i * 70, RED, 50 + i * 6);
+      if (t > SEG.hook2.start) { man({ x: 160, y: 1700, s: 220 }, { face: 'confused', look: 1 }); question(160, 1150, t, 80); }
+    },
+    myth: (t, st, c) => { bigText([['REAL…', 130, INK], ['or BRO SCIENCE?', 120, RED]], 800, t, st.s.start); bro({ x: 540, y: 1650, s: 380 }, t, false); },
+    study: (t, st, c) => {
+      const cc = rep(t, 2);
+      for (const [x, on, txt] of [[290, true, '"squeeze the muscle"'], [790, false, '"just lift it"']]) {
+        const m = man({ x, y: 1600, s: 420 }, { arms: { L: [10, 5], R: [8, 10 + 130 * cc] }, flex: on ? 0.4 + 0.6 * cc : 0.2, flexSide: 'R' }); dumbbell(m.R.H, 380);
+        bulb(x + 120, 940, on); label(txt, x, 820, on ? RED : INK, 52);
+      }
+      label('8 weeks of curls', 540, 700, INK, 60);
+    },
+    result: (t, st, c) => { const g = ease(clamp(st.u * 1.6)); bars(330, 1350, [{ label: 'focused', v: 0.8 * g, on: true, value: '12%' }, { label: 'not', v: 0.47 * g, value: '7%' }], 560, 140, 50); bars(780, 1350, [{ label: 'focused', v: 0.5 * g }, { label: 'not', v: 0.48 * g }], 560, 140, 50); label('BICEPS', 330, 1500, RED, 60); label('QUADS: no clear difference', 780, 1500, INK, 46); },
+    out: (t, st, c) => { const m = man({ x: 300, y: 1600, s: 420 }, { arms: { L: [10, 5], R: [8, 10 + 130 * c] }, flex: c, flexSide: 'R' }); dumbbell(m.R.H, 380); mark(true, 470, 880, 110); label('curls, raises', 300, 1680, RED, 56); squatFront({ x: 790, y: 1600, s: 420 }, c, 0); label('big lifts: just lift', 790, 1680, INK, 52); },
+  },
+});
+</script></body></html>

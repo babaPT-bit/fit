@@ -173,6 +173,7 @@
     const td = [J.sh[0] - J.hip[0], J.sh[1] - J.hip[1]], tl = Math.hypot(...td);
     const hc = J.head || [J.sh[0] + td[0] / tl * 0.2, J.sh[1] + td[1] / tl * 0.2];
     if (J.elb) ln([J.sh, J.elb, J.hand]);
+    if (J.head) { const hv = [hc[0] - J.sh[0], hc[1] - J.sh[1]], hl = Math.hypot(...hv); if (hl > 0.12) ln([J.sh, [J.sh[0] + hv[0] / hl * (hl - 0.1), J.sh[1] + hv[1] / hl * (hl - 0.1)]]); }
     const hp = P(hc), R = 0.11 * o.s;
     rc.circle(hp[0], hp[1], R * 2, ro({ fill: '#f4f1ea', fillStyle: 'solid' }));
     // face: lookDeg = where the face points, upDeg = where the top of the head points (0 right, 90 up)

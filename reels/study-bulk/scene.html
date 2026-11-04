@@ -1,0 +1,29 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Bulk Myth</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script>
+function burgers(x, y, n) { for (let i = 0; i < n; i++) { const yy = y - i * 60; S.rc.ellipse(x, yy, 160, 50, ro({ strokeWidth: 4, fill: 'rgba(200,140,60,0.5)', fillStyle: 'solid' })); S.rc.line(x - 75, yy + 20, x + 75, yy + 20, ro({ strokeWidth: 6, stroke: '#7a4a1a' })); } }
+function seesaw(cx, cy, a) { S.rc.line(cx - 330 * Math.cos(a), cy + 330 * Math.sin(a), cx + 330 * Math.cos(a), cy - 330 * Math.sin(a), ro({ strokeWidth: 9 })); S.rc.polygon([[cx, cy], [cx - 50, cy + 90], [cx + 50, cy + 90]], ro({ strokeWidth: 5 })); }
+StudyRun({
+  key: /^(bulk|cut|skinny|weight|only|protein|beginners|returning|fat|same|dirty)/i,
+  hook: [['BULK OR', 140], ['NOTHING?', 150]], cite: 'Barakat et al., 2020 (review)',
+  scenes: {
+    hook: (t, st, c) => { bro({ x: 280, y: 1650, s: 420 }, t, speaking('hook1', t), { arms: { L: [20, 10], R: [80, 0] } }); man({ x: 720, y: 1650, s: 420 }, { face: 'sad', arms: { L: [8, 4], R: [8, 4] } }); burgers(950, 1640, 6); if (t > SEG.hook1.vo - 0.1) say(380, 640, 640, 'Skinny guy? Eat EVERYTHING, get fat, THEN cut!', [320, 880], 54); },
+    myth: (t, st, c) => { bigText([['BULK → CUT', 130, INK], ['the ONLY way?', 110, RED]], 700, t, st.s.start); burgers(540, 1400, 5); },
+    study: (t, st, c) => { scientist({ x: 540, y: 950, s: 300 }, t); group(540, 1650, 240, 4, (i, tt) => ({ hands: { L: [-0.3, 1.5 + 0.5 * c], R: [0.3, 1.5 + 0.5 * c] } }), t); label('lifting + enough protein', 540, 1720, RED, 56); },
+    result: (t, st, c) => { seesaw(540, 1150, rad(4 * Math.sin(t * 2))); label('muscle ↑', 300, 1000, RED, 70); label('fat ↓', 790, 1000, RED, 70); label('at the SAME time', 540, 1320, INK, 62); label('beginners · returning · more body fat', 540, 1420, INK, 48); },
+    out: (t, st, c) => { sticky(160, 700, 760, 450, -0.02, [['Lift hard', 76, RED], ['Eat your protein', 66], ['Skip the dirty bulk', 66]], fade(st.u, 0.05, 0.2)); mark(true, 540, 1400, 120); },
+  },
+});
+</script></body></html>

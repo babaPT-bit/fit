@@ -1,0 +1,36 @@
+[
+ {
+  "id": "hook1",
+  "text": "A thousand crunches, Russian twists, and ten-minute fat burners, every day. Belly fat, you're done!",
+  "voice": "am_puck",
+  "speed": 1.1,
+  "post": 0.6,
+  "file": "hook1.wav",
+  "dur": 5.653
+ },
+ {
+  "id": "myth",
+  "text": "Burning fat from one spot is one of the oldest myths.",
+  "file": "myth.wav",
+  "dur": 3.328
+ },
+ {
+  "id": "study",
+  "text": "For six weeks, one group did ab exercises. The other didn't.",
+  "file": "study.wav",
+  "dur": 3.861
+ },
+ {
+  "id": "result",
+  "text": "Belly fat didn't change in either group. Their abs got stronger, but the fat stayed.",
+  "file": "result.wav",
+  "dur": 4.864
+ },
+ {
+  "id": "out",
+  "text": "Abs are built with training, and revealed by a calorie deficit. Save this.",
+  "post": 1.0,
+  "file": "out.wav",
+  "dur": 4.437
+ }
+]

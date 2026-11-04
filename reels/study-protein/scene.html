@@ -1,0 +1,46 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Protein Myth</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script>
+function shaker(x, y, k = 1) { S.rc.rectangle(x - 35 * k, y - 110 * k, 70 * k, 120 * k, ro({ strokeWidth: 5, fill: '#fbf9f3', fillStyle: 'solid' })); S.rc.rectangle(x - 40 * k, y - 130 * k, 80 * k, 22 * k, ro({ strokeWidth: 5, fill: INK, fillStyle: 'solid' })); label('40g', x, y - 40 * k, RED, 44 * k); }
+function trash(x, y) { S.rc.linearPath([[x - 70, y - 120], [x - 55, y], [x + 55, y], [x + 70, y - 120]], ro({ strokeWidth: 6 })); S.rc.line(x - 85, y - 130, x + 85, y - 130, ro({ strokeWidth: 7 })); for (const d of [-25, 0, 25]) S.rc.line(x + d, y - 105, x + d * 0.8, y - 15, ro({ strokeWidth: 3 })); }
+function curve(x0, y0, w, h, decay, col, on) { const pts = []; for (let i = 0; i <= 40; i++) { const u = i / 40, v = Math.min(1, u * 6) * Math.exp(-Math.max(0, u - 0.17) * decay); pts.push([x0 + u * w, y0 - v * h]); } S.rc.curve(pts, ro({ stroke: col, strokeWidth: on ? 8 : 6 })); }
+StudyRun({
+  key: /^(forty|ten|waste|thirty-gram|myth|twenty-five|hundred|bigger|longer|daily|total)/i,
+  hook: [['10 g WASTED?', 140]], cite: 'Trommelen et al., 2023',
+  scenes: {
+    hook: (t, st, c) => {
+      const talk = speaking('hook1', t); bro({ x: 260, y: 1650, s: 420 }, t, talk, { arms: { L: [20, 10], R: [80, 0] } });
+      const g = man({ x: 720, y: 1650, s: 420 }, { face: 'sad', arms: { L: [40, 120], R: [15, 5] } }); shaker(g.L.H[0], g.L.H[1] + 40);
+      if (t > SEG.hook1.vo - 0.1) say(340, 640, 520, 'Bro, 40 g?! 10 g just went to WASTE!', [300, 900], 54);
+      trash(960, 1640); arrow(g.L.H[0] + 40, g.L.H[1] - 40, 930, 1480); label('-10 g', 960, 1400, RED, 64);
+    },
+    myth: (t, st, c) => { bigText([['"Your body can only', 80, INK], ['use 30 g per meal"', 80, INK]], 700, t, st.s.start); cross(540, 670, 700, 200); },
+    study: (t, st, c) => {
+      scientist({ x: 540, y: 900, s: 280 }, t);
+      for (const [x, g, txt] of [[260, 25, '25 g'], [820, 100, '100 g']]) { S.rc.ellipse(x, 1120, 120 + g * 2.2, 50 + g * 0.5, ro({ strokeWidth: 5 })); S.rc.ellipse(x, 1105, 40 + g * 1.2, 22 + g * 0.3, ro(hatch(RED, 8))); label(txt, x, 1230, RED, 70); }
+      group(260, 1650, 230, 3, {}, t); group(820, 1650, 230, 3, {}, t);
+    },
+    result: (t, st, c) => {
+      const x0 = 150, y0 = 1350, w = 780 * ease(clamp(st.u * 1.5)), h = 500;
+      S.rc.line(x0, y0, x0 + 800, y0, ro({ strokeWidth: 5 })); S.rc.line(x0, y0, x0, y0 - 560, ro({ strokeWidth: 5 }));
+      ctx.save(); ctx.beginPath(); ctx.rect(x0, y0 - 600, w + 5, 620); ctx.clip();
+      curve(x0, y0, 780, h, 9, INK, false); curve(x0, y0, 780, h * 1.02, 2.2, RED, true); ctx.restore();
+      label('muscle building', x0 + 20, y0 - 580, INK, 50, 'left'); label('hours after the meal →', 560, y0 + 60, INK, 48);
+      label('25 g', 330, y0 - 330, INK, 56); label('100 g', 760, y0 - 380, RED, 62);
+    },
+    out: (t, st, c) => { trash(330, 1100); cross(330, 1030, 220, 200); sticky(560, 800, 420, 330, 0.04, [['DAILY TOTAL', 64, RED], ['is what matters', 52], ['~1.6 g / kg', 52]], fade(st.u, 0.1, 0.25)); mark(true, 780, 1300, 110); },
+  },
+});
+</script></body></html>

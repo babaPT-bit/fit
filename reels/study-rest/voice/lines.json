@@ -1,0 +1,36 @@
+[
+ {
+  "id": "hook1",
+  "text": "What are you doing? Back under the bar in ten seconds, or your muscles get cold! Resting is for lazy people!",
+  "voice": "am_onyx",
+  "speed": 1.08,
+  "post": 0.6,
+  "file": "hook1.wav",
+  "dur": 6.059
+ },
+ {
+  "id": "myth",
+  "text": "Short rests feel more intense. But do they build more?",
+  "file": "myth.wav",
+  "dur": 3.243
+ },
+ {
+  "id": "study",
+  "text": "For eight weeks, one group rested one minute between sets. The other rested three.",
+  "file": "study.wav",
+  "dur": 4.821
+ },
+ {
+  "id": "result",
+  "text": "The three-minute group gained more strength, and more muscle in their thighs.",
+  "file": "result.wav",
+  "dur": 3.84
+ },
+ {
+  "id": "out",
+  "text": "On big lifts, rest two to three minutes. Save this.",
+  "post": 1.0,
+  "file": "out.wav",
+  "dur": 3.072
+ }
+]

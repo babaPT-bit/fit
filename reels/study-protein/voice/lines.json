@@ -1,0 +1,42 @@
+[
+ {
+  "id": "hook1",
+  "text": "Bro, you ate forty grams of protein? Ten grams just went to waste!",
+  "voice": "am_onyx",
+  "speed": 1.08,
+  "file": "hook1.wav",
+  "dur": 4.224
+ },
+ {
+  "id": "hook2",
+  "text": "Sound familiar?",
+  "post": 0.6,
+  "file": "hook2.wav",
+  "dur": 1.152
+ },
+ {
+  "id": "myth",
+  "text": "The thirty-gram limit is one of the most repeated gym myths.",
+  "file": "myth.wav",
+  "dur": 3.52
+ },
+ {
+  "id": "study",
+  "text": "In a 2023 study, people ate either twenty-five or one hundred grams of protein after training.",
+  "file": "study.wav",
+  "dur": 6.763
+ },
+ {
+  "id": "result",
+  "text": "The bigger meal didn't go to waste. Their bodies kept using it for muscle, for longer.",
+  "file": "result.wav",
+  "dur": 4.907
+ },
+ {
+  "id": "out",
+  "text": "What matters most is your daily total. Eat the protein. Save this.",
+  "post": 1.0,
+  "file": "out.wav",
+  "dur": 4.053
+ }
+]

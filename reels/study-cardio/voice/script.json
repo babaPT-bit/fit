@@ -1,0 +1,26 @@
+[
+ {
+  "id": "hook1",
+  "text": "Bro, what are you doing? Get off the treadmill! Cardio will eat your gains!",
+  "voice": "am_onyx",
+  "speed": 1.08,
+  "post": 0.6
+ },
+ {
+  "id": "myth",
+  "text": "Cardio is the gym's favourite villain."
+ },
+ {
+  "id": "study",
+  "text": "A large review compared lifting alone with lifting plus cardio."
+ },
+ {
+  "id": "result",
+  "text": "Muscle growth and max strength were about the same. Only explosive power dropped a little."
+ },
+ {
+  "id": "out",
+  "text": "Do your cardio. Ideally, not right before leg day. Save this.",
+  "post": 1.0
+ }
+]

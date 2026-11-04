@@ -1,0 +1,32 @@
+[
+ {
+  "id": "hook1",
+  "text": "You want size? Lift heavy, bro!",
+  "voice": "am_onyx",
+  "speed": 1.08
+ },
+ {
+  "id": "hook2",
+  "text": "No way. I'll use light weights. I just want to tone.",
+  "voice": "am_puck",
+  "speed": 1.1,
+  "post": 0.6
+ },
+ {
+  "id": "myth",
+  "text": "Here's the thing. There's no such thing as toning. Muscle grows, or it doesn't."
+ },
+ {
+  "id": "study",
+  "text": "A review compared light and heavy weights, both taken close to failure."
+ },
+ {
+  "id": "result",
+  "text": "Muscle growth was similar. Heavy weights built more strength."
+ },
+ {
+  "id": "out",
+  "text": "Light weights build muscle too, if you push them hard. Go heavy for strength. Save this.",
+  "post": 1.0
+ }
+]

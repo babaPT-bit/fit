@@ -1,0 +1,30 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Crunches Study</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script>
+function crunchJ(c) { const hip = [0, 0.12], knee = [0.32, 0.5], ankle = [0.62, 0.07], sh = add(hip, pol(180 - 32 * c), 0.52); return { hip, knee, ankle, sh, elb: add(sh, pol(-20 - 32 * c), 0.18), hand: add(add(sh, pol(-20 - 32 * c), 0.18), pol(160 - 32 * c), 0.14), head: add(sh, pol(180 - 45 * c), 0.2), toe: add(ankle, pol(0), 0.12) }; }
+function crunch(o, c) { floorLine(o); return sideFig(o, crunchJ(c), { face: -1, lookDeg: 90 + 45 * c, upDeg: 180 - 45 * c }); }
+function fatMeter(x, y, v, lab) { S.rc.rectangle(x - 30, y - 400, 60, 400, ro({ strokeWidth: 5 })); S.rc.rectangle(x - 26, y - 400 * v, 52, 400 * v, ro(pencil())); label(lab, x, y + 55, INK, 48); }
+StudyRun({
+  key: /^(crunches|thousand|belly|fat|spot|abs|stronger|stayed|deficit)/i,
+  hook: [['1000 CRUNCHES', 130], ['A DAY?', 150]], cite: 'Vispute et al., 2011',
+  scenes: {
+    hook: (t, st, c) => { crunch({ x: 600, y: 1600, s: 560 }, rep(t, 0.7)); label(String(Math.min(1000, Math.floor(t * 70))), 820, 1000, RED, 120); if (t > SEG.hook1.vo - 0.1) say(480, 640, 700, '1000 crunches + Russian twists + fat burners. Belly fat, you\'re DONE!', [560, 900], 48); },
+    myth: (t, st, c) => { bigText([['"SPOT', 140, INK], ['REDUCTION"', 140, INK]], 700, t, st.s.start); cross(540, 680, 620, 220); crunch({ x: 560, y: 1600, s: 450 }, c); },
+    study: (t, st, c) => { label('6 weeks', 540, 680, INK, 64); crunch({ x: 300, y: 1300, s: 330 }, c); label('ab exercises', 290, 1400, RED, 56); group(790, 1350, 230, 2, {}, t); label('no ab work', 790, 1420, RED, 56); scientist({ x: 540, y: 1700, s: 220 }, t); },
+    result: (t, st, c) => { fatMeter(330, 1300, 0.6, 'belly fat'); fatMeter(780, 1300, 0.6, 'belly fat'); label('ab group', 330, 760, RED, 56); label('no ab work', 780, 760, INK, 56); label('no change in either', 540, 1480, RED, 60); label('(abs got stronger though)', 540, 1550, INK, 48); },
+    out: (t, st, c) => { label('Abs: BUILT with training', 540, 760, INK, 64); label('REVEALED by a calorie deficit', 540, 860, RED, 62); S.rc.circle(540, 1200, 360, ro({ strokeWidth: 6 })); S.rc.circle(540, 1200, 240, ro({ strokeWidth: 4, stroke: SOFT })); S.rc.line(300, 1060, 300, 1340, ro({ strokeWidth: 6 })); S.rc.line(780, 1060, 780, 1340, ro({ strokeWidth: 6 })); mark(true, 860, 1450, 100); },
+  },
+});
+</script></body></html>

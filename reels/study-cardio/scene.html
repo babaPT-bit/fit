@@ -1,0 +1,30 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Cardio Study</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script>
+function runJ(t) { const a = Math.sin(t * 9); return { ankle: add([0, 0.92], pol(-90 + 30 * a), 0.88), knee: add([0, 0.92], pol(-90 + 30 * a), 0.45), hip: [0, 0.92], sh: [0.06, 1.42], elb: add([0.06, 1.42], pol(-90 - 35 * a), 0.3), hand: add(add([0.06, 1.42], pol(-90 - 35 * a), 0.3), pol(10 - 35 * a), 0.26), ankle2: add([0, 0.92], pol(-90 - 30 * a), 0.88), knee2: add([0, 0.92], pol(-90 - 30 * a), 0.45) }; }
+function treadmill(o) { S.rc.rectangle(...toS(o, [-0.6, 0.08]), 1.3 * o.s, 0.08 * o.s, ro({ strokeWidth: 6, stroke: GREY })); S.rc.line(...toS(o, [0.65, 0.08]), ...toS(o, [0.55, 1.2]), ro({ strokeWidth: 7, stroke: GREY })); S.rc.rectangle(...toS(o, [0.45, 1.3]), 0.25 * o.s, 0.12 * o.s, ro({ strokeWidth: 5, stroke: GREY })); }
+function monster(x, y, t) { const m = 0.2 + 0.2 * Math.abs(Math.sin(t * 6)); S.rc.circle(x, y, 300, ro({ strokeWidth: 6 })); S.rc.arc(x, y + 20, 200, 200 * m * 2, 0, Math.PI, true, ro({ strokeWidth: 6, fill: INK, fillStyle: 'solid' })); for (const d of [-50, 50]) S.rc.circle(x + d, y - 60, 40, ro({ strokeWidth: 4, fill: '#fbf9f3', fillStyle: 'solid' })); S.rc.ellipse(x + 220, y + 20, 110, 70, ro(hatch(RED, 7))); label('your gains', x + 220, y + 110, RED, 46); }
+StudyRun({
+  key: /^(cardio|treadmill|gains|villain|lifting|same|strength|explosive|power|leg)/i,
+  hook: [['CARDIO KILLS', 130], ['GAINS?', 150]], cite: 'Schumann et al., 2022 (review)',
+  scenes: {
+    hook: (t, st, c) => { const o = { x: 720, y: 1650, s: 420 }; treadmill(o); sideFig(o, runJ(t)); bro({ x: 250, y: 1650, s: 400 }, t, speaking('hook1', t), { arms: { L: [20, 10], R: [80, 0] } }); if (t > SEG.hook1.vo - 0.1) say(470, 640, 640, 'Get OFF the treadmill! It\'ll EAT your gains!', [380, 880], 54); },
+    myth: (t, st, c) => { monster(460, 1000, t); label('the gym\'s favourite villain', 540, 1450, INK, 58); },
+    study: (t, st, c) => { scientist({ x: 540, y: 950, s: 300 }, t); group(290, 1650, 230, 3, { hands: { L: [-0.3, 1.5 + 0.5 * c], R: [0.3, 1.5 + 0.5 * c] } }, t); label('lifting only', 290, 1720, RED, 54); const o = { x: 790, y: 1650, s: 330 }; treadmill(o); sideFig(o, runJ(t)); label('lifting + cardio', 790, 1720, RED, 54); },
+    result: (t, st, c) => { const g = ease(clamp(st.u * 1.6)); bars(540, 1300, [{ label: 'muscle', v: 0.7 * g, on: true, value: '≈' }, { label: 'max strength', v: 0.7 * g, on: true, value: '≈' }, { label: 'explosive', v: 0.55 * g, value: 'a bit ↓' }], 500, 170, 90); },
+    out: (t, st, c) => { const o = { x: 420, y: 1550, s: 450 }; treadmill(o); sideFig(o, runJ(t)); mark(true, 860, 900, 110); sticky(620, 1150, 380, 220, 0.04, [['not right before', 50], ['leg day', 56, RED]], fade(st.u, 0.2, 0.35)); },
+  },
+});
+</script></body></html>

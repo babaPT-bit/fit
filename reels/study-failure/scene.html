@@ -1,0 +1,28 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Failure Study</title>
+<style>
+@font-face { font-family: Caveat; font-weight: 700; src: url(../lib/fonts/caveat-700.woff2); }
+html,body{margin:0;background:#fff}canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/rough.js"></script>
+<script src="../lib/doodle.js"></script>
+<script src="voice/lines.js"></script>
+<script>window.TIMING = { pre: 0.15, post: 0.3 };</script>
+<script src="../lib/doodlekit.js"></script>
+<script src="../lib/fixkit.js"></script>
+<script src="../lib/studykit.js"></script>
+<script>
+function collapsed(o) { sideFig(o, { sh: [-0.5, 0.1], hip: [0, 0.1], knee: [0.45, 0.1], ankle: [0.9, 0.1], elb: [-0.35, 0.3], hand: [-0.3, 0.5], head: [-0.7, 0.15] }, Object.assign({ mood: 'sad' }, LYING)); S.rc.line(...toS(o, [-0.6, 0.55]), ...toS(o, [0.1, 0.55]), ro({ strokeWidth: 9, stroke: GREY })); for (const x of [-0.6, 0.1]) S.rc.circle(...toS(o, [x, 0.55]), 0.3 * o.s, ro({ strokeWidth: 4, fill: INK, fillStyle: 'hachure' })); }
+StudyRun({
+  key: /^(fail|failure|count|sweating|floor|hardcore|similar|short|fatigue|tank)/i,
+  hook: [["DIDN'T FAIL =", 130], ["DIDN'T COUNT?", 130]], cite: 'Refalo et al., 2023 (review)',
+  scenes: {
+    hook: (t, st, c) => { bro({ x: 280, y: 1650, s: 420 }, t, speaking('hook1', t), { arms: { L: [20, 10], R: [80, 0] } }); const g = man({ x: 800, y: 1650, s: 420 }, { face: 'confused', arms: { L: [10, 5], R: [10, 5] } }); dumbbell(g.L.H, 380); dumbbell(g.R.H, 380); if (t > SEG.hook1.vo - 0.1) say(360, 660, 600, 'Not sweating? Not on the floor? DIDN\'T COUNT!', [300, 900], 54); },
+    myth: (t, st, c) => { bigText([['FAIL EVERY', 120, RED], ['SET?', 140, RED]], 650, t, st.s.start); collapsed({ x: 560, y: 1500, s: 420 }); },
+    study: (t, st, c) => { scientist({ x: 540, y: 950, s: 300 }, t); collapsed({ x: 300, y: 1550, s: 260 }); label('to failure', 260, 1660, RED, 56); const m = man({ x: 790, y: 1600, s: 330 }, { arms: { L: [10, 5], R: [10, 5] } }); dumbbell(m.L.H, 300); dumbbell(m.R.H, 300); label('1–2 reps short', 790, 1680, RED, 56); },
+    result: (t, st, c) => { const g = ease(clamp(st.u * 1.6)); bars(540, 1300, [{ label: 'failure', v: 0.7 * g, value: 'growth' }, { label: '1–2 short', v: 0.68 * g, on: true, value: 'growth' }], 520, 200, 120); label('≈ the same', 540, 1460, RED, 70); label('…but failing every set = more fatigue', 540, 1560, INK, 50); },
+    out: (t, st, c) => { sticky(200, 700, 680, 420, -0.02, [['Leave 1–2 reps', 80, RED], ['in the tank', 80, RED], ['on most sets', 60]], fade(st.u, 0.05, 0.2)); mark(true, 540, 1350, 120); },
+  },
+});
+</script></body></html>
